@@ -34,7 +34,7 @@ connection.connect(function(err) {
     drawSeparator()
     console.log('Connected as id ' + connection.threadId);
     drawSeparator()
-    readConfig(configurationReadCallback);
+    databaseHelper.readConfig(connection, configurationReadCallback);
 }); 
 
 ////////////////////////////////////////////////////////////
@@ -74,9 +74,12 @@ app.get('*', function(req, res){
 //Send  
 app.io.on('connection',function(socket){
     socket.on('RequestConfig',function(){
-        databaseHelper.readConfig(connection, sendConfigToWeb)
+        console.log("Requested configuration")
+        databaseHelper.readConfigAndEmit(connection, socket)
+        
     })
     socket.on('UpdateConfig', function(data){
+        console.log("Requested an update to configuration")
         databaseHelper.setConfig(connection, data.Name, data.Value, configurationSetCallBack)
     })
 })
@@ -112,7 +115,6 @@ app.io.on('connection',function(socket){
         socket.emit('lastStationHum',{'value':randomnumber});
     });
 });
-setConfig
 
 //Send from database Functions
 function sendTempFromDB(rowCount,socket){
@@ -187,7 +189,6 @@ function configurationReadCallback(err, rows, fields){
         console.log("Could not read config table")
         throw err;
     }
-    assignConfigurationValues(err, rows, fields)
     main()
 }
 
@@ -240,7 +241,6 @@ function assignConfigurationValues(err, rows, fields)
  */
 function configurationSetCallBack(err, result){
     console.log("Configuration result : " + result)
-    databaseHelper.readConfig(connection, sendConfigToWeb)
 }
 
 /**
@@ -320,7 +320,7 @@ function sendConfigToWeb(err, rows, fields){
         throw err;
         console.log("Could not read config table")
     }
-    socket.emit('ReceiveConfig', {'rows' : rows})
+    socket.emit('ReceiveConfig', {'row' : rows})
 }
 
 /**

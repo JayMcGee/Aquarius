@@ -16,42 +16,45 @@ var dbRows = []
 
 io = io.connect()
 io.emit('ready')
+alert("Happening")
 
-io.emit('requestConfig')
+io.emit('RequestConfig')
 
-io.on('receiveConfig',function(data)
-	{
-	    dbRows = data.rows
-	    
-	    for ( var i = 0; i < dbRows.length; i++)
-	    {
-	        var id    = dbRows[i].Id
-	        var name  = dbRows[i].Name
-	        var value = dbRows[i].Value
-	        var desc  = dbRows[i].Description
-	        
-	        if(name == "STATION_ID")
-	        {
-	            $("#idInput").val(value)
-	        }
-	        else if(name == "NUMBER_RETRIES")
-	        {
-	             $("#retriesInput").val(value)
-	        }
-	        else if(name == "SEND_ADDRESS")
-	        {
-	            $("#addressInput").val(value)
-	        }
-	        else if (name == "READ_INTERVAL")
-	        {
-	         	$("#intervalInput").val(value)   
-	        }
-	        else if (name == "LAST_KNOWN_DATE")
-	        {
-	            $("#dateInput").html(value)
-	        }
-	    }
-	})
+io.on('ReceiveConfig',function( data )
+{
+	
+	alert(data.toSource())
+    dbRows = data.row
+    
+    for ( var i = 0; i < dbRows.length; i++)
+    {
+        var id    = dbRows[i].Id
+        var name  = dbRows[i].Name
+        var value = dbRows[i].Value
+        var desc  = dbRows[i].Description
+        
+        if(name == "STATION_ID")
+        {
+            $("#idInput").val(value)
+        }
+        else if(name == "NUMBER_RETRIES")
+        {
+             $("#retriesInput").val(value)
+        }
+        else if(name == "SEND_ADDRESS")
+        {
+            $("#addressInput").val(value)
+        }
+        else if (name == "READ_INTERVAL")
+        {
+         	$("#intervalInput").val(value)   
+        }
+        else if (name == "LAST_KNOWN_DATE")
+        {
+            $("#dateInput").html(value)
+        }
+    }
+})
 
 
 /**

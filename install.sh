@@ -5,6 +5,7 @@ cd /var/lib/cloud9/Aquarius/node-bootstrap
 npm install 
 npm install express.io
 npm install node-schedule
+npm install execSync
 
 echo "installing Service"
 cp /var/lib/cloud9/Aquarius/aquarius.service /lib/systemd/system

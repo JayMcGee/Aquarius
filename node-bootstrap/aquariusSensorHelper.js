@@ -2,12 +2,30 @@ var mysql = require('mysql');
 
 module.exports = {
     
-    readConfig : function( connection , callBackToApp ){
+    readConfig : function( connection , callBackToApp){
         console.log("Selecting database")
         connection.query('USE `station_aquarius`;')
         
         console.log("Querying")
-        connection.query('SELECT config_id AS ID, config_key_name AS Name, config_key_value AS Value, config_key_description AS Description FROM `t_Config`;', callBackToApp)
+        var query = connection.query('SELECT config_id AS ID, config_key_name AS Name, config_key_value AS Value, config_key_description AS Description FROM `t_Config`;', callBackToApp)
+        
+        return query
+    },
+    
+    readConfigAndEmit : function( connection , socket){
+        console.log("Selecting database")
+        connection.query('USE `station_aquarius`;')
+        
+        console.log("Querying")
+        var query = connection.query('SELECT config_id AS ID, config_key_name AS Name, config_key_value AS Value, config_key_description AS Description FROM `t_Config`;', function(err, rows, fields){
+            if (err) {
+                throw err;
+                console.log("Could not read config table")
+            }
+            socket.emit('ReceiveConfig', {'row' : rows})
+        })
+        
+        return query
     },
     
     setConfig : function( connection , name , value , callBackToApp){
@@ -17,7 +35,7 @@ module.exports = {
         console.log("Querying")
         sql = 'UPDATE `t_Config` SET `config_key_value` = ' + value + ' WHERE `config_key_name` = "' + name + '";';
         console.log(sql)
-        connection.query(sql, callBackToApp)
+        return connection.query(sql, callBackToApp)
     },
 
 
@@ -30,7 +48,7 @@ module.exports = {
         console.log("Inserting")
         sql = 'INSERT INTO `t_Data` ( data_value, data_t_unit, data_date, data_is_sent ) VALUES ("' + value + '", "' + unit + '", "' + date + '", "' + isSent + '");'
         console.log(sql)
-        connection.query(sql, callBackToApp)
+        return connection.query(sql, callBackToApp)
     },
 /*
     SELECT 
@@ -58,6 +76,6 @@ ORDER BY t_SensorsUnit.cloudia_unit_id, t_Sensor.cloudia_sensor_id;*/
             'WHERE unit_t_type = types_id and sensor_t_unit = unit_id ' +
             'ORDER BY t_SensorsUnit.cloudia_unit_id, t_Sensor.cloudia_sensor_id;'
         console.log(sql)
-        connection.query(sql, callBackToApp)
+        return connection.query(sql, callBackToApp)
     }
 };
