@@ -1,6 +1,6 @@
 # Aquarius
 
-The aquarius water quality evaluation station will be a programmable autonomous terminal. It will have acces to cellular network to transmit data to CloudIA, a scientific database and data visualisation interfaces.
+The aquarius water quality evaluation station will be a programmable autonomous terminal. It will have acces to cellular network to transmit data to CloudIA, a scientific database and data visualisation interface.
 
 The terminal evaluates water quality by acquiring acidity level (pH), water conductivity (µS/cm), dissolved oxygen (mg/L) and temperature(℃).  
 
@@ -12,9 +12,9 @@ La borne permettra d’évaluer la qualité de l’eau en recueillant des mesure
 
 -------------------------------------------------------------------------------------------------------------------------
 
-Aquarius runs on a Beaglebon Black the pH,DO, and Conductivity sensors from Atlas Scientifir are on a I2C bus, water temperature is on a oneWire bus. 
+Aquarius is a Beaglebone Black with pH, dissolved oxygen, and conductivity sensors built by Atlas Scientific and a water temperature sensor by Dallas Semiconductor.
 
-There is a driver for each sensor to calibrate or read a value, those drivers are executed by an interface hosted on the apache server (/var/www) wich host the real-time interface written in Html connected to the server with Node.Js
+Each sensor has its own driver to calibrate or read a value. Those drivers are executed by an interface hosted on the apache server (/var/www) with a real-time interface written in Html connected to the server with Node.Js.
 
 
 
