@@ -1,0 +1,100 @@
+{
+	"stationmessage": 
+	{
+    	"datetime": "hh:mm:ss:dd:mm:yyyy",
+    	"stationid": "sta000",
+    	"eventtype": "regularreading",
+    	"event": 
+			[{
+				"sensorunitid": "su0001", 
+				"data": 
+				[{
+					"id": "001",        		
+					"valuetype": "max",   		
+					"value": "3.00"
+        		}, 
+				{
+					"id": "001",
+					"valuetype": "average",
+					"value": "0.00"
+        		}, 
+				{
+					"id": "002",
+					"valuetype": "max",
+					"value": "3.00"
+        		}, 
+				{	
+					"id": "002",
+					"valuetype": "average",
+					"value": "3.00"
+        		},
+				{
+					"id": "003",
+					"valuetype": "max",
+					"value": "3.10"
+        		},
+				{
+					"id": "003",
+					"valuetype": "average",
+					"value": "0.00"
+        		}]
+			},
+			{
+				"sensorunitid": "su0002",	
+				"data": 
+				[{
+					"id": "001",          	
+					"valuetype": "max",   		
+					"value": "3.00"
+        		},
+				{
+					"id": "001",
+					"valuetype": "average",
+					"value": "0.00"
+        		},
+				{
+					"id": "002",
+					"valuetype": "max",
+					"value": "3.00"
+        		}, 
+				{
+					"id": "002",
+					"valuetype": "average",
+					"value": "3.00"
+        		},
+				{
+					"id": "003",
+					"valuetype": "max",
+					"value": "3.10"
+        		}, 	
+				{
+					"id": "003",
+					"valuetype": "average",
+					"value": "0.00"
+        		}]
+			}, 
+			{
+				"sensorunitid": "su0006",
+				"data": 
+				[{
+					"id": "004",
+					"valuetype": "max",
+					"value": "78.30"
+        		}]
+			}, 
+			{
+				"sensorunitid": "su0007",
+				"data": 
+				[{
+					"id": "005",
+					"valuetype": "As is",
+					"value": "12.30"
+        		},
+				{
+					"id": "006",
+					"valuetype": "As is",
+					"value": "19.00"
+        		}]
+    	}]
+	}
+}
