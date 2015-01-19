@@ -1,2 +1,3 @@
 # Aquarius
-Bouée de capteurs pou
+
+Aquarius is a platform for water quality sensor. I 
