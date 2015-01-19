@@ -10,5 +10,12 @@ La station d’évaluation de la qualité de l’eau Aquarius sera une borne aut
 
 La borne permettra d’évaluer la qualité de l’eau en recueillant des mesures d’acidité (pH), de conductivité (µS/cm), de la concentration d’oxygène dissous (mg/L) et de la température (℃).
 
+-------------------------------------------------------------------------------------------------------------------------
+
+Aquarius runs on a Beaglebon Black the pH,DO, and Conductivity sensors from Atlas Scientifir are on a I2C bus, water temperature is on a oneWire bus. 
+
+There is a driver for each sensor to calibrate or read a value, those drivers are executed by an interface hosted on the apache server (/var/www) wich host the real-time interface written in Html connected to the server with Node.Js
+
+
 
 
