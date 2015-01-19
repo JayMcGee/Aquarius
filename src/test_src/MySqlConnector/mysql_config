@@ -1,0 +1,4 @@
+mysql_config --cflags
+-I/usr/include/mysql  -DBIG_JOINS=1  -fno-strict-aliasing   -DUNIV_LINUX
+mysql_config --libs
+-Wl,-Bsymbolic-functions -rdynamic -L/usr/lib/mysql -lmysqlclient -l mysqlcppconn
