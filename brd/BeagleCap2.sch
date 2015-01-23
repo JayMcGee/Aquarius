@@ -2245,30 +2245,12 @@ In this library the device names are the same as the pin names of the symbols, t
 <text x="-1.905" y="-3.175" size="1.778" layer="96">&gt;VALUE</text>
 <pin name="GND" x="0" y="2.54" visible="off" length="short" direction="sup" rot="R270"/>
 </symbol>
-<symbol name="VCC">
-<circle x="0" y="1.27" radius="1.27" width="0.254" layer="94"/>
-<text x="-1.905" y="3.175" size="1.778" layer="96">&gt;VALUE</text>
-<pin name="VCC" x="0" y="-2.54" visible="off" length="short" direction="sup" rot="R90"/>
-</symbol>
 </symbols>
 <devicesets>
 <deviceset name="GND" prefix="SUPPLY">
 <description>&lt;b&gt;SUPPLY SYMBOL&lt;/b&gt;</description>
 <gates>
 <gate name="GND" symbol="GND" x="0" y="0"/>
-</gates>
-<devices>
-<device name="">
-<technologies>
-<technology name=""/>
-</technologies>
-</device>
-</devices>
-</deviceset>
-<deviceset name="VCC" prefix="SUPPLY">
-<description>&lt;b&gt;SUPPLY SYMBOL&lt;/b&gt;</description>
-<gates>
-<gate name="G$1" symbol="VCC" x="0" y="0"/>
 </gates>
 <devices>
 <device name="">
@@ -13131,10 +13113,10 @@ Source: http://products.nichicon.co.jp/en/pdf/XJA043/e-ud.pdf</description>
 <part name="U1" library="RHT03_DHT-22_AM2302" deviceset="RHT03_DHT-22_AM2302" device="WIRED" value="DHT22"/>
 <part name="SUPPLY3" library="supply2" deviceset="GND" device=""/>
 <part name="P+2" library="supply1" deviceset="VCC" device="" value="3.3V"/>
-<part name="R1" library="adafruit" deviceset="R-US_" device="0207/10" value="100"/>
-<part name="R2" library="adafruit" deviceset="R-US_" device="0207/10" value="4.7K"/>
-<part name="R3" library="adafruit" deviceset="R-US_" device="0207/10" value="100"/>
-<part name="R4" library="adafruit" deviceset="R-US_" device="0207/10" value="4.7K"/>
+<part name="R1" library="adafruit" deviceset="R-US_" device="R0805" value="100"/>
+<part name="R2" library="adafruit" deviceset="R-US_" device="R0805" value="4.7K"/>
+<part name="R3" library="adafruit" deviceset="R-US_" device="R0805" value="100"/>
+<part name="R4" library="adafruit" deviceset="R-US_" device="R0805" value="4.7K"/>
 <part name="3.3V" library="supply1" deviceset="VCC" device="" value="3.3V"/>
 <part name="IC2" library="linear" deviceset="78*" device="TV" technology="05"/>
 <part name="U$1" library="LEDscape" deviceset="BEAGLEBONE_NO_OUTLINE" device=""/>
@@ -13148,20 +13130,19 @@ Source: http://products.nichicon.co.jp/en/pdf/XJA043/e-ud.pdf</description>
 <part name="P+4" library="supply1" deviceset="VCC" device="" value="3.3V"/>
 <part name="SUPPLY5" library="supply2" deviceset="GND" device=""/>
 <part name="P+5" library="supply1" deviceset="VCC" device="" value="3.3V"/>
-<part name="R5" library="adafruit" deviceset="R-US_" device="0207/10" value="4.7K"/>
-<part name="R6" library="adafruit" deviceset="R-US_" device="0207/10" value="4.7K"/>
+<part name="R5" library="adafruit" deviceset="R-US_" device="R0805" value="4.7K"/>
+<part name="R6" library="adafruit" deviceset="R-US_" device="R0805" value="4.7K"/>
 <part name="SUPPLY6" library="supply2" deviceset="GND" device=""/>
 <part name="BARREL" library="con-wago-500" deviceset="W237-102" device=""/>
 <part name="D1" library="diode" deviceset="1N4004" device="" value="1N4007"/>
 <part name="D2" library="diode" deviceset="1N4004" device="" value="1N4007"/>
-<part name="LED1" library="led" deviceset="LED" device="5MM"/>
-<part name="R7" library="adafruit" deviceset="R-US_" device="0207/10" value="330"/>
-<part name="R8" library="adafruit" deviceset="R-US_" device="0207/10" value="1K"/>
+<part name="LED1" library="led" deviceset="LED" device="SML0805"/>
+<part name="R7" library="adafruit" deviceset="R-US_" device="R0805" value="330"/>
+<part name="R8" library="adafruit" deviceset="R-US_" device="R0805" value="1K"/>
 <part name="D3" library="diode" deviceset="1N4148" device="DO35-10"/>
-<part name="R9" library="adafruit" deviceset="R-US_" device="0207/10" value="4.7K"/>
+<part name="R9" library="adafruit" deviceset="R-US_" device="R0805" value="4.7K"/>
 <part name="D4" library="diode" deviceset="1N4148" device="DO35-10"/>
-<part name="R10" library="adafruit" deviceset="R-US_" device="0207/10" value="4.7K"/>
-<part name="SUPPLY7" library="supply2" deviceset="VCC" device=""/>
+<part name="R10" library="adafruit" deviceset="R-US_" device="R0805" value="4.7K"/>
 <part name="J2" library="con-amp" deviceset="MTA03-100" device="" value="DS18B20"/>
 <part name="J3" library="con-amp" deviceset="MTA03-100" device="" value="Battery"/>
 <part name="U$5" library="LEDscape" deviceset="ATLAS_STAMP" device=""/>
@@ -13222,7 +13203,6 @@ Source: http://products.nichicon.co.jp/en/pdf/XJA043/e-ud.pdf</description>
 <instance part="R9" gate="G$1" x="92.71" y="-34.29" rot="R270"/>
 <instance part="D4" gate="G$1" x="83.82" y="-49.53"/>
 <instance part="R10" gate="G$1" x="101.6" y="-34.29" rot="R270"/>
-<instance part="SUPPLY7" gate="G$1" x="88.9" y="-24.13"/>
 <instance part="J2" gate="G$1" x="-66.04" y="104.14" rot="R90"/>
 <instance part="J3" gate="G$1" x="-8.89" y="154.94" rot="R90"/>
 <instance part="U$5" gate="G$1" x="123.19" y="-15.24" rot="R90"/>
@@ -13385,7 +13365,7 @@ Source: http://products.nichicon.co.jp/en/pdf/XJA043/e-ud.pdf</description>
 <wire x1="124.46" y1="-50.8" x2="125.73" y2="-50.8" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="3.3V" class="0">
+<net name="GNDX" class="0">
 <segment>
 <wire x1="76.2" y1="45.72" x2="76.2" y2="48.26" width="0.1524" layer="91"/>
 <pinref part="P+1" gate="VCC" pin="VCC"/>
@@ -13441,22 +13421,6 @@ Source: http://products.nichicon.co.jp/en/pdf/XJA043/e-ud.pdf</description>
 <junction x="99.06" y="41.91"/>
 <pinref part="R6" gate="G$1" pin="2"/>
 <wire x1="92.71" y1="41.91" x2="92.71" y2="39.37" width="0.1524" layer="91"/>
-</segment>
-<segment>
-<pinref part="SUPPLY7" gate="G$1" pin="VCC"/>
-<wire x1="88.9" y1="-26.67" x2="88.9" y2="-27.94" width="0.1524" layer="91"/>
-<pinref part="R9" gate="G$1" pin="1"/>
-<wire x1="92.71" y1="-29.21" x2="92.71" y2="-27.94" width="0.1524" layer="91"/>
-<wire x1="92.71" y1="-27.94" x2="88.9" y2="-27.94" width="0.1524" layer="91"/>
-<pinref part="R10" gate="G$1" pin="1"/>
-<wire x1="101.6" y1="-29.21" x2="101.6" y2="-27.94" width="0.1524" layer="91"/>
-<wire x1="101.6" y1="-27.94" x2="92.71" y2="-27.94" width="0.1524" layer="91"/>
-<junction x="92.71" y="-27.94"/>
-<wire x1="101.6" y1="-27.94" x2="106.68" y2="-27.94" width="0.1524" layer="91"/>
-<junction x="101.6" y="-27.94"/>
-<wire x1="106.68" y1="-27.94" x2="106.68" y2="-40.64" width="0.1524" layer="91"/>
-<pinref part="J4" gate="G$1" pin="1"/>
-<wire x1="106.68" y1="-40.64" x2="125.73" y2="-40.64" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$3" class="0">
@@ -13679,6 +13643,23 @@ Source: http://products.nichicon.co.jp/en/pdf/XJA043/e-ud.pdf</description>
 <pinref part="LED1" gate="G$1" pin="A"/>
 <wire x1="66.04" y1="156.21" x2="66.04" y2="157.48" width="0.1524" layer="91"/>
 <junction x="66.04" y="157.48"/>
+<label x="66.04" y="158.75" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="R9" gate="G$1" pin="1"/>
+<wire x1="92.71" y1="-29.21" x2="92.71" y2="-27.94" width="0.1524" layer="91"/>
+<wire x1="92.71" y1="-27.94" x2="101.6" y2="-27.94" width="0.1524" layer="91"/>
+<pinref part="R10" gate="G$1" pin="1"/>
+<wire x1="101.6" y1="-27.94" x2="101.6" y2="-29.21" width="0.1524" layer="91"/>
+<wire x1="101.6" y1="-27.94" x2="106.68" y2="-27.94" width="0.1524" layer="91"/>
+<junction x="101.6" y="-27.94"/>
+<wire x1="106.68" y1="-27.94" x2="106.68" y2="-40.64" width="0.1524" layer="91"/>
+<pinref part="J4" gate="G$1" pin="1"/>
+<wire x1="106.68" y1="-40.64" x2="125.73" y2="-40.64" width="0.1524" layer="91"/>
+<label x="92.71" y="-27.94" size="1.778" layer="95"/>
+<wire x1="92.71" y1="-27.94" x2="90.17" y2="-27.94" width="0.1524" layer="91"/>
+<junction x="92.71" y="-27.94"/>
+<wire x1="90.17" y1="-27.94" x2="90.17" y2="-24.13" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>
