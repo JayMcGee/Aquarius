@@ -87,7 +87,7 @@
 			<ul class="breadcrumb">
 				<li>
 					<i class="icon-home"></i>
-					<a href="index.html">Home</a>
+					<a href="index.php">Home</a>
 					<i class="icon-angle-right"></i> 
 				</li>
 				<li>
@@ -769,10 +769,10 @@
 		<script src='js/jquery.dataTables.min.js'></script>
 
 		<script src="js/excanvas.js"></script>
-	<script src="js/jquery.flot.js"></script>
-	<script src="js/jquery.flot.pie.js"></script>
-	<script src="js/jquery.flot.stack.js"></script>
-	<script src="js/jquery.flot.resize.min.js"></script>
+		<script src="js/jquery.flot.js"></script>
+		<script src="js/jquery.flot.pie.js"></script>
+		<script src="js/jquery.flot.stack.js"></script>
+		<script src="js/jquery.flot.resize.min.js"></script>
 	
 		<script src="js/jquery.chosen.min.js"></script>
 	
