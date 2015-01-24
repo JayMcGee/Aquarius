@@ -13365,7 +13365,7 @@ Source: http://products.nichicon.co.jp/en/pdf/XJA043/e-ud.pdf</description>
 <wire x1="124.46" y1="-50.8" x2="125.73" y2="-50.8" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="GNDX" class="0">
+<net name="3.3V" class="0">
 <segment>
 <wire x1="76.2" y1="45.72" x2="76.2" y2="48.26" width="0.1524" layer="91"/>
 <pinref part="P+1" gate="VCC" pin="VCC"/>
