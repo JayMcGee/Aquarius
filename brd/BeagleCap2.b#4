@@ -146,8 +146,8 @@
 <wire x1="-32" y1="41" x2="-37" y2="47" width="0.4064" layer="20" curve="90"/>
 <wire x1="-37" y1="47" x2="-38" y2="47" width="0.4064" layer="20"/>
 <wire x1="-38" y1="47" x2="-38" y2="78.5" width="0.4064" layer="20"/>
-<text x="12.5" y="-66.5" size="2.54" layer="21">AQUARIUS</text>
-<text x="12" y="-72.5" size="1.778" layer="21">Jean-Philippe Fournier
+<text x="11" y="-67.5" size="2.54" layer="21">AQUARIUS</text>
+<text x="11" y="-72.5" size="1.778" layer="21">Jean-Philippe Fournier
 Jean-Pascal McGee</text>
 <hole x="-36" y="-71.5" drill="2"/>
 <hole x="35.5" y="-71.5" drill="2"/>
