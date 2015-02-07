@@ -57,7 +57,7 @@
     }
 
     $servername = "localhost";
-    $username = "beaglebone";
+    $username = "root";
     $password = "poutine";
     $dbname = "aquariusStation";
     // Create connection
