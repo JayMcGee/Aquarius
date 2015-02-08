@@ -1,0 +1,20 @@
+.btn-update {
+	margin-top: 10px;
+	width:100%;
+	border: 0px solid #a7a9aa;
+	padding: 11px 14px;
+	font-size: 17.5px;
+}
+.btn-calibrate{
+	margin-top: 10px;
+	width:16.2%;
+	border: 0px solid #a7a9aa;
+	padding: 11px 1px;
+	font-size: 17.5px;
+}
+.box-calibrate{
+	width: 100%;
+	height:200px;
+	float:left;
+	display: none;
+}
