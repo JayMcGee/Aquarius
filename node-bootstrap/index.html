@@ -405,7 +405,7 @@
         
         io.on('lastTemp',function(data){
             var chart = $('#tempChart').highcharts();
-            if(!isNaN(data.value)){
+            if(!isNaN(data.value) && (data.value !== null) && (data.value !== "")){
                 chart.series[0].addPoint(data.value,true,true);
             }
         });

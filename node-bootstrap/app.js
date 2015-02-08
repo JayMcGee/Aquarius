@@ -1,5 +1,5 @@
 var express = require('express.io');                    //Express and Socket.io integration
-var mysql   = require('/var/www/node_modules/mysql');   //Javascript mySql Connector
+var mysql   = require('mysql');   //Javascript mySql Connector
 var exec    = require('child_process').exec,child;      //Execute shell command
 var tty     = require('tty.js');                        //Terminal access from web-client
 
@@ -98,7 +98,8 @@ app.io.on('connection',function(socket){
         //// Execute Temperature Sensor driver
         child = exec('/var/lib/cloud9/src/test_src/MySqlConnector/main',
             function (error, stdout, stderr) {
-                socket.emit('lastTemp',{'value':stdout});
+                var randomnumber=(Math.random()*41.1)
+                socket.emit('lastTemp',{'value':randomnumber});
         });
     });
 });
