@@ -367,29 +367,44 @@
                 },
                 title: {
                 text: 'Temperature'
-            },
-            xAxis: {
-                type: 'datetime'
-            },
-            yAxis: {
-                floor: -30,
-                ceiling: 100,
-                title: {
-                    text: 'Celcius'
-                }
-            },
-            tooltip: {
-                formatter: function () {
-                    return '<b>' + this.series.name + '</b><br/>' +
-                        Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br/>' +
-                        Highcharts.numberFormat(this.y, 2) + " °C";
-                }
-            },
-                series:[{
-                    name: "Temperature sensor",
-                    data:[null]
-                }]
-            })
+	            },
+	            colors: ['#FF9900'],
+	            xAxis: {
+	                type: 'datetime'
+	            },
+	            yAxis: {
+	                floor: -30,
+	                ceiling: 100,
+	                title: {
+	                    text: 'Celcius'
+	                }
+	            },
+	            plotOptions: {
+		            area: {
+		                marker: {
+		                    enabled: true,
+		                    symbol: 'circle',
+		                    radius: 2.5,
+		                    states: {
+		                        hover: {
+		                            enabled: true
+		                        }
+		                    }
+		                }
+		            }
+		        },
+	            tooltip: {
+	                formatter: function () {
+	                    return '<b>' + this.series.name + '</b><br/>' +
+	                        Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br/>' +
+	                        Highcharts.numberFormat(this.y, 2) + " °C";
+	                }
+	            },
+	                series:[{
+	                    name: "Temperature sensor",
+	                    data:[null]
+	                }]
+	            })
         });
         
         io.on('tempData',function(data){
@@ -399,7 +414,6 @@
             data.array.forEach(function(row){
                dataBuff.push(row.TempWater)
             });
-            
             chart.series[0].setData(dataBuff);
         })
         
@@ -441,7 +455,6 @@
         
         //Save interval Settings
         $('#InfroTextSubmit').click(function(){
-            
             if ($('#title').val()==="") {
               // invalid
               $('#title').next('.help-inline').show();
