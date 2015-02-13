@@ -3,50 +3,63 @@
 
 #include "OneWireDevice.h"
 #include <stdint.h>
+#include <stdlib.h>
+
+#define NOM_TEMPORAIRE "ds18b_0001"
+#define DATA_Q "1"
+#define DATA_1_NAME "TEMPERATURE"
 
 using namespace std;
 
 
 int main(int argc, char * argv[])
 {
-    int returned = 0;
+    int returned = 1;
     string deviceID = DEVICE;
-    
-    if(argc > 1)
+    char * output;
+   
+    if(argc < 2)
     {
-        deviceID.assign(argv[1]);
+        cout << "Missing arguments, could not execute" << endl
+             << "[Executable] [DeviceLocation]" << endl;
+        return returned;
     }
     
-    cout << "Preparing to read in one wire device file at ID : " << deviceID <<  endl;
+    deviceID.assign(argv[1]);
     
     OneWireDevice ow(deviceID);
     
-    cout << "Device created succesfully" << endl;
-    
     float temp;
     
-    cout << "Path validation..." << endl;
+    //cout << "Path validation..." << endl;
     if(ow.isValidPath())
     {
-        cout << "Device path is valid" << endl;
+        //cout << "Device path is valid" << endl;
         if(ow.updateTemperature())
         {
-            cout << "Temperature updated " << endl;
+            //cout << "Temperature updated " << endl;
             if(ow.getLastTemperature(&temp))
             {
                 cout << "Current temperature : " << temp << endl;
-                returned = 1;
+                sprintf(output, "%s:%s:%s:%s:%s:%f", "NOM", NOM_TEMPORAIRE, "DATQ", DATA_Q, DATA_1_NAME, temp);
+                cout << "Current temperature : " << temp << endl;
+                returned = 0;
             }
             else
-                cout << "Could not retrieve latest temperature" << endl;
+                sprintf(output, "%s:%s:%s:%s", "NOM", NOM_TEMPORAIRE, "DATQ", "OW_NO_DATA");
+                //cout << "Could not retrieve latest temperature" << endl;
         }
         else
-            cout << "Could not update temperature" << endl;
+            sprintf(output, "%s:%s:%s:%s", "NOM", NOM_TEMPORAIRE, "DATQ", "OW_NO_RESPONSE");
+            //cout << "Could not update temperature" << endl;
     }
     else 
-    {
-        cout << "Device path is not valid" << endl;
+    {   
+        sprintf(output, "%s:%s:%s:%s", "NOM", NOM_TEMPORAIRE, "DATQ", "OW_NO_DEVICE");
+        //cout << "Device path is not valid" << endl;
     }
+    
+    cout << output << endl;
     
     return returned;
 }
