@@ -298,9 +298,26 @@
 	<!-- JQuery Knobs -->
 	<script>
 	    $(function() {
+	    	var knobWidthHeight,
+            windowObj;
+            // store reference to div obj
+            windowObj = $('.circleStatsItemBox');
+            // if the window is higher than it is wider
+            if(windowObj.height() > windowObj.width()){
+                    // use 75% width
+                knobWidthHeight = Math.round(windowObj.width()*0.75);
+            } else {
+                // else if the window is wider than it is higher
+                // use 75% height
+                knobWidthHeight = Math.round(windowObj.height()*0.75);
+            }
+            // change the data-width and data-height attributes of the input to either 75%
+            // of the width or 75% of the height
+            $('.whiteCircle').attr('data-width',knobWidthHeight).attr('data-height',knobWidthHeight);
+
 	        $(".whiteCircle").knob({
 	        	  draw : function () {
-	        	  		$(".whiteCircle").css("font-size","38px");
+	        	  		//$(".whiteCircle").css("font-size","38px");
                         // "tron" case
                         if(this.$.data('skin') == 'tron') {
                             this.cursorExt = 0.3;
@@ -328,11 +345,11 @@
                         }
                     }
 	        });
-
+			//var width = document.getElementById('tempCircle').offsetWidth;
 	        $('.whiteCircle').trigger(
 		        'configure',
 		        {
-		        	"width" : 200,
+		        	//"width" : width,
 		        	"thickness" : 0.15,
 		            "fgColor":"#EEF8F2",
 		            "inputColor" :"#EEF8F2",
