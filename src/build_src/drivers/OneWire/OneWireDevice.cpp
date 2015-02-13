@@ -1,104 +1,108 @@
 #include "OneWireDevice.h"
-
-bool exists_test(string name) {
-    ifstream f(name);
-    if (f.good()) {
-        f.close();
-        return true;
-    } else {
-        f.close();
-        return false;
-    }   
-}
-
-OneWireDevice::OneWireDevice()
+namespace aquarius
 {
-    // Create file path with a default deviceID
-    filePath_ = createFilePath("28-000006052315");
+    const string OneWireDevice::dataName[OW_DATA_QTY] = { "TEMPERATURE" };
     
-    //If the file path exists
-    if(exists_test(filePath_))
-        hasValidPath_ = true;
-    else
-        hasValidPath_ = false;
-        
-    hasUpdated_ = false;
-    lastTemperature_ = 0.0f;
-}
-
-OneWireDevice::OneWireDevice(string deviceID)
-{
-    //Create file path with the included deviceID
-    filePath_ = createFilePath(deviceID);
-    if(exists_test(filePath_))
-        hasValidPath_ = true;
-    else
-        hasValidPath_ = false;
-        
-    hasUpdated_ = false;
-    lastTemperature_ = 0.0f;
-}
-
-OneWireDevice::~OneWireDevice()
-{
+    bool exists_test(string name) {
+        ifstream f(name);
+        if (f.good()) {
+            f.close();
+            return true;
+        } else {
+            f.close();
+            return false;
+        }   
+    }
     
-}
-
-string OneWireDevice::createFilePath(string deviceID)
-{
-    return FILE_PATH + deviceID + END_PATH;
-}
-    
-bool OneWireDevice::updateTemperature()
-{
-    if(hasValidPath_)
+    OneWireDevice::OneWireDevice()
     {
-        //input file stream to read in the device file
-        ifstream onewireFin(filePath_);
-    
-        string data = "";
+        // Create file path with a default deviceID
+        filePath_ = createFilePath("28-000006052315");
         
-        string temp = "";
-        
-        //Read all the lines in the file
-        while(onewireFin.good())
-        {
-            onewireFin >> temp;
-            
-            data += temp;
-        }
-        
-        temp = data;
-        
-        size_t found = temp.find_last_of('=');
-        
-        //If the data includes a '=', substring and cast to float, divided by 1000 to get Celsius
-        if(found != string::npos)
-        {
-            data = temp.substr(found + 1);
-            
-            lastTemperature_ = stof(data) / 1000;
-            
-            return(hasUpdated_ = true);
-        }
+        //If the file path exists
+        if(exists_test(filePath_))
+            hasValidPath_ = true;
         else
-        {
-            return (hasUpdated_ = false);
-        }
+            hasValidPath_ = false;
+            
+        hasUpdated_ = false;
+        lastTemperature_ = 0.0f;
     }
-    return false;
-}
-
-bool OneWireDevice::isValidPath()
-{
-    return (hasValidPath_ = exists_test(filePath_));
-}
-        
-bool OneWireDevice::getLastTemperature(float * temperature)
-{
-    if(hasUpdated_)
+    
+    OneWireDevice::OneWireDevice(string deviceID)
     {
-        *temperature = lastTemperature_;
+        //Create file path with the included deviceID
+        filePath_ = createFilePath(deviceID);
+        if(exists_test(filePath_))
+            hasValidPath_ = true;
+        else
+            hasValidPath_ = false;
+            
+        hasUpdated_ = false;
+        lastTemperature_ = 0.0f;
     }
-    return hasUpdated_;
+    
+    OneWireDevice::~OneWireDevice()
+    {
+        
+    }
+    
+    string OneWireDevice::createFilePath(string deviceID)
+    {
+        return FILE_PATH + deviceID + END_PATH;
+    }
+        
+    bool OneWireDevice::updateTemperature()
+    {
+        if(hasValidPath_)
+        {
+            //input file stream to read in the device file
+            ifstream onewireFin(filePath_);
+        
+            string data = "";
+            
+            string temp = "";
+            
+            //Read all the lines in the file
+            while(onewireFin.good())
+            {
+                onewireFin >> temp;
+                
+                data += temp;
+            }
+            
+            temp = data;
+            
+            size_t found = temp.find_last_of('=');
+            
+            //If the data includes a '=', substring and cast to float, divided by 1000 to get Celsius
+            if(found != string::npos)
+            {
+                data = temp.substr(found + 1);
+                
+                lastTemperature_ = stof(data) / 1000;
+                
+                return(hasUpdated_ = true);
+            }
+            else
+            {
+                return (hasUpdated_ = false);
+            }
+        }
+        return false;
+    }
+    
+    bool OneWireDevice::isValidPath()
+    {
+        return (hasValidPath_ = exists_test(filePath_));
+    }
+            
+    bool OneWireDevice::getLastTemperature(float * temperature)
+    {
+        if(hasUpdated_)
+        {
+            *temperature = lastTemperature_;
+        }
+        return hasUpdated_;
+    }
 }

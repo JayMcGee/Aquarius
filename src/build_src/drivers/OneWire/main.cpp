@@ -1,16 +1,20 @@
 
 #define DEVICE "28-000006052315"
 
+#include "../../commun.h"
+
 #include "OneWireDevice.h"
+#include <string>
+#include <iostream>
+
+#include <unistd.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #define NOM_TEMPORAIRE "ds18b_0001"
-#define DATA_Q "1"
-#define DATA_1_NAME "TEMPERATURE"
 
 using namespace std;
-
 
 int main(int argc, char * argv[])
 {
@@ -27,7 +31,7 @@ int main(int argc, char * argv[])
     
     deviceID.assign(argv[1]);
     
-    OneWireDevice ow(deviceID);
+    aquarius::OneWireDevice ow(deviceID);
     
     float temp;
     
@@ -40,26 +44,19 @@ int main(int argc, char * argv[])
             //cout << "Temperature updated " << endl;
             if(ow.getLastTemperature(&temp))
             {
-                cout << "Current temperature : " << temp << endl;
-                sprintf(output, "%s:%s:%s:%s:%s:%f", "NOM", NOM_TEMPORAIRE, "DATQ", DATA_Q, DATA_1_NAME, temp);
-                cout << "Current temperature : " << temp << endl;
-                returned = 0;
+                float datas[1] = { temp };
+                aquarius::outputReadData(NOM_TEMPORAIRE, OW_DATA_QTY, ow.dataName, datas);
+                return 0;
             }
             else
-                sprintf(output, "%s:%s:%s:%s", "NOM", NOM_TEMPORAIRE, "DATQ", "OW_NO_DATA");
-                //cout << "Could not retrieve latest temperature" << endl;
+                aquarius::outputError(NOM_TEMPORAIRE, "OW_NO_DATA");
         }
         else
-            sprintf(output, "%s:%s:%s:%s", "NOM", NOM_TEMPORAIRE, "DATQ", "OW_NO_RESPONSE");
-            //cout << "Could not update temperature" << endl;
+            aquarius::outputError(NOM_TEMPORAIRE, "OW_NO_RESPONSE");
     }
-    else 
-    {   
-        sprintf(output, "%s:%s:%s:%s", "NOM", NOM_TEMPORAIRE, "DATQ", "OW_NO_DEVICE");
-        //cout << "Device path is not valid" << endl;
-    }
-    
-    cout << output << endl;
-    
-    return returned;
+    else  
+        aquarius::outputError(NOM_TEMPORAIRE, "OW_NO_DEVICE");
+        
+    return 1;
 }
+
