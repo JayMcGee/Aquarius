@@ -1,21 +1,21 @@
+#include "../../commun.h"
 #include "dht22Device.h"
-#include <string.h>
+#include <string>
 #include <iostream>
-#include <unistd.h>
-#include <stdlib.h>
-#include <vector>
+
+#define NOM_TEMPORAIRE "dht22_0001"
 
 using namespace std;
 
-//string stringify(int argc, char ** argv);
-const vector<string> explode(const string& s, const char& c);
-
 int main(int argc, char ** argv)
 {
-    float humidite = 0;
+    float humidity = 0;
     float temperature = 0;
     
-    if(argc < 3)
+    string outputData;
+    char * output;
+    
+    if(argc < 2)
     {
         cout << "Missing arguments, could not execute" << endl
              << "[Executable] [DeviceLocation] [Command]" << endl;
@@ -25,69 +25,34 @@ int main(int argc, char ** argv)
     string deviceLocation;
     deviceLocation.assign(argv[1]);
     
-    string command;
-    command.assign(argv[2]);
+    vector<string> v{aquarius::splitArguments(deviceLocation, ':')};
     
-    cout << "Emplacement : " << deviceLocation << endl
-         << "Commande : " << command << endl;
-    
-    vector<string> v{explode(deviceLocation, ':')};
     int high = atoi((v[0].c_str())), low = atoi((v[1].c_str()));
-    DHT dht(high, low);
     
+    aquarius::DHT dht(high, low);
     
-    int retour = 0;
+    int retour = -128;
     
-    cout << "Démarrage du test de DHT22" << endl;
-    cout << "Communication avec le DHT22 débutée" << endl;
+    retour = dht.updateData();
     
-    while(1)
+    if(dht.getLatestTemperature(&temperature) && dht.getLatestHumidity(&humidity) && retour >= 0)
     {
-        retour = dht.updateData();
-    
-        if(retour == DHT_ERROR_TIMEOUT)
-        {
-            cout << "Erreur de timeout" << endl;
-        }
-        else if(retour == DHT_ERROR_CHECKSUM)
-        {
-            cout << "Erreur de checksum" << endl;
-        }
-        else if(retour >= 0)
-        {   
-            if(dht.getLatestTemperature(&temperature) && dht.getLatestHumidity(&humidite))
-                cout << "Température : " << temperature << " et humidité : " << humidite << endl;
-            else
-                cout << "Data not updated" << endl;
-        }
-        else
-        {   
-             cout << "Erreur no. : " << retour << endl;
-        }
-        sleep(2);
+        float datas[2] = { temperature, humidity };
+        aquarius::outputReadData(NOM_TEMPORAIRE, DHT_DATA_QTY, dht.dataName, datas);
+        return 0;
+    }
+    else if(retour == DHT_ERROR_TIMEOUT)
+    {
+        aquarius::outputError(NOM_TEMPORAIRE, "DHT_ERROR_TIMEOUT");
+    } 
+    else if(retour == DHT_ERROR_CHECKSUM)
+    {
+        aquarius::outputError(NOM_TEMPORAIRE, "DHT_ERROR_CHECKSUM");
+    }
+    else
+    {
+        aquarius::outputError(NOM_TEMPORAIRE, "DHT_UNKNOWN_ERROR");
     }
     
-    return 0;
-}
-/*
-std::string[] stringify(int argc, char ** argv)
-{
-    std::string args[argc];
-    
-	return args;
-}*/
-
-const vector<string> explode(const string& s, const char& c)
-{
-	string buff{""};
-	vector<string> v;
-	
-	for(auto n:s)
-	{
-		if(n != c) buff+=n; else
-		if(n == c && buff != "") { v.push_back(buff); buff = ""; }
-	}
-	if(buff != "") v.push_back(buff);
-	
-	return v;
+    return 1;
 }

@@ -6,6 +6,7 @@
 //Standard libraries
 #include <iostream>
 #include <string>
+#include <vector>
 #include <stdio.h>
 #include <time.h>
 #include <unistd.h>
@@ -18,15 +19,15 @@
 #define NOM_STATION "aquarius001"
 #define DATE_TIME_OUTPUT "%Y/%m/%d %X"
 
-
+using namespace std;
 
 namespace aquarius
 {
 	typedef float t_Temperature;
-	typedef int t_PH;
-	typedef int t_Conductivity;
-	typedef int t_DO;
-	typedef int t_Humidity;
+	typedef float t_PH;
+	typedef float t_Conductivity;
+	typedef float t_DO;
+	typedef float t_Humidity;
 
 	// Data structure to pass all sensor data easily
 	struct SensorData
@@ -51,6 +52,12 @@ namespace aquarius
 	*	@brief Function that gives out the current systeme date and time
 	*   @return Gives back a date time formatted to the system constant DATE_TIME_OUTPUT
 	*/
-	const std::string currentDateTime();
+	const string currentDateTime();
+	
+    void outputError(string deviceName, string errorName);
+    
+    void outputReadData(string deviceName, int dataQty, const string dataNames[], const float datas[]);
+    
+    const vector<string> splitArguments(const string& s, const char& c);
 
 }

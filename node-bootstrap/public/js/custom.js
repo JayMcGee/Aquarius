@@ -113,17 +113,6 @@ $(document).ready(function(){
 	calendars();
 	growlLikeNotifications();
 	widthFunctions();
-	
-	if(jQuery.browser.version.substring(0, 2) == "8.") {
-		 
-		//disable jQuery Knob
-		
-	} else {
-		
-		circle_progess();
-		
-	}
-	
 	chart();
 	messageLike();	
 	
@@ -694,74 +683,6 @@ function template_functions(){
 		});
 			
 }
-
-/* ---------- Circle Progess Bars ---------- */
-
-function circle_progess() {
-	
-	var divElement = $('div'); //log all div elements
-	
-	if (retina()) {
-		
-		$(".whiteCircle").knob({
-	        'readOnly': true,
-	        'width': 240,
-	        'height': 240,
-			'bgColor': 'rgba(255,255,255,0.5)',
-	        'fgColor': 'rgba(255,255,255,0.9)',
-	        'dynamicDraw': true,
-	        'thickness': 0.2,
-	        'tickColorizeValues': true
-	    });
-	
-		$(".circleStat").css('zoom',0.5);
-		$(".whiteCircle").css('zoom',0.999);
-		
-		
-	} else {
-		
-		$(".whiteCircle").knob({
-	        'readOnly': true,
-	        'width': 120,
-	        'height': 120,
-			'bgColor': 'rgba(255,255,255,0.5)',
-	        'fgColor': 'rgba(255,255,255,0.9)',
-	        'dynamicDraw': true,
-	        'thickness': 0.2,
-	        'tickColorizeValues': true
-	    });
-		
-	}
-	
-	
-	
-	$(".circleStatsItemBox").each(function(){
-		
-		var value = $(this).find(".value > .number").html();
-		var unit = $(this).find(".value > .unit").html();
-		var percent = $(this).find("input").val()/100;
-		
-		countSpeed = 2300*percent;
-		
-		endValue = value*percent;
-		
-		$(this).find(".count > .unit").html(unit);
-		$(this).find(".count > .number").countTo({
-			
-			from: 0,
-		    to: endValue,
-		    speed: countSpeed,
-		    refreshInterval: 50
-		
-		});
-		
-		//$(this).find(".count").html(value*percent + unit);
-		
-	});
-	
-}                
-
-      
 
 /* ---------- Calendars ---------- */
 

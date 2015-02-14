@@ -25,10 +25,6 @@
 	<!-- start: Favicon -->
 	<link rel="shortcut icon" href="images/favicon.png">
 	<!-- end: Favicon -->
-	
-		
-		
-		
 </head>
 
 <body>
@@ -67,15 +63,6 @@
 			<!-- start: Content -->
 			<div id="content" class="span10">			
 			
-			<ul class="breadcrumb">
-				<li>
-					<i class="icon-home"></i>
-					<a href="index.html">Home</a> 
-					<i class="icon-angle-right"></i>
-				</li>
-				<li><a href="#">Dashboard</a></li>
-			</ul>
-			
             <div class="box-header">
     			<h2><i class="halflings-icon list-alt"></i><span class="break"></span>Most recent values</h2>
     			<div class="box-icon">
@@ -85,65 +72,64 @@
 			</div>
 			<div class="box-content">
     			<div class="row-fluid hideInIE8 circleStats">
-    				<div class="span4" onTablet="span4" onDesktop="span4">
+    				<div class="span2" onTablet="span2" onDesktop="span2">
                     	<div class="circleStatsItemBox yellow">
     						<div class="header">Temperature</div>
-    						<span class="percent">°Celcius</span>
     						<div class="circleStat">
-                        		<input id="tempCircle" type="text" data-step="0.1" data-min="-30" class="whiteCircle">
+                        		<input id="tempCircle" type="text" data-skin="tron" data-readOnly="true" data-step="0.1" data-min="-30" class="whiteCircle">
     						</div>
+    						<div class="footer">°Celcius</div>
                     	</div>
     				</div>
     
-    				<div class="span4" onTablet="span4" onDesktop="span4">
+    				<div class="span2" onTablet="span2" onDesktop="span2">
                     	<div class="circleStatsItemBox red">
     						<div class="header">pH</div>
-    						<span class="percent">pH</span>
     						<div class="circleStat">
-                        		<input id="phCircle" type="text" value="7.00" data-step="0.01" data-min="0" data-max="14" class="whiteCircle" />
+                        		<input id="phCircle" type="text" value="7.00" data-skin="tron" data-readOnly="true" data-step="0.11" data-min="0" data-max="14" class="whiteCircle" />
     						</div>
+    						<div class="footer">pH</div>
                     	</div>
     				</div>
     
-    				<div class="span4" onTablet="span4" onDesktop="span4">
+    				<div class="span2" onTablet="span2" onDesktop="span2">
                     	<div class="circleStatsItemBox blue">
     						<div class="header">Dissolved oxygen</div>
-    						<span class="percent">mg/L</span>
                         	<div class="circleStat">
-                        		<input id="doCircle" type="text" value="8" data-step="0.01" data-min="0" data-max="13"  class="whiteCircle" />
+                        		<input id="doCircle" type="text" value="8" data-skin="tron" data-readOnly="true" data-step="0.11" data-min="0" data-max="13"  class="whiteCircle" />
     						</div>
+    						<div class="footer">mg/L</div>
                     	</div>
     				</div>
-    			</div>
-    
-    			<div class="row-fluid hideInIE8 circleStats">
-    				<div class="span4 " onTablet="span4" onDesktop="span4">
+
+    				<div class="span2 " onTablet="span2" onDesktop="span2">
                     	<div class="circleStatsItemBox green">
     						<div class="header">Conductivity</div>
-    						<span class="percent">S/m</span>
+    						
                         	<div class="circleStat">
-                        		<input id="condCircle" type="text" value="5000" data-step="0.1" data-min="0" data-max="20000" class="whiteCircle" />
+                        		<input id="condCircle" type="text" value="5000" data-skin="tron" data-readOnly="true" data-step="0.1" data-min="0" data-max="20000" class="whiteCircle" />
     						</div>
+    						<div class="footer">S/m</div>
                     	</div>
     				</div>
     
-    				<div class="span4" onTablet="span4" onDesktop="span4">
+    				<div class="span2" onTablet="span2" onDesktop="span2">
                     	<div class="circleStatsItemBox orange">
     						<div class="header">Station Temperature</div>
-    						<span class="percent">°Celcius</span>
                         	<div class="circleStat">
-                        		<input id="stationTempCircle" type="text" value="50" data-step="0.1" data-min="-30" data-max="100" class="whiteCircle" />
+                        		<input id="stationTempCircle" type="text" value="50" data-skin="tron" data-readOnly="true" data-step="0.1" data-min="-30" data-max="100" class="whiteCircle" />
     						</div>
+    						<div class="footer">°Celcius</div>
                     	</div>
     				</div>
     
-    				<div class="span4" onTablet="span4" onDesktop="span4">
+    				<div class="span2" onTablet="span2" onDesktop="span2">
                     	<div class="circleStatsItemBox pinkDark">
     						<div class="header">Station Humidity</div>
-    						<span class="percent">Percent %</span>
                         	<div class="circleStat">
-                        		<input id="stationHumCircle" type="text" value="60" data-step="0.1" data-min="0" data-max="100" class="whiteCircle" />
+                        		<input id="stationHumCircle" type="text" value="60" data-skin="tron" data-readOnly="true" data-step="0.1" data-min="0" data-max="100" class="whiteCircle" />
     						</div>
+    						<div class="footer">Percent %</div>
                     	</div>
     				</div>							
     			</div>
@@ -238,7 +224,7 @@
       <input type="hidden" name="InfroText" value="1">
   
       <table>
-        <tbody><tr><td>Title</td><td><input type="text" name="title" id="title" style="width:300px"><span class="hide help-inline"></span></td></tr>
+        <tbody><tr><td>Interval : </td><td><input type="text" name="interval" id="interval" style="width:100px"><span class="help-inline"> Milliseconds </span></td></tr>
       </tbody></table>
       </form>
     </div>
@@ -309,6 +295,71 @@
 
 		<script src="js/custom.js"></script>
 	
+	<!-- JQuery Knobs -->
+	<script>
+	    $(function() {
+	    	var knobWidthHeight,
+            windowObj;
+            // store reference to div obj
+            windowObj = $('.circleStatsItemBox');
+            // if the window is higher than it is wider
+            if(windowObj.height() > windowObj.width()){
+                    // use 75% width
+                knobWidthHeight = Math.round(windowObj.width()*0.75);
+            } else {
+                // else if the window is wider than it is higher
+                // use 75% height
+                knobWidthHeight = Math.round(windowObj.height()*0.75);
+            }
+            // change the data-width and data-height attributes of the input to either 75%
+            // of the width or 75% of the height
+            $('.whiteCircle').attr('data-width',knobWidthHeight).attr('data-height',knobWidthHeight);
+
+	        $(".whiteCircle").knob({
+	        	  draw : function () {
+	        	  		//$(".whiteCircle").css("font-size","38px");
+                        // "tron" case
+                        if(this.$.data('skin') == 'tron') {
+                            this.cursorExt = 0.3;
+                            var a = this.arc(this.cv)  // Arc
+                                , pa                   // Previous arc
+                                , r = 1;
+                            this.g.lineWidth = this.lineWidth;
+                            if (this.o.displayPrevious) {
+                                pa = this.arc(this.v);
+                                this.g.beginPath();
+                                this.g.strokeStyle = this.pColor;
+                                this.g.arc(this.xy, this.xy, this.radius - this.lineWidth, pa.s, pa.e, pa.d);
+                                this.g.stroke();
+                            }
+                            this.g.beginPath();
+                            this.g.strokeStyle = r ? this.o.fgColor : this.fgColor ;
+                            this.g.arc(this.xy, this.xy, this.radius - this.lineWidth, a.s, a.e, a.d);
+                            this.g.stroke();
+                            this.g.lineWidth = 2;
+                            this.g.beginPath();
+                            this.g.strokeStyle = this.o.fgColor;
+                            this.g.arc( this.xy, this.xy, this.radius - this.lineWidth + 1 + this.lineWidth * 2 / 3, 0, 2 * Math.PI, false);
+                            this.g.stroke();
+                            return false;
+                        }
+                    }
+	        });
+			//var width = document.getElementById('tempCircle').offsetWidth;
+	        $('.whiteCircle').trigger(
+		        'configure',
+		        {
+		        	//"width" : width,
+		        	"thickness" : 0.15,
+		            "fgColor":"#EEF8F2",
+		            "inputColor" :"#EEF8F2",
+		        }
+		    );
+	    });
+
+	</script>
+
+
 	<!-- Information Popup -->
 	<script type="text/javascript">
 		$(function(){
@@ -431,7 +482,16 @@
         // first update is from Database any update after is directly from 
         // the sensor driver
         io.on('lastTemp',function(data){
-            $('#tempCircle').val(data.value).trigger('change');
+            //$('#tempCircle').val(data.value).trigger('change');
+            var valInit = $('#tempCircle').val();
+			$({value: valInit}).animate({value: data.value}, {
+				duration: 500,
+				easing:'swing',
+				step: function()
+				{
+					$('#tempCircle').val(this.value).trigger('change');
+				}
+			})
         });
         io.on('lastPh',function(data){
             $('#phCircle').val(data.value).trigger('change');

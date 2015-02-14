@@ -1,7 +1,7 @@
 #include "commun.h"
 namespace aquarius
 {
-	const std::string currentDateTime() 
+	const string currentDateTime() 
 	{
 		time_t     now = time(0);
 		struct tm  tstruct;
@@ -13,4 +13,36 @@ namespace aquarius
 
 		return buf;
 	}	 
+	
+	void outputError(string deviceName, string errorName)
+    {
+        cout << "NOM:" << deviceName << ":DATQ:" << errorName << endl;
+    }
+    
+    void outputReadData(string deviceName, int dataQty, const string dataNames[], const float datas[])
+    {
+        cout << "NOM:" << deviceName << ":DATQ:" << dataQty;
+        
+        for(int i = 0; i < dataQty; i++)
+        {
+            cout << ":" << dataNames[i] << ":" << datas[i];
+        }
+        cout << endl;
+    }
+    
+    
+    const vector<string> splitArguments(const string& s, const char& c)
+    {
+    	string buff{""};
+    	vector<string> v;
+    	
+    	for(auto n:s)
+    	{
+    		if(n != c) buff+=n; else
+    		if(n == c && buff != "") { v.push_back(buff); buff = ""; }
+    	}
+    	if(buff != "") v.push_back(buff);
+    	
+    	return v;
+    }
 }

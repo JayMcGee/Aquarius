@@ -4,12 +4,10 @@
   "dependencies": {
     "express": "*",
     "express.io":"*",
+    "socket.io":"*",
     "stylus": "*",
     "http":"*",
-    "web-terminal":"*",
-    "socket.io":"*",
     "mysql":"*",
-    "child_process":"*",
     "tty.js":"*",
 	"serve-favicon": "*",
 	"morgan": "*",

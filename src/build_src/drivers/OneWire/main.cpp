@@ -1,52 +1,62 @@
 
 #define DEVICE "28-000006052315"
 
+#include "../../commun.h"
+
 #include "OneWireDevice.h"
+#include <string>
+#include <iostream>
+
+#include <unistd.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#define NOM_TEMPORAIRE "ds18b_0001"
 
 using namespace std;
 
-
 int main(int argc, char * argv[])
 {
-    int returned = 0;
+    int returned = 1;
     string deviceID = DEVICE;
-    
-    if(argc > 1)
+    char * output;
+   
+    if(argc < 2)
     {
-        deviceID.assign(argv[1]);
+        cout << "Missing arguments, could not execute" << endl
+             << "[Executable] [DeviceLocation]" << endl;
+        return returned;
     }
     
-    cout << "Preparing to read in one wire device file at ID : " << deviceID <<  endl;
+    deviceID.assign(argv[1]);
     
-    OneWireDevice ow(deviceID);
-    
-    cout << "Device created succesfully" << endl;
+    aquarius::OneWireDevice ow(deviceID);
     
     float temp;
     
-    cout << "Path validation..." << endl;
+    //cout << "Path validation..." << endl;
     if(ow.isValidPath())
     {
-        cout << "Device path is valid" << endl;
+        //cout << "Device path is valid" << endl;
         if(ow.updateTemperature())
         {
-            cout << "Temperature updated " << endl;
+            //cout << "Temperature updated " << endl;
             if(ow.getLastTemperature(&temp))
             {
-                cout << "Current temperature : " << temp << endl;
-                returned = 1;
+                float datas[1] = { temp };
+                aquarius::outputReadData(NOM_TEMPORAIRE, OW_DATA_QTY, ow.dataName, datas);
+                return 0;
             }
             else
-                cout << "Could not retrieve latest temperature" << endl;
+                aquarius::outputError(NOM_TEMPORAIRE, "OW_NO_DATA");
         }
         else
-            cout << "Could not update temperature" << endl;
+            aquarius::outputError(NOM_TEMPORAIRE, "OW_NO_RESPONSE");
     }
-    else 
-    {
-        cout << "Device path is not valid" << endl;
-    }
-    
-    return returned;
+    else  
+        aquarius::outputError(NOM_TEMPORAIRE, "OW_NO_DEVICE");
+        
+    return 1;
 }
+
