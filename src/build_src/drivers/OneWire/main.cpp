@@ -1,50 +1,64 @@
-
+/**
+ * @file   main.cpp
+ * @author Jean-Philippe Fournier
+ * @date   Febuary 13 2015
+ * @brief  main driver executable for the One wire maxim Ds18b20 device
+ */
+ 
+ //Temporary ID for easy recall of the value, DEV only
 #define DEVICE "28-000006052315"
 
 #include "../../commun.h"
-
 #include "OneWireDevice.h"
 #include <string>
 #include <iostream>
 
+//TO BE VERIFIED 
 #include <unistd.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
+//TO BE REMOVED, TEMPORARY Until name given by command line arguments
 #define NOM_TEMPORAIRE "ds18b_0001"
 
 using namespace std;
 
+/**
+ * @brief Output the missing arguments phrase for help
+ * @return A string that explains the minimum args for the driver to work
+ */
+string OW_output_missingArguments();
+
 int main(int argc, char * argv[])
-{
-    int returned = 1;
-    string deviceID = DEVICE;
-    char * output;
-   
-    if(argc < 2)
+{ 
+    //floating points to contain read temperature
+    float temp;
+	//Check for missing arguments, if missing, skip execution and let caller know
+    if(argc < OW_MIN_ARGS)
     {
-        cout << "Missing arguments, could not execute" << endl
-             << "[Executable] [DeviceLocation]" << endl;
-        return returned;
+        cout << OW_output_missingArguments() << endl;
+        return 1;
     }
+	
+	//Extract device location from arguments
+    string deviceID;
+    deviceID.assign(argv[OW_ARG_LOCATION_POS]);
     
-    deviceID.assign(argv[1]);
-    
+	//Create the One Wire device object
     aquarius::OneWireDevice ow(deviceID);
     
-    float temp;
-    
-    //cout << "Path validation..." << endl;
+    //Path validation...
     if(ow.isValidPath())
     {
-        //cout << "Device path is valid" << endl;
+        //Device path is valid
         if(ow.updateTemperature())
         {
-            //cout << "Temperature updated " << endl;
+            //Temperature updated
             if(ow.getLastTemperature(&temp))
             {
-                float datas[1] = { temp };
+				//Create an output stream with read data
+                float datas[OW_DATA_QTY] = { temp };
                 aquarius::outputReadData(NOM_TEMPORAIRE, OW_DATA_QTY, ow.dataName, datas);
                 return 0;
             }
@@ -60,3 +74,7 @@ int main(int argc, char * argv[])
     return 1;
 }
 
+string OW_output_missingArguments()
+{
+	return "Missing arguments, could not execute \n\r [Executable] [DeviceLocation] ex: ./driverName 28-000006052315";
+}

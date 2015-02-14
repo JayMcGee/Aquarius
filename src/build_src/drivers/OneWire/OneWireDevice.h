@@ -13,10 +13,14 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+
 /** The final path to be used to access the device files is FILE_PATH + Device ID + END_PATH **/
 #define FILE_PATH "/sys/devices/w1_bus_master1/"
 #define END_PATH "/w1_slave"
+
 #define OW_DATA_QTY 1
+#define OW_MIN_ARGS 2
+#define OW_ARG_LOCATION_POS 1
 
 using namespace std;
 
