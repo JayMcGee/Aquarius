@@ -9,6 +9,8 @@
 #define DHT_22
 
 #define DHT_DATA_QTY 2
+#define DHT_MIN_ARGS 2
+#define DHT_ARG_LOCATION_POS 1
 
 #include "libs/bbb_dht_read.h"
 #include <string>
@@ -61,9 +63,9 @@ namespace aquarius
             /**
              * @brief Gets the latest updated humidity
              * @param humidity Pointer to the latest humidity
-             * @return true if the lateste good humidity was read at the last attempt
+             * @return true if the latest good humidity was read at the last attempt
              */
             bool getLatestHumidity(float * humidity);
-    };
+    };	
 }
 #endif
