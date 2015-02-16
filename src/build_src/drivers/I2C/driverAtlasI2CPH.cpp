@@ -43,7 +43,7 @@ using namespace std;
  * @param delay			Delay before looking for an answer
  * @param returnData    Pointer to the returned data buffer
  */
-void getStatus(BlackI2C * i2c, string commandTo, int delay, string * returnData);
+void i2cCommand(BlackI2C * i2c, string commandTo, int delay, string * returnData);
 
 /**
  * @brief Output the missing arguments phrase for help
