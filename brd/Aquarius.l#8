@@ -94,13 +94,13 @@
 <wire x1="12.7" y1="-22.86" x2="-12.7" y2="-22.86" width="0.254" layer="94"/>
 <wire x1="-12.7" y1="-22.86" x2="-12.7" y2="7.62" width="0.254" layer="94"/>
 <pin name="VIN" x="-17.78" y="5.08" length="middle" direction="sup"/>
-<pin name="AGND" x="0" y="-27.94" length="middle" rot="R90"/>
+<pin name="SYNC" x="-17.78" y="2.54" length="middle"/>
 <pin name="P$3" x="-17.78" y="0" length="middle"/>
 <pin name="P$4" x="-17.78" y="-2.54" length="middle"/>
 <pin name="P$5" x="-17.78" y="-5.08" length="middle"/>
 <pin name="P$6" x="-17.78" y="-7.62" length="middle"/>
 <pin name="P$7" x="-17.78" y="-10.16" length="middle"/>
-<pin name="PGND" x="2.54" y="-27.94" length="middle" direction="sup" rot="R90"/>
+<pin name="P$8" x="-17.78" y="-12.7" length="middle"/>
 </symbol>
 </symbols>
 <devicesets>

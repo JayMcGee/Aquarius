@@ -84,6 +84,7 @@
 <smd name="VIN4" x="1.16" y="-7.3" dx="3.06" dy="0.89" layer="1" rot="R90"/>
 <smd name="VIN5" x="2.42" y="-7.3" dx="3.06" dy="0.89" layer="1" rot="R90"/>
 <smd name="VIN6" x="3.68" y="-7.3" dx="3.06" dy="0.89" layer="1" rot="R90"/>
+<smd name="P$1" x="0.01" y="0" dx="8.54" dy="5.35" layer="1" rot="R90"/>
 </package>
 </packages>
 <symbols>

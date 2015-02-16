@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.1" unitdist="mm" unit="mm" style="lines" multiple="1" display="yes" altdistance="0.025" altunitdist="inch" altunit="inch"/>
+<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="2" name="Route2" color="1" fill="3" visible="no" active="yes"/>
@@ -891,12 +891,12 @@
 <wire x1="5.08" y1="-10.16" x2="5.08" y2="5.08" width="0.254" layer="94"/>
 <wire x1="5.08" y1="5.08" x2="-5.08" y2="5.08" width="0.254" layer="94"/>
 <wire x1="-5.08" y1="5.08" x2="-5.08" y2="-10.16" width="0.254" layer="94"/>
-<pin name="VCC" x="-2.54" y="-8.89" length="point" rot="R270"/>
-<pin name="PRB" x="0" y="-8.89" length="point" rot="R270"/>
-<pin name="PGND" x="2.54" y="-8.89" length="point" rot="R270"/>
-<pin name="GND" x="-2.54" y="3.81" length="point" rot="R90"/>
-<pin name="TX" x="0" y="3.81" length="point" rot="R90"/>
-<pin name="RX" x="2.54" y="3.81" length="point" rot="R90"/>
+<pin name="VCC" x="-2.54" y="-8.89" visible="pad" length="short" rot="R270"/>
+<pin name="PRB" x="0" y="-8.89" visible="pad" length="short" rot="R270"/>
+<pin name="PGND" x="2.54" y="-8.89" visible="pad" length="short" rot="R270"/>
+<pin name="GND" x="-2.54" y="3.81" visible="pad" length="short" rot="R90"/>
+<pin name="TX" x="0" y="3.81" visible="pad" length="short" rot="R90"/>
+<pin name="RX" x="2.54" y="3.81" visible="pad" length="short" rot="R90"/>
 </symbol>
 </symbols>
 <devicesets>

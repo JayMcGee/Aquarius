@@ -89,18 +89,18 @@
 </packages>
 <symbols>
 <symbol name="LMZ23605">
-<wire x1="-12.7" y1="7.62" x2="12.7" y2="7.62" width="0.254" layer="94"/>
-<wire x1="12.7" y1="7.62" x2="12.7" y2="-22.86" width="0.254" layer="94"/>
-<wire x1="12.7" y1="-22.86" x2="-12.7" y2="-22.86" width="0.254" layer="94"/>
-<wire x1="-12.7" y1="-22.86" x2="-12.7" y2="7.62" width="0.254" layer="94"/>
-<pin name="VIN" x="-17.78" y="5.08" length="middle" direction="sup"/>
-<pin name="SYNC" x="-17.78" y="2.54" length="middle"/>
-<pin name="EN" x="-17.78" y="0" length="middle"/>
-<pin name="AGND" x="-17.78" y="-2.54" length="middle"/>
-<pin name="PGND" x="-17.78" y="-5.08" length="middle"/>
-<pin name="P$6" x="-17.78" y="-7.62" length="middle"/>
-<pin name="P$7" x="-17.78" y="-10.16" length="middle"/>
-<pin name="P$8" x="-17.78" y="-12.7" length="middle"/>
+<wire x1="-7.62" y1="10.16" x2="7.62" y2="10.16" width="0.254" layer="94"/>
+<wire x1="7.62" y1="10.16" x2="7.62" y2="-10.16" width="0.254" layer="94"/>
+<wire x1="7.62" y1="-10.16" x2="-7.62" y2="-10.16" width="0.254" layer="94"/>
+<wire x1="-7.62" y1="-10.16" x2="-7.62" y2="10.16" width="0.254" layer="94"/>
+<pin name="VIN" x="-12.7" y="7.62" length="middle" direction="sup"/>
+<pin name="SYNC" x="-12.7" y="5.08" length="middle"/>
+<pin name="EN" x="-12.7" y="2.54" length="middle"/>
+<pin name="AGND" x="-5.08" y="-15.24" length="middle" direction="sup" rot="R90"/>
+<pin name="PGND" x="5.08" y="-15.24" length="middle" rot="R90"/>
+<pin name="FB" x="12.7" y="2.54" length="middle" rot="R180"/>
+<pin name="SS/TRK" x="-12.7" y="0" length="middle"/>
+<pin name="VOUT" x="12.7" y="7.62" length="middle" direction="sup" rot="R180"/>
 </symbol>
 </symbols>
 <devicesets>

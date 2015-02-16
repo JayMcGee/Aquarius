@@ -6,36 +6,36 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.05" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
+<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
-<layer number="1" name="Top" color="4" fill="1" visible="yes" active="no"/>
-<layer number="2" name="Route2" color="1" fill="3" visible="yes" active="no"/>
-<layer number="3" name="Route3" color="4" fill="3" visible="yes" active="no"/>
-<layer number="4" name="Route4" color="1" fill="4" visible="yes" active="no"/>
-<layer number="5" name="Route5" color="4" fill="4" visible="yes" active="no"/>
-<layer number="6" name="Route6" color="1" fill="8" visible="yes" active="no"/>
-<layer number="7" name="Route7" color="4" fill="8" visible="yes" active="no"/>
-<layer number="8" name="Route8" color="1" fill="2" visible="yes" active="no"/>
-<layer number="9" name="Route9" color="4" fill="2" visible="yes" active="no"/>
-<layer number="10" name="Route10" color="1" fill="7" visible="yes" active="no"/>
-<layer number="11" name="Route11" color="4" fill="7" visible="yes" active="no"/>
-<layer number="12" name="Route12" color="1" fill="5" visible="yes" active="no"/>
-<layer number="13" name="Route13" color="4" fill="5" visible="yes" active="no"/>
-<layer number="14" name="Route14" color="1" fill="6" visible="yes" active="no"/>
-<layer number="15" name="Route15" color="4" fill="6" visible="yes" active="no"/>
-<layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="no"/>
-<layer number="17" name="Pads" color="2" fill="1" visible="yes" active="no"/>
-<layer number="18" name="Vias" color="2" fill="1" visible="yes" active="no"/>
-<layer number="19" name="Unrouted" color="6" fill="1" visible="yes" active="no"/>
-<layer number="20" name="Dimension" color="15" fill="1" visible="yes" active="no"/>
-<layer number="21" name="tPlace" color="7" fill="1" visible="yes" active="no"/>
-<layer number="22" name="bPlace" color="7" fill="1" visible="yes" active="no"/>
-<layer number="23" name="tOrigins" color="15" fill="1" visible="yes" active="no"/>
-<layer number="24" name="bOrigins" color="15" fill="1" visible="yes" active="no"/>
-<layer number="25" name="tNames" color="7" fill="1" visible="yes" active="no"/>
-<layer number="26" name="bNames" color="7" fill="1" visible="yes" active="no"/>
-<layer number="27" name="tValues" color="7" fill="1" visible="yes" active="no"/>
-<layer number="28" name="bValues" color="7" fill="1" visible="yes" active="no"/>
+<layer number="1" name="Top" color="4" fill="1" visible="no" active="no"/>
+<layer number="2" name="Route2" color="1" fill="3" visible="no" active="no"/>
+<layer number="3" name="Route3" color="4" fill="3" visible="no" active="no"/>
+<layer number="4" name="Route4" color="1" fill="4" visible="no" active="no"/>
+<layer number="5" name="Route5" color="4" fill="4" visible="no" active="no"/>
+<layer number="6" name="Route6" color="1" fill="8" visible="no" active="no"/>
+<layer number="7" name="Route7" color="4" fill="8" visible="no" active="no"/>
+<layer number="8" name="Route8" color="1" fill="2" visible="no" active="no"/>
+<layer number="9" name="Route9" color="4" fill="2" visible="no" active="no"/>
+<layer number="10" name="Route10" color="1" fill="7" visible="no" active="no"/>
+<layer number="11" name="Route11" color="4" fill="7" visible="no" active="no"/>
+<layer number="12" name="Route12" color="1" fill="5" visible="no" active="no"/>
+<layer number="13" name="Route13" color="4" fill="5" visible="no" active="no"/>
+<layer number="14" name="Route14" color="1" fill="6" visible="no" active="no"/>
+<layer number="15" name="Route15" color="4" fill="6" visible="no" active="no"/>
+<layer number="16" name="Bottom" color="1" fill="1" visible="no" active="no"/>
+<layer number="17" name="Pads" color="2" fill="1" visible="no" active="no"/>
+<layer number="18" name="Vias" color="2" fill="1" visible="no" active="no"/>
+<layer number="19" name="Unrouted" color="6" fill="1" visible="no" active="no"/>
+<layer number="20" name="Dimension" color="15" fill="1" visible="no" active="no"/>
+<layer number="21" name="tPlace" color="7" fill="1" visible="no" active="no"/>
+<layer number="22" name="bPlace" color="7" fill="1" visible="no" active="no"/>
+<layer number="23" name="tOrigins" color="15" fill="1" visible="no" active="no"/>
+<layer number="24" name="bOrigins" color="15" fill="1" visible="no" active="no"/>
+<layer number="25" name="tNames" color="7" fill="1" visible="no" active="no"/>
+<layer number="26" name="bNames" color="7" fill="1" visible="no" active="no"/>
+<layer number="27" name="tValues" color="7" fill="1" visible="no" active="no"/>
+<layer number="28" name="bValues" color="7" fill="1" visible="no" active="no"/>
 <layer number="29" name="tStop" color="7" fill="3" visible="no" active="no"/>
 <layer number="30" name="bStop" color="7" fill="6" visible="no" active="no"/>
 <layer number="31" name="tCream" color="7" fill="4" visible="no" active="no"/>
@@ -44,8 +44,8 @@
 <layer number="34" name="bFinish" color="6" fill="6" visible="no" active="no"/>
 <layer number="35" name="tGlue" color="7" fill="4" visible="no" active="no"/>
 <layer number="36" name="bGlue" color="7" fill="5" visible="no" active="no"/>
-<layer number="37" name="tTest" color="7" fill="1" visible="yes" active="no"/>
-<layer number="38" name="bTest" color="7" fill="1" visible="yes" active="no"/>
+<layer number="37" name="tTest" color="7" fill="1" visible="no" active="no"/>
+<layer number="38" name="bTest" color="7" fill="1" visible="no" active="no"/>
 <layer number="39" name="tKeepout" color="4" fill="11" visible="no" active="no"/>
 <layer number="40" name="bKeepout" color="1" fill="11" visible="no" active="no"/>
 <layer number="41" name="tRestrict" color="4" fill="10" visible="no" active="no"/>
@@ -53,17 +53,17 @@
 <layer number="43" name="vRestrict" color="2" fill="10" visible="no" active="no"/>
 <layer number="44" name="Drills" color="7" fill="1" visible="no" active="no"/>
 <layer number="45" name="Holes" color="7" fill="1" visible="no" active="no"/>
-<layer number="46" name="Milling" color="3" fill="1" visible="yes" active="no"/>
-<layer number="47" name="Measures" color="7" fill="1" visible="yes" active="no"/>
-<layer number="48" name="Document" color="7" fill="1" visible="yes" active="no"/>
-<layer number="49" name="Reference" color="7" fill="1" visible="yes" active="no"/>
-<layer number="50" name="dxf" color="7" fill="1" visible="yes" active="no"/>
-<layer number="51" name="tDocu" color="7" fill="1" visible="yes" active="no"/>
-<layer number="52" name="bDocu" color="7" fill="1" visible="yes" active="no"/>
-<layer number="53" name="tGND_GNDA" color="7" fill="9" visible="yes" active="no"/>
-<layer number="54" name="bGND_GNDA" color="1" fill="9" visible="yes" active="no"/>
-<layer number="56" name="wert" color="7" fill="1" visible="yes" active="no"/>
-<layer number="57" name="tCAD" color="7" fill="1" visible="yes" active="no"/>
+<layer number="46" name="Milling" color="3" fill="1" visible="no" active="no"/>
+<layer number="47" name="Measures" color="7" fill="1" visible="no" active="no"/>
+<layer number="48" name="Document" color="7" fill="1" visible="no" active="no"/>
+<layer number="49" name="Reference" color="7" fill="1" visible="no" active="no"/>
+<layer number="50" name="dxf" color="7" fill="1" visible="no" active="no"/>
+<layer number="51" name="tDocu" color="7" fill="1" visible="no" active="no"/>
+<layer number="52" name="bDocu" color="7" fill="1" visible="no" active="no"/>
+<layer number="53" name="tGND_GNDA" color="7" fill="9" visible="no" active="no"/>
+<layer number="54" name="bGND_GNDA" color="1" fill="9" visible="no" active="no"/>
+<layer number="56" name="wert" color="7" fill="1" visible="no" active="no"/>
+<layer number="57" name="tCAD" color="7" fill="1" visible="no" active="no"/>
 <layer number="91" name="Nets" color="2" fill="1" visible="yes" active="yes"/>
 <layer number="92" name="Busses" color="1" fill="1" visible="yes" active="yes"/>
 <layer number="93" name="Pins" color="2" fill="1" visible="no" active="yes"/>
@@ -2245,12 +2245,30 @@ In this library the device names are the same as the pin names of the symbols, t
 <text x="-1.905" y="-3.175" size="1.778" layer="96">&gt;VALUE</text>
 <pin name="GND" x="0" y="2.54" visible="off" length="short" direction="sup" rot="R270"/>
 </symbol>
+<symbol name="VCC">
+<circle x="0" y="1.27" radius="1.27" width="0.254" layer="94"/>
+<text x="-1.905" y="3.175" size="1.778" layer="96">&gt;VALUE</text>
+<pin name="VCC" x="0" y="-2.54" visible="off" length="short" direction="sup" rot="R90"/>
+</symbol>
 </symbols>
 <devicesets>
 <deviceset name="GND" prefix="SUPPLY">
 <description>&lt;b&gt;SUPPLY SYMBOL&lt;/b&gt;</description>
 <gates>
 <gate name="GND" symbol="GND" x="0" y="0"/>
+</gates>
+<devices>
+<device name="">
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="VCC" prefix="SUPPLY">
+<description>&lt;b&gt;SUPPLY SYMBOL&lt;/b&gt;</description>
+<gates>
+<gate name="G$1" symbol="VCC" x="0" y="0"/>
 </gates>
 <devices>
 <device name="">
@@ -13152,6 +13170,37 @@ Source: http://products.nichicon.co.jp/en/pdf/XJA043/e-ud.pdf</description>
 <part name="C2" library="rcl" deviceset="CPOL-US" device="E2-5" value="10uF"/>
 <part name="J4" library="con-amp" deviceset="MTA05-100" device=""/>
 <part name="SUPPLY8" library="supply2" deviceset="GND" device=""/>
+<<<<<<< HEAD:brd/Aquarius.s#9
+<part name="SW1" library="special" deviceset="SW_DIP-1" device=""/>
+<part name="R11" library="adafruit" deviceset="R-US_" device="R0805" value="4.7K"/>
+<part name="SUPPLY7" library="supply2" deviceset="GND" device=""/>
+<part name="R14" library="adafruit" deviceset="R-US_" device="R0805" value="110K"/>
+<part name="C4" library="rcl" deviceset="CPOL-US" device="153CLV-0405" value="10uF"/>
+<part name="IC1" library="74xx-us" deviceset="74*123" device="D"/>
+<part name="U2" library="Maxim_By_element14_Batch_1" deviceset="DS3231SN" device=""/>
+<part name="R15" library="adafruit" deviceset="R-US_" device="R0805" value="4.7K"/>
+<part name="SUPPLY1" library="supply2" deviceset="GND" device=""/>
+<part name="S1" library="switch-omron" deviceset="10-XX" device=""/>
+<part name="U$5" library="Aquarius" deviceset="LM2678" device="KTW0007B"/>
+<part name="D1" library="adafruit" deviceset="SCHOTTKY-DIODE" device="CB417-15"/>
+<part name="D2" library="adafruit" deviceset="SCHOTTKY-DIODE" device="CB417-15"/>
+<part name="SL1" library="con-amp-quick" deviceset="M02" device=""/>
+<part name="SL2" library="con-amp-quick" deviceset="M02" device=""/>
+<part name="SUPPLY9" library="supply2" deviceset="GND" device=""/>
+<part name="C3" library="rcl" deviceset="CPOL-US" device="140CLH-0810" value="4.7uF"/>
+<part name="C5" library="rcl" deviceset="C-EU" device="C0805" value="100nF"/>
+<part name="C6" library="rcl" deviceset="C-EU" device="C0805" value="10nF"/>
+<part name="D3" library="adafruit" deviceset="SCHOTTKY-DIODE" device="CB417-15" value="3A"/>
+<part name="C1" library="rcl" deviceset="CPOL-US" device="140CLH-0810"/>
+<part name="L1" library="rcl" deviceset="L-US" device="L8530M" value="22uH"/>
+<part name="SUPPLY4" library="supply2" deviceset="VCC" device=""/>
+<part name="SUPPLY10" library="supply2" deviceset="VCC" device=""/>
+<part name="SUPPLY11" library="supply2" deviceset="VCC" device=""/>
+<part name="SUPPLY12" library="supply2" deviceset="VCC" device=""/>
+<part name="SUPPLY13" library="supply2" deviceset="VCC" device=""/>
+<part name="SUPPLY14" library="supply2" deviceset="VCC" device=""/>
+=======
+>>>>>>> parent of 7f156e2... Pcb and pcb 3d model:brd/BeagleCap.sch
 </parts>
 <sheets>
 <sheet>
@@ -13212,6 +13261,38 @@ Source: http://products.nichicon.co.jp/en/pdf/XJA043/e-ud.pdf</description>
 <instance part="C2" gate="G$1" x="50.8" y="147.32"/>
 <instance part="J4" gate="G$1" x="128.27" y="-45.72" rot="R270"/>
 <instance part="SUPPLY8" gate="GND" x="124.46" y="-55.88"/>
+<<<<<<< HEAD:brd/Aquarius.s#9
+<instance part="SW1" gate="G$1" x="111.76" y="60.96"/>
+<instance part="R11" gate="G$1" x="81.28" y="68.58" rot="R90"/>
+<instance part="SUPPLY7" gate="GND" x="125.73" y="53.34"/>
+<instance part="R14" gate="G$1" x="-93.98" y="66.04" rot="R270"/>
+<instance part="C4" gate="G$1" x="-77.47" y="31.75"/>
+<instance part="IC1" gate="A" x="-58.42" y="45.72"/>
+<instance part="IC1" gate="P" x="-30.48" y="67.31"/>
+<instance part="U2" gate="A" x="-138.43" y="30.48"/>
+<instance part="R15" gate="G$1" x="-105.41" y="66.04" rot="R270"/>
+<instance part="SUPPLY1" gate="GND" x="-35.56" y="-3.81"/>
+<instance part="S1" gate="1" x="-35.56" y="11.43"/>
+<instance part="U$5" gate="G$1" x="11.43" y="149.86"/>
+<instance part="D1" gate="G$1" x="-26.67" y="157.48"/>
+<instance part="D2" gate="G$1" x="-26.67" y="144.78"/>
+<instance part="SL1" gate="G$1" x="-41.91" y="154.94"/>
+<instance part="SL2" gate="G$1" x="-41.91" y="142.24"/>
+<instance part="SUPPLY9" gate="GND" x="-15.24" y="129.54"/>
+<instance part="C3" gate="G$1" x="-15.24" y="142.24"/>
+<instance part="C5" gate="G$1" x="-7.62" y="143.51"/>
+<instance part="C6" gate="G$1" x="45.72" y="154.94" rot="R90"/>
+<instance part="D3" gate="G$1" x="45.72" y="139.7" rot="R90"/>
+<instance part="C1" gate="G$1" x="76.2" y="143.51"/>
+<instance part="L1" gate="G$1" x="67.31" y="149.86" rot="R90"/>
+<instance part="SUPPLY4" gate="G$1" x="-58.42" y="127"/>
+<instance part="SUPPLY10" gate="G$1" x="99.06" y="113.03"/>
+<instance part="SUPPLY11" gate="G$1" x="81.28" y="77.47"/>
+<instance part="SUPPLY12" gate="G$1" x="140.97" y="36.83"/>
+<instance part="SUPPLY13" gate="G$1" x="76.2" y="50.8"/>
+<instance part="SUPPLY14" gate="G$1" x="99.06" y="45.72"/>
+=======
+>>>>>>> parent of 7f156e2... Pcb and pcb 3d model:brd/BeagleCap.sch
 </instances>
 <busses>
 </busses>
@@ -13365,6 +13446,8 @@ Source: http://products.nichicon.co.jp/en/pdf/XJA043/e-ud.pdf</description>
 <wire x1="124.46" y1="-50.8" x2="125.73" y2="-50.8" width="0.1524" layer="91"/>
 </segment>
 </net>
+<<<<<<< HEAD:brd/Aquarius.s#9
+=======
 <net name="3.3V" class="0">
 <segment>
 <wire x1="76.2" y1="45.72" x2="76.2" y2="48.26" width="0.1524" layer="91"/>
@@ -13423,6 +13506,7 @@ Source: http://products.nichicon.co.jp/en/pdf/XJA043/e-ud.pdf</description>
 <wire x1="92.71" y1="41.91" x2="92.71" y2="39.37" width="0.1524" layer="91"/>
 </segment>
 </net>
+>>>>>>> parent of 7f156e2... Pcb and pcb 3d model:brd/BeagleCap.sch
 <net name="N$3" class="0">
 <segment>
 <pinref part="U1" gate="G$1" pin="DATA"/>
@@ -13622,6 +13706,73 @@ Source: http://products.nichicon.co.jp/en/pdf/XJA043/e-ud.pdf</description>
 <pinref part="J4" gate="G$1" pin="4"/>
 </segment>
 </net>
+<<<<<<< HEAD:brd/Aquarius.s#9
+<net name="VCC" class="0">
+<segment>
+<wire x1="-58.42" y1="116.84" x2="-58.42" y2="106.68" width="0.1524" layer="91"/>
+<wire x1="-58.42" y1="106.68" x2="-63.5" y2="106.68" width="0.1524" layer="91"/>
+<wire x1="-58.42" y1="116.84" x2="-58.42" y2="124.46" width="0.1524" layer="91"/>
+<junction x="-58.42" y="116.84"/>
+<pinref part="R4" gate="G$1" pin="1"/>
+<wire x1="-53.34" y1="116.84" x2="-58.42" y2="116.84" width="0.1524" layer="91"/>
+<pinref part="J2" gate="G$1" pin="3"/>
+<pinref part="SUPPLY4" gate="G$1" pin="VCC"/>
+</segment>
+<segment>
+<pinref part="U1" gate="G$1" pin="VDD"/>
+<wire x1="104.14" y1="101.6" x2="99.06" y2="101.6" width="0.1524" layer="91"/>
+<wire x1="99.06" y1="101.6" x2="99.06" y2="107.95" width="0.1524" layer="91"/>
+<pinref part="R2" gate="G$1" pin="2"/>
+<wire x1="99.06" y1="107.95" x2="99.06" y2="110.49" width="0.1524" layer="91"/>
+<wire x1="88.9" y1="106.68" x2="88.9" y2="107.95" width="0.1524" layer="91"/>
+<wire x1="88.9" y1="107.95" x2="99.06" y2="107.95" width="0.1524" layer="91"/>
+<junction x="99.06" y="107.95"/>
+<pinref part="SUPPLY10" gate="G$1" pin="VCC"/>
+</segment>
+<segment>
+<pinref part="R11" gate="G$1" pin="2"/>
+<wire x1="81.28" y1="74.93" x2="81.28" y2="73.66" width="0.1524" layer="91"/>
+<pinref part="SUPPLY11" gate="G$1" pin="VCC"/>
+</segment>
+<segment>
+<wire x1="140.97" y1="34.29" x2="140.97" y2="20.32" width="0.1524" layer="91"/>
+<pinref part="U$4" gate="G$1" pin="VCC"/>
+<wire x1="140.97" y1="20.32" x2="140.97" y2="7.62" width="0.1524" layer="91"/>
+<wire x1="140.97" y1="7.62" x2="140.97" y2="-5.08" width="0.1524" layer="91"/>
+<wire x1="140.97" y1="-5.08" x2="134.62" y2="-5.08" width="0.1524" layer="91"/>
+<pinref part="U$3" gate="G$1" pin="VCC"/>
+<wire x1="134.62" y1="7.62" x2="140.97" y2="7.62" width="0.1524" layer="91"/>
+<junction x="140.97" y="7.62"/>
+<pinref part="U$2" gate="G$1" pin="VCC"/>
+<wire x1="134.62" y1="20.32" x2="140.97" y2="20.32" width="0.1524" layer="91"/>
+<junction x="140.97" y="20.32"/>
+<pinref part="SUPPLY12" gate="G$1" pin="VCC"/>
+</segment>
+<segment>
+<wire x1="76.2" y1="45.72" x2="76.2" y2="48.26" width="0.1524" layer="91"/>
+<pinref part="U$1" gate="G$1" pin="VDD_3V3EXP@2"/>
+<wire x1="45.72" y1="45.72" x2="53.34" y2="45.72" width="0.1524" layer="91"/>
+<pinref part="U$1" gate="G$1" pin="VDD_3V3EXP@1"/>
+<wire x1="53.34" y1="45.72" x2="76.2" y2="45.72" width="0.1524" layer="91"/>
+<wire x1="-10.16" y1="45.72" x2="-15.24" y2="45.72" width="0.1524" layer="91"/>
+<wire x1="-15.24" y1="45.72" x2="-15.24" y2="53.34" width="0.1524" layer="91"/>
+<wire x1="-15.24" y1="53.34" x2="53.34" y2="53.34" width="0.1524" layer="91"/>
+<wire x1="53.34" y1="53.34" x2="53.34" y2="45.72" width="0.1524" layer="91"/>
+<junction x="53.34" y="45.72"/>
+<pinref part="SUPPLY13" gate="G$1" pin="VCC"/>
+</segment>
+<segment>
+<wire x1="99.06" y1="43.18" x2="99.06" y2="41.91" width="0.1524" layer="91"/>
+<pinref part="R5" gate="G$1" pin="2"/>
+<wire x1="99.06" y1="41.91" x2="99.06" y2="15.24" width="0.1524" layer="91"/>
+<wire x1="99.06" y1="15.24" x2="92.71" y2="15.24" width="0.1524" layer="91"/>
+<wire x1="92.71" y1="15.24" x2="92.71" y2="12.7" width="0.1524" layer="91"/>
+<wire x1="99.06" y1="41.91" x2="92.71" y2="41.91" width="0.1524" layer="91"/>
+<junction x="99.06" y="41.91"/>
+<pinref part="R6" gate="G$1" pin="2"/>
+<wire x1="92.71" y1="41.91" x2="92.71" y2="39.37" width="0.1524" layer="91"/>
+<pinref part="SUPPLY14" gate="G$1" pin="VCC"/>
+=======
 <net name="ORP_SENSOR" class="0">
 <segment>
 <pinref part="U$5" gate="G$1" pin="PRB"/>
@@ -13660,6 +13811,7 @@ Source: http://products.nichicon.co.jp/en/pdf/XJA043/e-ud.pdf</description>
 <wire x1="92.71" y1="-27.94" x2="90.17" y2="-27.94" width="0.1524" layer="91"/>
 <junction x="92.71" y="-27.94"/>
 <wire x1="90.17" y1="-27.94" x2="90.17" y2="-24.13" width="0.1524" layer="91"/>
+>>>>>>> parent of 7f156e2... Pcb and pcb 3d model:brd/BeagleCap.sch
 </segment>
 </net>
 </nets>

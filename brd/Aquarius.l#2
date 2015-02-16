@@ -77,14 +77,14 @@
 <wire x1="-5" y1="-5" x2="-5" y2="4.9" width="0.127" layer="51"/>
 <circle x="-3.9" y="-3.8" radius="0.806225" width="0.127" layer="51"/>
 <circle x="3.9" y="3.8" radius="0.8544" width="0.127" layer="51"/>
-<smd name="VIN" x="-0.1" y="-7.3" dx="3.06" dy="0.89" layer="1" rot="R90"/>
-<smd name="VIN1" x="-1.36" y="-7.3" dx="3.06" dy="0.89" layer="1" rot="R90"/>
-<smd name="VIN2" x="-2.62" y="-7.3" dx="3.06" dy="0.89" layer="1" rot="R90"/>
-<smd name="VIN3" x="-3.88" y="-7.3" dx="3.06" dy="0.89" layer="1" rot="R90"/>
-<smd name="VIN4" x="1.16" y="-7.3" dx="3.06" dy="0.89" layer="1" rot="R90"/>
-<smd name="VIN5" x="2.42" y="-7.3" dx="3.06" dy="0.89" layer="1" rot="R90"/>
-<smd name="VIN6" x="3.68" y="-7.3" dx="3.06" dy="0.89" layer="1" rot="R90"/>
-<smd name="P$1" x="0.01" y="0" dx="8.54" dy="5.35" layer="1" rot="R90"/>
+<smd name="AGND" x="-0.1" y="-7.3" dx="3.06" dy="0.89" layer="1" rot="R90"/>
+<smd name="EN" x="-1.36" y="-7.3" dx="3.06" dy="0.89" layer="1" rot="R90"/>
+<smd name="SYNC" x="-2.62" y="-7.3" dx="3.06" dy="0.89" layer="1" rot="R90"/>
+<smd name="VIN" x="-3.88" y="-7.3" dx="3.06" dy="0.89" layer="1" rot="R90"/>
+<smd name="FB" x="1.16" y="-7.3" dx="3.06" dy="0.89" layer="1" rot="R90"/>
+<smd name="SS/TRK" x="2.42" y="-7.3" dx="3.06" dy="0.89" layer="1" rot="R90"/>
+<smd name="VOUT" x="3.68" y="-7.3" dx="3.06" dy="0.89" layer="1" rot="R90"/>
+<smd name="PGND" x="0.01" y="0" dx="8.54" dy="5.35" layer="1" rot="R90"/>
 </package>
 </packages>
 <symbols>

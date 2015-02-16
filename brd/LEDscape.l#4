@@ -724,7 +724,6 @@
 <rectangle x1="15.875" y1="0" x2="34.29" y2="17.78" layer="39"/>
 </package>
 <package name="ATLAS_STAMP">
-<rectangle x1="0" y1="0" x2="13.97" y2="20.16" layer="21"/>
 <pad name="TX" x="6.985" y="18.97" drill="0.8"/>
 <pad name="GND" x="4.445" y="18.97" drill="0.8" shape="square"/>
 <pad name="RX" x="9.525" y="18.97" drill="0.8" rot="R180"/>
@@ -739,6 +738,10 @@
 <text x="5.3" y="2.7" size="0.6096" layer="25" rot="R180">Vcc</text>
 <text x="5.6" y="13.6" size="0.6096" layer="25">ATLAS</text>
 <text x="4.9" y="12.4" size="0.6096" layer="25">Scientific</text>
+<wire x1="0" y1="0" x2="14" y2="0" width="0.127" layer="21"/>
+<wire x1="14" y1="0" x2="14" y2="20.3" width="0.127" layer="21"/>
+<wire x1="14" y1="20.3" x2="0" y2="20.3" width="0.127" layer="21"/>
+<wire x1="0" y1="20.3" x2="0" y2="0" width="0.127" layer="21"/>
 </package>
 </packages>
 <symbols>
@@ -886,14 +889,14 @@
 <text x="-3.19" y="-4.44" size="1.778" layer="94">Stamp</text>
 <wire x1="-5.08" y1="-10.16" x2="5.08" y2="-10.16" width="0.254" layer="94"/>
 <wire x1="5.08" y1="-10.16" x2="5.08" y2="5.08" width="0.254" layer="94"/>
-<wire x1="5.08" y1="5.08" x2="-5.08" y2="5.08" width="0.254" layer="94"/>
-<wire x1="-5.08" y1="5.08" x2="-5.08" y2="-10.16" width="0.254" layer="94"/>
-<pin name="VCC" x="-2.54" y="-8.89" length="point" rot="R270"/>
-<pin name="PRB" x="0" y="-8.89" length="point" rot="R270"/>
-<pin name="PGND" x="2.54" y="-8.89" length="point" rot="R270"/>
-<pin name="GND" x="-2.54" y="3.81" length="point" rot="R90"/>
-<pin name="TX" x="0" y="3.81" length="point" rot="R90"/>
-<pin name="RX" x="2.54" y="3.81" length="point" rot="R90"/>
+<wire x1="5.08" y1="5.08" x2="-7.62" y2="5.08" width="0.254" layer="94"/>
+<wire x1="-7.62" y1="5.08" x2="-5.08" y2="-10.16" width="0.254" layer="94"/>
+<pin name="VCC" x="-2.54" y="-8.89" visible="pad" length="short" rot="R270"/>
+<pin name="PRB" x="0" y="-8.89" visible="pad" length="short" rot="R270"/>
+<pin name="PGND" x="2.54" y="-8.89" visible="pad" length="short" rot="R270"/>
+<pin name="GND" x="-2.54" y="3.81" visible="pad" length="short" rot="R90"/>
+<pin name="TX" x="0" y="3.81" visible="pad" length="short" rot="R90"/>
+<pin name="RX" x="2.54" y="3.81" visible="pad" length="short" rot="R90"/>
 </symbol>
 </symbols>
 <devicesets>

@@ -61,7 +61,7 @@
 <layer number="52" name="bDocu" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="91" name="Nets" color="2" fill="1" visible="yes" active="yes"/>
 <layer number="92" name="Busses" color="1" fill="1" visible="yes" active="yes"/>
-<layer number="93" name="Pins" color="2" fill="1" visible="no" active="yes"/>
+<layer number="93" name="Pins" color="2" fill="1" visible="yes" active="yes"/>
 <layer number="94" name="Symbols" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="95" name="Names" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="96" name="Values" color="7" fill="1" visible="yes" active="yes"/>
@@ -89,6 +89,18 @@
 </packages>
 <symbols>
 <symbol name="LMZ23605">
+<wire x1="-12.7" y1="7.62" x2="12.7" y2="7.62" width="0.254" layer="94"/>
+<wire x1="12.7" y1="7.62" x2="12.7" y2="-22.86" width="0.254" layer="94"/>
+<wire x1="12.7" y1="-22.86" x2="-12.7" y2="-22.86" width="0.254" layer="94"/>
+<wire x1="-12.7" y1="-22.86" x2="-12.7" y2="7.62" width="0.254" layer="94"/>
+<pin name="VIN" x="-17.78" y="5.08" length="middle" direction="sup"/>
+<pin name="AGND" x="0" y="-27.94" length="middle" rot="R90"/>
+<pin name="P$3" x="-17.78" y="0" length="middle"/>
+<pin name="P$4" x="-17.78" y="-2.54" length="middle"/>
+<pin name="P$5" x="-17.78" y="-5.08" length="middle"/>
+<pin name="P$6" x="-17.78" y="-7.62" length="middle"/>
+<pin name="P$7" x="-17.78" y="-10.16" length="middle"/>
+<pin name="PGND" x="2.54" y="-27.94" length="middle" direction="sup" rot="R90"/>
 </symbol>
 </symbols>
 <devicesets>
