@@ -1,9 +1,15 @@
 #include "../../commun.h"
 #include <iostream>
+#include <stdlib.h>     //atof
 #include "../../../include/blacklib/BlackLib.h"
 #include "../../../include/blacklib/BlackI2C.h"
 
 #define I2C_COMMS_ERROR "I2C_COMMS_ERROR"
+
+#define PH_READ_BACK_OK 1
+#define PH_READ_BACK_FAIL 2
+#define PH_READ_BACK_PENDING 254
+#define PH_READ_BACK_NO_DATA 255
 
 //Commands that can be called for the pH module
 #define PH_COMMAND_CALIB "Cal"
@@ -104,6 +110,7 @@ int main(int argc, char * argv[])
     command.assign(argv[2]);    
     vector<string> commandSplitted{aquarius::splitArguments(command, ':')};
 	
+	int commandSuccess;
     ////////////////////////////********COMMAND BUILDING**********////////////////////
     //Creates i2c command
 	//If command is calibration 	
@@ -132,7 +139,7 @@ int main(int argc, char * argv[])
 				return 1;
 			}
 			cout << "Final command : " << finalCommand << endl;
-			i2cCommand(&myI2c, finalCommand, PH_COMMAND_CALIB_DELAY, &returnString);
+			commandSuccess = i2cCommand(&myI2c, finalCommand, PH_COMMAND_CALIB_DELAY, &returnString);
 		}
 		else
 		{
@@ -144,7 +151,7 @@ int main(int argc, char * argv[])
 	{
 		cout << "Initiating a factory reset" << endl;
 		i2cCommand(&myI2c, commandSplitted[0], PH_COMMAND_X_DELAY, &returnString);
-		i2cCommand(&myI2c, PH_COMMAND_STATUS, PH_COMMAND_STATUS_DELAY, &returnString);
+		commandSuccess = i2cCommand(&myI2c, PH_COMMAND_STATUS, PH_COMMAND_STATUS_DELAY, &returnString);
 	}
 	else if(commandSplitted[0].compare(PH_COMMAND_L) == 0)
 	{
@@ -157,7 +164,7 @@ int main(int argc, char * argv[])
 			//OUTPUT ERROR NOT ENOUGH PARAMS
 			return 1;
 		}			
-		//i2cCommand(&myI2c, command, PH_COMMAND_R_DELAY, &returnString);
+		//commandSuccess = i2cCommand(&myI2c, command, PH_COMMAND_R_DELAY, &returnString);
 	}
 	else if(commandSplitted[0].compare(PH_COMMAND_T) == 0)
 	{
@@ -172,41 +179,69 @@ int main(int argc, char * argv[])
 		}
 	}	
 	else if(commandSplitted[0].compare(PH_COMMAND_I) == 0)=
-		i2cCommand(&myI2c, commandSplitted[0], PH_COMMAND_R_DELAY, &returnString);	
+		commandSuccess = i2cCommand(&myI2c, commandSplitted[0], PH_COMMAND_R_DELAY, &returnString);	
     //If the command is a reading
     else if(commandSplitted[0].compare(PH_COMMAND_R) == 0)
-        i2cCommand(&myI2c, commandSplitted[0], PH_COMMAND_R_DELAY, &returnString);
+        commandSuccess = i2cCommand(&myI2c, commandSplitted[0], PH_COMMAND_R_DELAY, &returnString);
 	else if(commandSplitted[0].compare(PH_COMMAND_STATUS) == 0)
-		i2cCommand(&myI2c, commandSplitted[0], PH_COMMAND_STATUS_DELAY, &returnString);
+		commandSuccess = i2cCommand(&myI2c, commandSplitted[0], PH_COMMAND_STATUS_DELAY, &returnString);
 	else if(commandSplitted[0].compare(PH_COMMAND_SLEEP) == 0)
-		i2cCommand(&myI2c, commandSplitted[0], PH_COMMAND_SLEEP_DELAY, &returnString);
+		commandSuccess = i2cCommand(&myI2c, commandSplitted[0], PH_COMMAND_SLEEP_DELAY, &returnString);
 	////////////////////////////********END OF COMMAND*************//////////
+	
 	
     ////////////////////////////********RESPONSE ANALYSIS**********////////////////////
     //Outputs designed for each commands
-    if(returnString.compare(I2C_COMMS_ERROR) == 0)
-    {
-        aquarius::outputError("PH", I2C_COMMS_ERROR);
-    }
-    else if(commandSplitted[0].compare(PH_COMMAND_CALIB) == 0)
-    {
-        cout << "Command calibration executed" << returnString << endl;
-        
-    }
-    else if(commandSplitted[0].compare(PH_COMMAND_R) == 0)
-    {
-        cout << "Command succesfully executed : " << returnString<< endl;
-        string dataName[] = { "PH" };
-        float datas[] = { 7.0 };
-        aquarius::outputReadData("PH", 1, dataName, datas);
-        return 0;
-    }
+	if(commandSuccess == PH_READ_BACK_OK)
+	{
+		if(returnString.compare(I2C_COMMS_ERROR) == 0)
+		{
+			aquarius::outputError("PH", I2C_COMMS_ERROR);
+		}
+		else if(commandSplitted[0].compare(PH_COMMAND_CALIB) == 0)
+		{
+			cout << "Command calibration executed" << returnString << endl;
+			
+		}
+		else if(commandSplitted[0].compare(PH_COMMAND_R) == 0)
+		{
+			cout << "Command succesfully executed PH = " << returnString.substr(1) << endl;
+			string dataName[] = { "PH" };
+			string tempPH = returnString.substr(1);
+			
+			float datas[] = { (float)atof(tempPH.c_str()) };
+			aquarius::outputReadData("PH", 1, dataName, datas);
+			return 0;
+		}		
+	}
+	else if(commandSuccess == PH_READ_BACK_FAIL)
+	{
+		
+	}
+	else if(commandSuccess == PH_READ_BACK_PENDING)
+	{
+		
+	}
+	else if(commandSuccess == PH_READ_BACK_NO_DATA)
+	{
+		
+	}
+	else
+	{
+		if(returnString.compare(I2C_COMMS_ERROR) == 0)
+		{
+			aquarius::outputError("PH", I2C_COMMS_ERROR);
+		}
+	}
+	
+    
+    
     /////////////////////////////////**************END OF RESPONSE****////////////////
 	
     return 1;
 }
 
-void i2cCommand(BlackI2C * i2c, string commandTo, int delay, string * returnData)
+int i2cCommand(BlackI2C * i2c, string commandTo, int delay, string * returnData)
 {
     uint8_t buffer[32] = {0x00};
     
@@ -217,11 +252,13 @@ void i2cCommand(BlackI2C * i2c, string commandTo, int delay, string * returnData
     if(i2c->readLine(buffer, sizeof(buffer)))
     {
         returnData->assign((char*)buffer);
+		return (int)buffer[0];
     }
     else
     {
         (*returnData) = I2C_COMMS_ERROR;
     }
+	return 0;
 }
 
 string AtlasPH_output_missingArguments()
