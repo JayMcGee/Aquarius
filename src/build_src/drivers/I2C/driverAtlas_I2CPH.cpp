@@ -49,7 +49,7 @@ using namespace std;
  * @param delay			Delay before looking for an answer
  * @param returnData    Pointer to the returned data buffer
  */
-void i2cCommand(BlackI2C * i2c, string commandTo, int delay, string * returnData);
+int i2cCommand(BlackI2C * i2c, string commandTo, int delay, string * returnData);
 
 /**
  * @brief Output the missing arguments phrase for help
@@ -178,7 +178,7 @@ int main(int argc, char * argv[])
 			return 1;
 		}
 	}	
-	else if(commandSplitted[0].compare(PH_COMMAND_I) == 0)=
+	else if(commandSplitted[0].compare(PH_COMMAND_I) == 0)
 		commandSuccess = i2cCommand(&myI2c, commandSplitted[0], PH_COMMAND_R_DELAY, &returnString);	
     //If the command is a reading
     else if(commandSplitted[0].compare(PH_COMMAND_R) == 0)
