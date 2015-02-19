@@ -7,9 +7,16 @@
 #define I2C_COMMS_ERROR "I2C_COMMS_ERROR"
 
 #define PH_READ_BACK_OK 1
+
 #define PH_READ_BACK_FAIL 2
+#define I2C_READ_FAIL "I2C_READ_FAIL"
 #define PH_READ_BACK_PENDING 254
+#define I2C_READ_PENDING "I2C_READ_PENDING"
 #define PH_READ_BACK_NO_DATA 255
+#define I2C_READ_NO_DATA "I2C_READ_NO_DATA"
+
+#define NOT_ENOUGH_PARAMS "NOT_ENOUGH_PARAMS"
+#define NOT_ENOUGH_SUBS "NOT_ENOUGH_SUBS"
 
 //Commands that can be called for the pH module
 #define PH_COMMAND_CALIB "Cal"
@@ -48,6 +55,7 @@ using namespace std;
  * @param commandTo     Command to send to the device
  * @param delay			Delay before looking for an answer
  * @param returnData    Pointer to the returned data buffer
+ * @return 
  */
 int i2cCommand(BlackI2C * i2c, string commandTo, int delay, string * returnData);
 
@@ -135,7 +143,7 @@ int main(int argc, char * argv[])
 			}
 			else
 			{
-				//OUTPUT ERROR NOT GOOD SUB COMMAND
+				aquarius::outputError("PH", NOT_ENOUGH_SUBS);
 				return 1;
 			}
 			cout << "Final command : " << finalCommand << endl;
@@ -143,7 +151,7 @@ int main(int argc, char * argv[])
 		}
 		else
 		{
-			//OUTPUT ERROR NOT ENOUGH ARGS
+			aquarius::outputError("PH", NOT_ENOUGH_PARAMS);
 			return 1;
 		}
 	}   
@@ -161,7 +169,7 @@ int main(int argc, char * argv[])
 		}
 		else
 		{
-			//OUTPUT ERROR NOT ENOUGH PARAMS
+			aquarius::outputError("PH", NOT_ENOUGH_PARAMS);
 			return 1;
 		}			
 		//commandSuccess = i2cCommand(&myI2c, command, PH_COMMAND_R_DELAY, &returnString);
@@ -170,7 +178,6 @@ int main(int argc, char * argv[])
 	{
 		if(commandSplitted.size() > 1)
 		{
-			
 		}
 		else
 		{
@@ -216,15 +223,15 @@ int main(int argc, char * argv[])
 	}
 	else if(commandSuccess == PH_READ_BACK_FAIL)
 	{
-		
+		aquarius::outputError("PH", I2C_READ_FAIL);
 	}
 	else if(commandSuccess == PH_READ_BACK_PENDING)
 	{
-		
+		aquarius::outputError("PH", I2C_READ_PENDING);
 	}
 	else if(commandSuccess == PH_READ_BACK_NO_DATA)
 	{
-		
+		aquarius::outputError("PH", I2C_READ_NO_DATA);
 	}
 	else
 	{
