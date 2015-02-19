@@ -16366,7 +16366,7 @@ at 30/07/2012 11:04:18</description>
 <part name="R6" library="adafruit" deviceset="R-US_" device="R0805" value="4.7K"/>
 <part name="SUPPLY6" library="supply2" deviceset="GND" device=""/>
 <part name="J2" library="con-amp" deviceset="MTA03-100" device="" value="DS18B20"/>
-<part name="J4" library="con-amp" deviceset="MTA05-100" device=""/>
+<part name="J4" library="con-amp" deviceset="MTA05-100" device="" value="GSM/GPS"/>
 <part name="SUPPLY8" library="supply2" deviceset="GND" device=""/>
 <part name="SW1" library="special" deviceset="SW_DIP-1" device=""/>
 <part name="R11" library="adafruit" deviceset="R-US_" device="R0805" value="4.7K"/>
@@ -16378,7 +16378,7 @@ at 30/07/2012 11:04:18</description>
 <part name="R15" library="adafruit" deviceset="R-US_" device="R0805" value="4.7K"/>
 <part name="SUPPLY1" library="supply2" deviceset="GND" device=""/>
 <part name="S1" library="switch-omron" deviceset="10-XX" device=""/>
-<part name="U$5" library="Aquarius" deviceset="LM2678" device="KTW0007B"/>
+<part name="LM2678" library="Aquarius" deviceset="LM2678" device="KTW0007B"/>
 <part name="D1" library="adafruit" deviceset="SCHOTTKY-DIODE" device="CB417-15"/>
 <part name="D2" library="adafruit" deviceset="SCHOTTKY-DIODE" device="CB417-15"/>
 <part name="BATT.1" library="con-amp-quick" deviceset="M02" device=""/>
@@ -16430,7 +16430,7 @@ at 30/07/2012 11:04:18</description>
 <instance part="SUPPLY6" gate="GND" x="-49.53" y="86.36" rot="MR0"/>
 <instance part="J2" gate="G$1" x="-66.04" y="104.14" rot="R90"/>
 <instance part="J4" gate="G$1" x="129.54" y="-45.72" rot="R270"/>
-<instance part="SUPPLY8" gate="GND" x="124.46" y="-55.88"/>
+<instance part="SUPPLY8" gate="GND" x="119.38" y="-55.88"/>
 <instance part="SW1" gate="G$1" x="111.76" y="60.96"/>
 <instance part="R11" gate="G$1" x="81.28" y="68.58" rot="R90"/>
 <instance part="SUPPLY7" gate="GND" x="125.73" y="53.34"/>
@@ -16442,7 +16442,7 @@ at 30/07/2012 11:04:18</description>
 <instance part="R15" gate="G$1" x="-105.41" y="66.04" rot="R270"/>
 <instance part="SUPPLY1" gate="GND" x="-35.56" y="-3.81"/>
 <instance part="S1" gate="1" x="-35.56" y="11.43"/>
-<instance part="U$5" gate="G$1" x="11.43" y="149.86"/>
+<instance part="LM2678" gate="G$1" x="11.43" y="149.86"/>
 <instance part="D1" gate="G$1" x="-26.67" y="157.48"/>
 <instance part="D2" gate="G$1" x="-26.67" y="144.78"/>
 <instance part="BATT.1" gate="G$1" x="-41.91" y="154.94"/>
@@ -16588,9 +16588,9 @@ at 30/07/2012 11:04:18</description>
 </segment>
 <segment>
 <pinref part="SUPPLY8" gate="GND" pin="GND"/>
-<wire x1="124.46" y1="-53.34" x2="124.46" y2="-50.8" width="0.1524" layer="91"/>
+<wire x1="119.38" y1="-53.34" x2="119.38" y2="-50.8" width="0.1524" layer="91"/>
 <pinref part="J4" gate="G$1" pin="5"/>
-<wire x1="124.46" y1="-50.8" x2="127" y2="-50.8" width="0.1524" layer="91"/>
+<wire x1="119.38" y1="-50.8" x2="127" y2="-50.8" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="SW1" gate="G$1" pin="1"/>
@@ -16614,12 +16614,12 @@ at 30/07/2012 11:04:18</description>
 <wire x1="-31.75" y1="134.62" x2="-15.24" y2="134.62" width="0.1524" layer="91"/>
 <pinref part="SUPPLY9" gate="GND" pin="GND"/>
 <wire x1="-15.24" y1="134.62" x2="-15.24" y2="132.08" width="0.1524" layer="91"/>
-<pinref part="U$5" gate="G$1" pin="GROUND"/>
+<pinref part="LM2678" gate="G$1" pin="GROUND"/>
 <wire x1="-15.24" y1="134.62" x2="-7.62" y2="134.62" width="0.1524" layer="91"/>
 <wire x1="-7.62" y1="134.62" x2="13.97" y2="134.62" width="0.1524" layer="91"/>
 <wire x1="13.97" y1="134.62" x2="13.97" y2="142.24" width="0.1524" layer="91"/>
 <junction x="-15.24" y="134.62"/>
-<pinref part="U$5" gate="G$1" pin="TAB_GND"/>
+<pinref part="LM2678" gate="G$1" pin="TAB_GND"/>
 <wire x1="13.97" y1="134.62" x2="16.51" y2="134.62" width="0.1524" layer="91"/>
 <wire x1="16.51" y1="134.62" x2="16.51" y2="142.24" width="0.1524" layer="91"/>
 <junction x="13.97" y="134.62"/>
@@ -16818,9 +16818,9 @@ at 30/07/2012 11:04:18</description>
 </segment>
 <segment>
 <pinref part="J4" gate="G$1" pin="1"/>
-<wire x1="127" y1="-40.64" x2="111.76" y2="-40.64" width="0.1524" layer="91"/>
-<wire x1="111.76" y1="-40.64" x2="111.76" y2="-38.1" width="0.1524" layer="91"/>
-<label x="114.3" y="-40.64" size="1.778" layer="95"/>
+<wire x1="127" y1="-40.64" x2="119.38" y2="-40.64" width="0.1524" layer="91"/>
+<wire x1="119.38" y1="-40.64" x2="119.38" y2="-38.1" width="0.1524" layer="91"/>
+<label x="121.92" y="-40.64" size="1.778" layer="95"/>
 </segment>
 <segment>
 <pinref part="L1" gate="G$1" pin="2"/>
@@ -16830,7 +16830,7 @@ at 30/07/2012 11:04:18</description>
 <wire x1="76.2" y1="149.86" x2="90.17" y2="149.86" width="0.1524" layer="91"/>
 <junction x="76.2" y="149.86"/>
 <label x="88.9" y="149.86" size="1.778" layer="95"/>
-<pinref part="U$5" gate="G$1" pin="FBACK"/>
+<pinref part="LM2678" gate="G$1" pin="FBACK"/>
 <wire x1="36.83" y1="152.4" x2="76.2" y2="152.4" width="0.1524" layer="91"/>
 <wire x1="76.2" y1="152.4" x2="76.2" y2="149.86" width="0.1524" layer="91"/>
 </segment>
@@ -16930,7 +16930,7 @@ at 30/07/2012 11:04:18</description>
 <wire x1="-21.59" y1="149.86" x2="-21.59" y2="157.48" width="0.1524" layer="91"/>
 <wire x1="-21.59" y1="157.48" x2="-24.13" y2="157.48" width="0.1524" layer="91"/>
 <junction x="-21.59" y="149.86"/>
-<pinref part="U$5" gate="G$1" pin="INPUT"/>
+<pinref part="LM2678" gate="G$1" pin="INPUT"/>
 <wire x1="-21.59" y1="149.86" x2="-15.24" y2="149.86" width="0.1524" layer="91"/>
 <wire x1="-15.24" y1="149.86" x2="-7.62" y2="149.86" width="0.1524" layer="91"/>
 <wire x1="-7.62" y1="149.86" x2="-3.81" y2="149.86" width="0.1524" layer="91"/>
@@ -16944,7 +16944,7 @@ at 30/07/2012 11:04:18</description>
 </net>
 <net name="N$13" class="0">
 <segment>
-<pinref part="U$5" gate="G$1" pin="OUTPUT"/>
+<pinref part="LM2678" gate="G$1" pin="OUTPUT"/>
 <pinref part="D3" gate="G$1" pin="C"/>
 <wire x1="36.83" y1="149.86" x2="45.72" y2="149.86" width="0.1524" layer="91"/>
 <wire x1="45.72" y1="149.86" x2="45.72" y2="142.24" width="0.1524" layer="91"/>
@@ -16960,7 +16960,7 @@ at 30/07/2012 11:04:18</description>
 </net>
 <net name="N$9" class="0">
 <segment>
-<pinref part="U$5" gate="G$1" pin="CBOOST"/>
+<pinref part="LM2678" gate="G$1" pin="CBOOST"/>
 <pinref part="C6" gate="G$1" pin="1"/>
 <wire x1="36.83" y1="154.94" x2="43.18" y2="154.94" width="0.1524" layer="91"/>
 </segment>

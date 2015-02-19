@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="7.1.0">
+<eagle version="6.4">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -36,7 +36,7 @@
 <layer number="26" name="bNames" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="27" name="tValues" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="28" name="bValues" color="7" fill="1" visible="yes" active="yes"/>
-<layer number="29" name="tStop" color="7" fill="3" visible="no" active="yes"/>
+<layer number="29" name="tStop" color="7" fill="3" visible="yes" active="yes"/>
 <layer number="30" name="bStop" color="7" fill="6" visible="no" active="yes"/>
 <layer number="31" name="tCream" color="7" fill="4" visible="no" active="yes"/>
 <layer number="32" name="bCream" color="7" fill="5" visible="no" active="yes"/>
@@ -151,7 +151,7 @@
 <wire x1="-34.5" y1="48.5" x2="-39.5" y2="54.5" width="0.254" layer="20" curve="90"/>
 <wire x1="-39.5" y1="54.5" x2="-40.5" y2="54.5" width="0.254" layer="20"/>
 <wire x1="-40.5" y1="54.5" x2="-40.5" y2="70.5" width="0.254" layer="20"/>
-<text x="-1.9548" y="-8.8468" size="2.54" layer="21">AQUARIUS</text>
+<text x="17.0424" y="-3.9548" size="2.54" layer="21" rot="R180">AQUARIUS</text>
 <hole x="-38.8048" y="-56.6848" drill="2"/>
 <hole x="33.1524" y="-56.6848" drill="2"/>
 <hole x="33" y="68.5" drill="2"/>
@@ -159,10 +159,10 @@
 <hole x="0.0572" y="0.008" drill="2"/>
 <hole x="-1.162" y="38.87" drill="2"/>
 <text x="18.288" y="-3.3528" size="1.778" layer="25">On/Off</text>
-<text x="-2.4384" y="4.8006" size="1.778" layer="25">Field</text>
-<text x="-1.0668" y="-3.3528" size="1.778" layer="25">Lab</text>
+<text x="37.0332" y="4.953" size="1.778" layer="25">Field</text>
+<text x="37.1094" y="1.2192" size="1.778" layer="25">Lab</text>
 <text x="-27.051" y="-44.2722" size="1.778" layer="25" rot="R180">Temp.</text>
-<text x="23.5458" y="-9.0678" size="1.778" layer="25">LM2678</text>
+<text x="22.7838" y="-7.0104" size="1.778" layer="25">LM2678</text>
 <text x="-58.5046" y="-64.2704" size="1.778" layer="144">LAYER-STACK</text>
 <text x="-79.8914" y="-70.6331" size="1.778" layer="145">01-16</text>
 <wire x1="8.0772" y1="45.9232" x2="8.0772" y2="44.9072" width="0.1016" layer="145"/>
@@ -772,6 +772,7 @@
 <wire x1="-35.008" y1="-26.912" x2="-33.992" y2="-27.928" width="0.1016" layer="146"/>
 <wire x1="-33.992" y1="-26.912" x2="-35.008" y2="-27.928" width="0.1016" layer="146"/>
 <wire x1="-34.5" y1="-26.912" x2="-34.5" y2="-27.928" width="0.1016" layer="146"/>
+<rectangle x1="8.8392" y1="-20.3454" x2="32.1564" y2="-7.4676" layer="29"/>
 </plain>
 <libraries>
 <library name="adafruit">
@@ -3312,9 +3313,6 @@ Please make sure your boards conform to these design rules.</description>
 <autorouter>
 <pass name="Default">
 <param name="RoutingGrid" value="50mil"/>
-<param name="AutoGrid" value="1"/>
-<param name="Efforts" value="0"/>
-<param name="TopRouterVariant" value="1"/>
 <param name="tpViaShape" value="round"/>
 <param name="PrefDir.1" value="|"/>
 <param name="PrefDir.2" value="0"/>
@@ -3618,8 +3616,8 @@ Please make sure your boards conform to these design rules.</description>
 <contactref element="X4" pad="1"/>
 <contactref element="X5" pad="1"/>
 <polygon width="1.016" layer="1">
-<vertex x="9.0678" y="-10.0584"/>
-<vertex x="31.9278" y="-9.9822"/>
+<vertex x="8.9916" y="-7.62"/>
+<vertex x="32.004" y="-7.6962"/>
 <vertex x="31.9278" y="-20.1168"/>
 <vertex x="9.0678" y="-20.1168"/>
 </polygon>
@@ -3668,6 +3666,10 @@ Please make sure your boards conform to these design rules.</description>
 <wire x1="-11.8872" y1="54.1782" x2="-12.0396" y2="54.3306" width="0.6096" layer="1"/>
 <wire x1="-12.0396" y1="54.3306" x2="-12.0396" y2="56.9214" width="0.6096" layer="1"/>
 <via x="-12.0396" y="56.9214" extent="1-16" drill="0.6" shape="square"/>
+<contactref element="SW2" pad="1"/>
+<contactref element="SW2" pad="2"/>
+<contactref element="SW2" pad="3"/>
+<contactref element="SW2" pad="4"/>
 </signal>
 <signal name="N$3">
 <contactref element="U1" pad="DATA"/>
@@ -3895,6 +3897,8 @@ Please make sure your boards conform to these design rules.</description>
 <wire x1="0.4398" y1="47.413" x2="1.7098" y2="47.413" width="0.6096" layer="1"/>
 <wire x1="-0.8302" y1="53.5598" x2="-0.8302" y2="49.4618" width="0.6096" layer="1"/>
 <wire x1="-0.8302" y1="49.4618" x2="-0.8382" y2="49.3014" width="0.6096" layer="1"/>
+<contactref element="U$1" pad="52"/>
+<wire x1="-30.8" y1="65.305" x2="-30.8" y2="62.765" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="PWR_BUT">
 <contactref element="IC1" pad="4"/>
@@ -3946,9 +3950,6 @@ Please make sure your boards conform to these design rules.</description>
 </signal>
 <signal name="N$12">
 <contactref element="U2" pad="4"/>
-</signal>
-<signal name="N$1">
-<contactref element="U$1" pad="52"/>
 </signal>
 <signal name="N$2">
 <contactref element="D1" pad="A"/>

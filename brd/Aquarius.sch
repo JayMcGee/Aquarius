@@ -16438,6 +16438,7 @@ diameter 5 mm, horizontal, grid 15.24 mm</description>
 <part name="R7" library="adafruit" deviceset="R-US_" device="R0805" value="4.7K"/>
 <part name="R8" library="adafruit" deviceset="R-US_" device="R0805" value="4.7K"/>
 <part name="R9" library="adafruit" deviceset="R-US_" device="R0805" value="4.7K"/>
+<part name="SUPPLY7" library="supply2" deviceset="GND" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -16505,6 +16506,7 @@ diameter 5 mm, horizontal, grid 15.24 mm</description>
 <instance part="R7" gate="G$1" x="152.4" y="81.28" rot="R90"/>
 <instance part="R8" gate="G$1" x="160.02" y="81.28" rot="R90"/>
 <instance part="R9" gate="G$1" x="167.64" y="81.28" rot="R90"/>
+<instance part="SUPPLY7" gate="GND" x="218.44" y="45.72"/>
 </instances>
 <busses>
 </busses>
@@ -16679,6 +16681,24 @@ diameter 5 mm, horizontal, grid 15.24 mm</description>
 <junction x="-35.56" y="154.94"/>
 <pinref part="X5" gate="G$1" pin="1"/>
 <junction x="-35.56" y="142.24"/>
+</segment>
+<segment>
+<pinref part="SW2" gate="A" pin="1"/>
+<pinref part="SUPPLY7" gate="GND" pin="GND"/>
+<wire x1="208.28" y1="58.42" x2="218.44" y2="58.42" width="0.1524" layer="91"/>
+<wire x1="218.44" y1="58.42" x2="218.44" y2="48.26" width="0.1524" layer="91"/>
+<pinref part="SW2" gate="A" pin="2"/>
+<wire x1="208.28" y1="60.96" x2="218.44" y2="60.96" width="0.1524" layer="91"/>
+<wire x1="218.44" y1="60.96" x2="218.44" y2="58.42" width="0.1524" layer="91"/>
+<junction x="218.44" y="58.42"/>
+<pinref part="SW2" gate="A" pin="3"/>
+<wire x1="208.28" y1="63.5" x2="218.44" y2="63.5" width="0.1524" layer="91"/>
+<wire x1="218.44" y1="63.5" x2="218.44" y2="60.96" width="0.1524" layer="91"/>
+<junction x="218.44" y="60.96"/>
+<pinref part="SW2" gate="A" pin="4"/>
+<wire x1="208.28" y1="66.04" x2="218.44" y2="66.04" width="0.1524" layer="91"/>
+<wire x1="218.44" y1="66.04" x2="218.44" y2="63.5" width="0.1524" layer="91"/>
+<junction x="218.44" y="63.5"/>
 </segment>
 </net>
 <net name="N$3" class="0">
@@ -16876,6 +16896,10 @@ diameter 5 mm, horizontal, grid 15.24 mm</description>
 <wire x1="88.9" y1="156.21" x2="88.9" y2="149.86" width="0.1524" layer="91"/>
 <junction x="88.9" y="149.86"/>
 </segment>
+<segment>
+<pinref part="U$1" gate="G$1" pin="VDD_5V@2"/>
+<wire x1="53.34" y1="43.18" x2="45.72" y2="43.18" width="0.1524" layer="91"/>
+</segment>
 </net>
 <net name="PWR_BUT" class="0">
 <segment>
@@ -16923,12 +16947,6 @@ diameter 5 mm, horizontal, grid 15.24 mm</description>
 <segment>
 <pinref part="U2" gate="A" pin="~RST"/>
 <wire x1="-156.21" y1="35.56" x2="-168.91" y2="35.56" width="0.1524" layer="91"/>
-</segment>
-</net>
-<net name="N$1" class="0">
-<segment>
-<pinref part="U$1" gate="G$1" pin="VDD_5V@2"/>
-<wire x1="53.34" y1="43.18" x2="45.72" y2="43.18" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$2" class="0">
