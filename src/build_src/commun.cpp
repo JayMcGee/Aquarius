@@ -16,18 +16,32 @@ namespace aquarius
 	
 	void outputError(string deviceName, string errorName)
     {
-        cout << "NOM:" << deviceName << ":DATQ:" << errorName << endl;
+        cout << DEVICE_NAME_VAR << deviceName << DATA_OUTPUT_DELIMITER 
+                << DATA_QUANTITY << DATA_OUTPUT_DELIMITER << errorName << endl;
     }
     
     void outputReadData(string deviceName, int dataQty, const string dataNames[], const float datas[])
     {
-        cout << "NOM:" << deviceName << ":DATQ:" << dataQty;
+        cout << DEVICE_NAME_VAR << DATA_OUTPUT_DELIMITER 
+                << deviceName << DATA_OUTPUT_DELIMITER
+                << DATA_QUANTITY << DATA_OUTPUT_DELIMITER 
+                << dataQty;
         
         for(int i = 0; i < dataQty; i++)
         {
-            cout << ":" << dataNames[i] << ":" << datas[i];
+            cout << DATA_OUTPUT_DELIMITER
+                    << dataNames[i] << DATA_OUTPUT_DELIMITER 
+                    << datas[i];
         }
         cout << endl;
+    }
+    
+    void outputCommandResult(string deviceName, string message)
+    {
+        cout << DEVICE_NAME_VAR << DATA_OUTPUT_DELIMITER 
+                << deviceName << DATA_OUTPUT_DELIMITER
+                << NO_DATA_MESSAGE << DATA_OUTPUT_DELIMITER
+                << message << endl;
     }
     
     
@@ -44,5 +58,25 @@ namespace aquarius
     	if(buff != "") v.push_back(buff);
     	
     	return v;
+    }
+    
+    int i2cCommand(BlackI2C * i2c, string commandTo, int delay, string * returnData)
+    {
+        uint8_t buffer[32] = {0x00};
+        
+        i2c->writeLine((uint8_t*)commandTo.c_str(),commandTo.size());
+        
+        usleep(delay * 100000);
+        
+        if(i2c->readLine(buffer, sizeof(buffer)))
+        {
+            returnData->assign((char*)buffer);
+    		return (int)buffer[0];
+        }
+        else
+        {
+            (*returnData) = I2C_COMMS_ERROR;
+        }
+    	return 0;
     }
 }
