@@ -57,27 +57,30 @@ int main(int argc, char * argv[])
     BlackI2C myI2c(bus, address);
     myI2c.open( BlackLib::ReadWrite | BlackLib::NonBlock);
     
+	
+	
     string command;
     command.assign(argv[2]);    
     vector<string> commandSplitted{aquarius::splitArguments(command, ':')};
 	string firstCommand = commandSplitted[0];
 	
+	aquarius::Atlas_PH pH(PH_TEMP_NAME, &myI2c);
 	
 	int commandResult;	
 	string finalCommand;
     ////////////////////////////********COMMAND BUILDING**********////////////////////
     //Creates i2c command
 	//If command is calibration 	
-	if(firstCommand.compare(PH_COMMAND_CALIB) == 0)
+	if(firstCommand.compare(I2C_COMMAND_CALIB) == 0)
 	{
 		//Verify that there is the minimum second argument
 		if(commandSplitted.size() > 2)
 		{
-			return aquarius::command_Calibration(&myI2c, PH_TEMP_NAME, commandSplitted[1], commandSplitted[2]);
+			return pH.command_Calibration(commandSplitted[1], commandSplitted[2]);
 		}
 		else if(commandSplitted.size() > 1)
 		{
-			return aquarius::command_Calibration(&myI2c, PH_TEMP_NAME, commandSplitted[1]);
+			return pH.command_Calibration(commandSplitted[1]);
 		}
 		else
 		{
@@ -86,16 +89,16 @@ int main(int argc, char * argv[])
 		}
 	}   
 	//Device LED control
-	else if(firstCommand.compare(PH_COMMAND_L) == 0)
+	else if(firstCommand.compare(I2C_COMMAND_L) == 0)
 	{
 		if(commandSplitted.size() > 1)
 		{
 			if(commandSplitted[1].compare(ATLAS_LED_CONTROL_ON) ||
 			   commandSplitted[1].compare(ATLAS_LED_CONTROL_OFF) ||
-			   commandSplitted[1].compare(PH_COMMAND_ARG_QUEST))
+			   commandSplitted[1].compare(I2C_COMMAND_ARG_QUEST))
 		   	{
 		   		finalCommand = (string)firstCommand + "," + commandSplitted[1];
-		   		return aquarius::command_LEDControl(&myI2c, PH_TEMP_NAME, commandSplitted[1]);
+		   		return pH.command_LEDControl(commandSplitted[1]);
 		   	}
 		   	else
 		   	{
@@ -111,28 +114,28 @@ int main(int argc, char * argv[])
 		
 	}
 	//Device temperature compensation
-	else if(firstCommand.compare(PH_COMMAND_T) == 0)
+	else if(firstCommand.compare(I2C_COMMAND_T) == 0)
 	{
 		if(commandSplitted.size() > 1)
-			return aquarius::command_Temperature_Compensation(&myI2c, PH_TEMP_NAME, commandSplitted[1]);
+			return pH.command_Temperature_Compensation(commandSplitted[1]);
 		else
-			return aquarius::command_Temperature_Compensation(&myI2c, PH_TEMP_NAME, PH_COMMAND_ARG_QUEST);
+			return pH.command_Temperature_Compensation(I2C_COMMAND_ARG_QUEST);
 	}	
 	//Factory reset
-	else if(firstCommand.compare(PH_COMMAND_X) == 0)
-		return aquarius::command_Factory_Reset(&myI2c, PH_TEMP_NAME);
+	else if(firstCommand.compare(I2C_COMMAND_X) == 0)
+		return pH.command_Factory_Reset();
 	//Device information
-	else if(firstCommand.compare(PH_COMMAND_I) == 0)
-		return aquarius::command_Information(&myI2c, PH_TEMP_NAME);
+	else if(firstCommand.compare(I2C_COMMAND_I) == 0)
+		return pH.command_Information();
     //If the command is a reading
-    else if(firstCommand.compare(PH_COMMAND_R) == 0)
-        return aquarius::command_Reading(&myI2c, PH_TEMP_NAME);
+    else if(firstCommand.compare(I2C_COMMAND_R) == 0)
+        return pH.command_Reading();
     //Device status
-	else if(firstCommand.compare(PH_COMMAND_STATUS) == 0)
-		return aquarius::command_Status(&myI2c, PH_TEMP_NAME);
+	else if(firstCommand.compare(I2C_COMMAND_STATUS) == 0)
+		return pH.command_Status();
 	//Device sleep mode
-	else if(firstCommand.compare(PH_COMMAND_SLEEP) == 0)
-		return aquarius::command_Sleep(&myI2c, PH_TEMP_NAME);
+	else if(firstCommand.compare(I2C_COMMAND_SLEEP) == 0)
+		return pH.command_Sleep();
 	else
 		aquarius::outputCommandResult(PH_TEMP_NAME, UNKNOWN_COMMAND);
 	////////////////////////////********END OF COMMAND*************//////////

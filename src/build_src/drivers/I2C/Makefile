@@ -1,32 +1,28 @@
-all:driverAtlasI2CDO driverAtlasI2CPH driverAtlasI2CK copylibs copyexec 
+all: driverAtlasI2CDO driverAtlasI2CPH driverAtlasI2CK
 	
 driverAtlasI2CDO: BlackI2C.o BlackCore.o commun.o
-	g++ -std=c++0x driverAtlas_I2CDO.cpp BlackI2C.o BlackCore.o commun.o -o driverAtlasI2CDO
+	g++ -std=c++0x driverAtlasI2CDO.cpp BlackI2C.o BlackCore.o commun.o -o driverAtlasI2CDO
 	
-driverAtlasI2CPH: BlackI2C.o BlackCore.o Atlas_PH.o commun.o
-	g++ -std=c++0x driverAtlas_I2CPH.cpp BlackI2C.o BlackCore.o Atlas_PH.o commun.o -o driverAtlasI2CPH
+driverAtlasI2CPH: BlackI2C.o BlackCore.o commun.o
+	g++ -std=c++0x driverAtlasI2CPH.cpp BlackI2C.o BlackCore.o commun.o -o driverAtlasI2CPH
 	
 driverAtlasI2CK: BlackI2C.o BlackCore.o commun.o
-	g++ -std=c++0x driverAtlas_I2CK.cpp BlackI2C.o BlackCore.o commun.o -o driverAtlasI2CK
-	
-commun.o: ../../commun.cpp
-	g++ -std=c++0x -o commun.o -c ../../commun.cpp
+	g++ -std=c++0x driverAtlasI2CK.cpp BlackI2C.o BlackCore.o commun.o -o driverAtlasI2CK
 	
 BlackI2C.o: ../../../include/blacklib/BlackI2C.cpp
 	g++ -std=c++0x -c ../../../include/blacklib/BlackI2C.cpp
 
 BlackCore.o: ../../../include/blacklib/BlackCore.cpp
 	g++ -std=c++0x -c ../../../include/blacklib/BlackCore.cpp
-
-Atlas_PH.o: Atlas_PH.cpp
-	g++ -std=c++0x -c Atlas_PH.cpp
+	
+commun.o: ../../commun.cpp
+	g++ -std=c++0x -o commun.o -c ../../commun.cpp
 	
 copylibs:
 	cp *.o ../../libs/
 	
 copyexec:
-	cp driverAtlasI2C* ../../exec/
+	cp driver* ../../exec/
 	
-clean: 
-	rm *.o
-	rm driverAtlasI2CDO driverAtlasI2CPH driverAtlasI2CK
+clean: rm *.o
+		rm driverAtlasI2CDO driverAtlasI2CPH driverAtlasI2CK
