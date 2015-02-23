@@ -19693,7 +19693,7 @@ Source: www.kingbright.com</description>
 <part name="SUPPLY8" library="supply2" deviceset="GND" device=""/>
 <part name="R11" library="adafruit" deviceset="R-US_" device="R0805" value="4.7K"/>
 <part name="R14" library="adafruit" deviceset="R-US_" device="R0805" value="110K"/>
-<part name="C4" library="rcl" deviceset="CPOL-US" device="153CLV-0405" value="10uF"/>
+<part name="C4" library="rcl" deviceset="CPOL-US" device="B" value="10uF"/>
 <part name="IC1" library="74xx-us" deviceset="74*123" device="D"/>
 <part name="U2" library="Maxim_By_element14_Batch_1" deviceset="DS3231SN" device=""/>
 <part name="R15" library="adafruit" deviceset="R-US_" device="R0805" value="4.7K"/>
@@ -19703,7 +19703,7 @@ Source: www.kingbright.com</description>
 <part name="D1" library="diode" deviceset="SCHOTTKY-DIODE" device="DO201T15"/>
 <part name="D2" library="diode" deviceset="SCHOTTKY-DIODE" device="DO201T15"/>
 <part name="SUPPLY9" library="supply2" deviceset="GND" device=""/>
-<part name="C3" library="rcl" deviceset="CPOL-US" device="D" value="4.7uF"/>
+<part name="C3" library="rcl" deviceset="CPOL-US" device="B" value="4.7uF"/>
 <part name="C5" library="rcl" deviceset="C-EU" device="C0805" value="100nF"/>
 <part name="C6" library="rcl" deviceset="C-EU" device="C0805" value="10nF"/>
 <part name="D3" library="diode" deviceset="SCHOTTKY-DIODE" device="DO201T15" value="3A"/>
