@@ -18459,7 +18459,7 @@ Source: www.kingbright.com</description>
 <part name="JP1" library="jumper" deviceset="JP2E" device=""/>
 <part name="LED1" library="led" deviceset="LED" device="CHIP-LED0805"/>
 <part name="R19" library="adafruit" deviceset="R-US_" device="R0805" value="200"/>
-<part name="JP2" library="pinhead" deviceset="PINHD-1X2" device=""/>
+<part name="JP2" library="pinhead" deviceset="PINHD-1X2" device="" value="I2C"/>
 </parts>
 <sheets>
 <sheet>

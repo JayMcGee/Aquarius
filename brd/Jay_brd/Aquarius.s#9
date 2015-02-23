@@ -16434,7 +16434,7 @@ diameter 5 mm, horizontal, grid 15.24 mm</description>
 <part name="X4" library="con-weidmueller-sl35" deviceset="180G-2" device="" value="Batt.1"/>
 <part name="X5" library="con-weidmueller-sl35" deviceset="180G-2" device="" value="Batt.2"/>
 <part name="D4" library="diode" deviceset="SCHOTTKY-DIODE" device="DO201T15"/>
-<part name="SW2" library="special" deviceset="SW_DIP-4" device=""/>
+<part name="SW2" library="special" deviceset="SW_DIP-4" device="" value="Modes"/>
 <part name="R7" library="adafruit" deviceset="R-US_" device="R0805" value="4.7K"/>
 <part name="R8" library="adafruit" deviceset="R-US_" device="R0805" value="4.7K"/>
 <part name="R9" library="adafruit" deviceset="R-US_" device="R0805" value="4.7K"/>
