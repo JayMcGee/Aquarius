@@ -1,12 +1,7 @@
-#include "Atlas_PH.h"
+#include "Atlas_I2C_PH.h"
 
 namespace aquarius
 {
-	Atlas_I2C_PH::Atlas_I2C_PH(string deviceName, BlackI2C * i2c)
-	{
-		deviceName_ = deviceName;
-		i2c_ = i2c;
-	}
 	
     int Atlas_I2C_PH::command_Calibration(string parameter, string value)
     {
@@ -30,23 +25,23 @@ namespace aquarius
             type = 1;
         }
         
-        int commandResult = aquarius::i2cCommand(i2c,command, I2C_COMMAND_CALIB_DELAY, &returnString);
+        int commandResult = aquarius::i2cCommand(i2c_,command, I2C_COMMAND_CALIB_DELAY, &returnString);
         
         if(commandResult == I2C_READ_BACK_OK)
     	{
     	    if(type)
-    		    aquarius::outputCommandResult(deviceName, (string)CALIBRATION_SUCCESSFULL_P1 + value + CALIBRATION_SUCCESSFULL_P2 + parameter);
+    		    aquarius::outputCommandResult(deviceName_, (string)CALIBRATION_SUCCESSFULL_P1 + value + CALIBRATION_SUCCESSFULL_P2 + parameter);
     		else
-    		    aquarius::outputCommandResult(deviceName, (string)CALIBRATION_QUERIED + splitArguments(returnString, ',')[1]);
+    		    aquarius::outputCommandResult(deviceName_, (string)CALIBRATION_QUERIED + splitArguments(returnString, ',')[1]);
     	}
     	else if(commandResult == I2C_READ_BACK_FAIL)
-    		aquarius::outputError(deviceName, I2C_READ_FAIL);
+    		aquarius::outputError(deviceName_, I2C_READ_FAIL);
     	else if(commandResult == I2C_READ_BACK_PENDING)
-    		aquarius::outputError(deviceName, I2C_READ_PENDING);
+    		aquarius::outputError(deviceName_, I2C_READ_PENDING);
     	else if(commandResult == I2C_READ_BACK_NO_DATA)
-    		aquarius::outputError(deviceName, I2C_READ_NO_DATA);
+    		aquarius::outputError(deviceName_, I2C_READ_NO_DATA);
 		else
-    	    aquarius::outputError(deviceName, I2C_COMMS_ERROR);
+    	    aquarius::outputError(deviceName_, I2C_COMMS_ERROR);
     	    
         return commandResult;
     }
@@ -110,7 +105,7 @@ namespace aquarius
     int Atlas_I2C_PH::command_Reading()
     {
         string returnString;
-        int commandResult = aquarius::i2cCommand(i2c, I2C_COMMAND_R, I2C_COMMAND_R_DELAY, &returnString);
+        int commandResult = aquarius::i2cCommand(i2c_, I2C_COMMAND_R, I2C_COMMAND_R_DELAY, &returnString);
         
     	if(commandResult == I2C_READ_BACK_OK)
     	{
@@ -120,23 +115,23 @@ namespace aquarius
     		
     		float datas[] = { (float)atof(tempPH.c_str()) };
     		
-    		aquarius::outputReadData(deviceName, ATLAS_PH_DATA_QTY, dataName, datas);
+    		aquarius::outputReadData(deviceName_, ATLAS_PH_DATA_QTY, dataName, datas);
     	}
     	else if(commandResult == I2C_READ_BACK_FAIL)
     	{
-    		aquarius::outputError(deviceName, I2C_READ_FAIL);
+    		aquarius::outputError(deviceName_, I2C_READ_FAIL);
     	}
     	else if(commandResult == I2C_READ_BACK_PENDING)
     	{
-    		aquarius::outputError(deviceName, I2C_READ_PENDING);
+    		aquarius::outputError(deviceName_, I2C_READ_PENDING);
     	}
     	else if(commandResult == I2C_READ_BACK_NO_DATA)
     	{
-    		aquarius::outputError(deviceName, I2C_READ_NO_DATA);
+    		aquarius::outputError(deviceName_, I2C_READ_NO_DATA);
     	}
 		else
     	{
-    	    aquarius::outputError(deviceName, I2C_COMMS_ERROR);
+    	    aquarius::outputError(deviceName_, I2C_COMMS_ERROR);
     	}
 		return commandResult;
     }

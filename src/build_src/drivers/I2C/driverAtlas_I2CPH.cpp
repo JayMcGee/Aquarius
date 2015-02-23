@@ -1,7 +1,7 @@
 #include "../../commun.h"
 #include <iostream>
 #include <stdlib.h>
-#include "Atlas_PH.h"
+#include "Atlas_I2C_PH.h"
 
 #define PH_TEMP_NAME "PH_001"
 using namespace BlackLib;
@@ -14,7 +14,7 @@ int main(int argc, char * argv[])
     
     if(argc < 3)
     {
-        cout << aquarius::AtlasPH_output_missingArguments() << endl;
+        cout << aquarius::Atlas_I2C::output_missingArguments() << endl;
         return 1;
     }
     string deviceLocation;
@@ -64,7 +64,7 @@ int main(int argc, char * argv[])
     vector<string> commandSplitted{aquarius::splitArguments(command, ':')};
 	string firstCommand = commandSplitted[0];
 	
-	aquarius::Atlas_PH pH(PH_TEMP_NAME, &myI2c);
+	aquarius::Atlas_I2C_PH pH(PH_TEMP_NAME, &myI2c);
 	
 	int commandResult;	
 	string finalCommand;

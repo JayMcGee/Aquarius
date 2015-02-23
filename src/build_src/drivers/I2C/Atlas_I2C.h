@@ -58,13 +58,13 @@ namespace aquarius
 		public:
 			Atlas_I2C(string deviceName, BlackI2C * i2c);
 		
-			virtual int command_Calibration(string parameter, string value = NO_CALIBRATION_VALUE);
+			virtual int command_Calibration(string parameter, string value = NO_CALIBRATION_VALUE) = 0;
 
 			int command_Information();
 			
 			int command_LEDControl(string parameter);
 			
-			virtual int command_Reading();
+			virtual int command_Reading() = 0;
 			
 			int command_Sleep();
 			
@@ -78,6 +78,6 @@ namespace aquarius
 			 * @brief Output the missing arguments phrase for help
 			 * @return A string that explains the minimum args for the driver to work
 			 */
-			string output_missingArguments();
-	}
+			static string output_missingArguments();
+	};
 }
