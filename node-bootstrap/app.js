@@ -95,13 +95,30 @@ app.io.on('connection',function(socket){
 //Receive update Command
 app.io.on('connection',function(socket){
     socket.on('updateTemp',function(){
-        //// Execute Temperature Sensor driver
-        child = exec('/var/lib/cloud9/src/test_src/MySqlConnector/main',
-            function (error, stdout, stderr) {
-                var randomnumber=(Math.random()*41.1)
-                socket.emit('lastTemp',{'value':randomnumber});
-        });
+        var randomnumber=(Math.random()*41.1)
+        socket.emit('lastTemp',{'value':randomnumber});
     });
+    socket.on('updatePh',function(){
+        var randomnumber=(Math.random()*13.99)
+        socket.emit('lastPh',{'value':randomnumber});
+    });
+    socket.on('updateDo',function(){
+        var randomnumber=(Math.random()*12.99)
+        socket.emit('lastDo',{'value':randomnumber});
+    });
+    socket.on('updateCond',function(){
+        var randomnumber=(Math.random()*20000)
+        socket.emit('lastCond',{'value':randomnumber});
+    });
+    socket.on('updateStationTemp',function(){
+        var randomnumber=(Math.random()*41.1)
+        socket.emit('lastStationTemp',{'value':randomnumber});
+    });
+    socket.on('updateStationHum',function(){
+        var randomnumber=(Math.random()*100)
+        socket.emit('lastStationHum',{'value':randomnumber});
+    });
+    
 });
 
 //receive start terminal

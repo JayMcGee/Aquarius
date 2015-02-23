@@ -76,7 +76,7 @@
                     	<div class="circleStatsItemBox yellow">
     						<div class="header">Temperature</div>
     						<div class="circleStat">
-                        		<input id="tempCircle" type="text" data-skin="tron" data-readOnly="true" data-step="0.1" data-min="-30" class="whiteCircle">
+                        		<input id="tempCircle" type="text" value = "99.1" data-skin="tron" data-readOnly="true" data-step="0.1" data-min="-30" data-max="100" class="whiteCircle">
     						</div>
     						<div class="footer">°Celcius</div>
                     	</div>
@@ -86,7 +86,7 @@
                     	<div class="circleStatsItemBox red">
     						<div class="header">pH</div>
     						<div class="circleStat">
-                        		<input id="phCircle" type="text" value="7.00" data-skin="tron" data-readOnly="true" data-step="0.11" data-min="0" data-max="14" class="whiteCircle" />
+                        		<input id="phCircle" type="text" value="13.11" data-skin="tron" data-readOnly="true" data-step="0.11" data-min="0" data-max="14" class="whiteCircle" />
     						</div>
     						<div class="footer">pH</div>
                     	</div>
@@ -96,7 +96,7 @@
                     	<div class="circleStatsItemBox blue">
     						<div class="header">Dissolved oxygen</div>
                         	<div class="circleStat">
-                        		<input id="doCircle" type="text" value="8" data-skin="tron" data-readOnly="true" data-step="0.11" data-min="0" data-max="13"  class="whiteCircle" />
+                        		<input id="doCircle" type="text" value="12.11" data-skin="tron" data-readOnly="true" data-step="0.11" data-min="0" data-max="13"  class="whiteCircle" />
     						</div>
     						<div class="footer">mg/L</div>
                     	</div>
@@ -107,7 +107,7 @@
     						<div class="header">Conductivity</div>
     						
                         	<div class="circleStat">
-                        		<input id="condCircle" type="text" value="5000" data-skin="tron" data-readOnly="true" data-step="0.1" data-min="0" data-max="20000" class="whiteCircle" />
+                        		<input id="condCircle" type="text" value="20000" data-skin="tron" data-readOnly="true" data-step="1" data-min="0" data-max="20000" class="whiteCircle" />
     						</div>
     						<div class="footer">S/m</div>
                     	</div>
@@ -117,7 +117,7 @@
                     	<div class="circleStatsItemBox orange">
     						<div class="header">Station Temperature</div>
                         	<div class="circleStat">
-                        		<input id="stationTempCircle" type="text" value="50" data-skin="tron" data-readOnly="true" data-step="0.1" data-min="-30" data-max="100" class="whiteCircle" />
+                        		<input id="stationTempCircle" type="text" value="99.9" data-skin="tron" data-readOnly="true" data-step="0.1" data-min="-30" data-max="100" class="whiteCircle" />
     						</div>
     						<div class="footer">°Celcius</div>
                     	</div>
@@ -145,6 +145,17 @@
 					</div>
 					<div class="box-content">
 				    	<div id="tempChart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+					</div>
+			</div><!--/row-->
+			<div class="row-fluid">
+					<div class="box-header">
+						<h2><i class="halflings-icon list-alt"></i><span class="break"></span>Temperature</h2>
+						<div class="box-icon">
+							<a href="#" class="btn-minimize"><i class="halflings-icon chevron-up"></i></a>
+						</div>
+					</div>
+					<div class="box-content">
+				    	<div id="phChart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
 					</div>
 			</div><!--/row-->
 
@@ -204,11 +215,9 @@
 	<div class="clearfix"></div>
 	
 	<footer>
-
 		<p>
 			<span style="text-align:left;float:left">&copy; 2013 <a href="http://jiji262.github.io/Bootstrap_Metro_Dashboard/" alt="Bootstrap_Metro_Dashboard">Bootstrap Metro Dashboard</a></span>
 		</p>
-
 	</footer>
 	
 <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -317,7 +326,8 @@
 
 	        $(".whiteCircle").knob({
 	        	  draw : function () {
-	        	  		//$(".whiteCircle").css("font-size","38px");
+	        	  		$(".whiteCircle").css("font-size","25px");
+	        	  		$("#condCircle").css("font-size","20px");
                         // "tron" case
                         if(this.$.data('skin') == 'tron') {
                             this.cursorExt = 0.3;
@@ -458,6 +468,55 @@
 	            })
         });
         
+        $(function(){
+            $('#phChart').highcharts({
+                chart:{
+                    type: 'line',
+                    zoomType: 'xy',
+                    marginRight: 10
+                },
+                title: {
+                text: 'pH'
+	            },
+	            colors: ['#FF1100'],
+	            xAxis: {
+	                type: 'datetime'
+	            },
+	            yAxis: {
+	                floor: -30,
+	                ceiling: 100,
+	                title: {
+	                    text: 'pH'
+	                }
+	            },
+	            plotOptions: {
+		            area: {
+		                marker: {
+		                    enabled: true,
+		                    symbol: 'circle',
+		                    radius: 2.5,
+		                    states: {
+		                        hover: {
+		                            enabled: true
+		                        }
+		                    }
+		                }
+		            }
+		        },
+	            tooltip: {
+	                formatter: function () {
+	                    return '<b>' + this.series.name + '</b><br/>' +
+	                        Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br/>' +
+	                        Highcharts.numberFormat(this.y, 2) + " °C";
+	                }
+	            },
+	                series:[{
+	                    name: "pH sensor",
+	                    data:[null]
+	                }]
+	            })
+        });
+        
         io.on('tempData',function(data){
             var chart = $('#tempChart').highcharts();
             var dataBuff = [];
@@ -470,8 +529,27 @@
         
         io.on('lastTemp',function(data){
             var chart = $('#tempChart').highcharts();
+            var shift = (chart.series[0].data.length > 10);
             if(!isNaN(data.value) && (data.value !== null) && (data.value !== "")){
-                chart.series[0].addPoint(data.value,true,true);
+                chart.series[0].addPoint(data.value,true,shift);
+            }
+        });
+        
+        io.on('phData',function(data){
+            var chart = $('#phChart').highcharts();
+            var dataBuff = [];
+            
+            data.array.forEach(function(row){
+               dataBuff.push(row.TempWater)
+            });
+            chart.series[0].setData(dataBuff);
+        })
+        
+        io.on('lastPh',function(data){
+            var chart = $('#phChart').highcharts();
+            var shift = (chart.series[0].data.length > 10);
+            if(!isNaN(data.value) && (data.value !== null) && (data.value !== "")){
+                chart.series[0].addPoint(data.value,true,shift);
             }
         });
         
@@ -482,7 +560,6 @@
         // first update is from Database any update after is directly from 
         // the sensor driver
         io.on('lastTemp',function(data){
-            //$('#tempCircle').val(data.value).trigger('change');
             var valInit = $('#tempCircle').val();
 			$({value: valInit}).animate({value: data.value}, {
 				duration: 500,
@@ -494,19 +571,59 @@
 			})
         });
         io.on('lastPh',function(data){
-            $('#phCircle').val(data.value).trigger('change');
+            var valInit = $('#phCircle').val();
+			$({value: valInit}).animate({value: data.value}, {
+				duration: 500,
+				easing:'swing',
+				step: function()
+				{
+					$('#phCircle').val(this.value).trigger('change');
+				}
+			})
         });
         io.on('lastDo',function(data){
-            $('#doCircle').val(data.value).trigger('change');
+            var valInit = $('#doCircle').val();
+			$({value: valInit}).animate({value: data.value}, {
+				duration: 500,
+				easing:'swing',
+				step: function()
+				{
+					$('#doCircle').val(this.value).trigger('change');
+				}
+			})
         });
-        io.on('lastCondu',function(data){
-            $('#condCircle').val(data.value).trigger('change');
+        io.on('lastCond',function(data){
+            var valInit = $('#condCircle').val();
+			$({value: valInit}).animate({value: data.value}, {
+				duration: 500,
+				easing:'swing',
+				step: function()
+				{
+					$('#condCircle').val(this.value).trigger('change');
+				}
+			})
         });
-        io.on('lastCaseT',function(data){
-            $('#stationTempCircle').val(data.value).trigger('change');
+        io.on('lastStationTemp',function(data){
+            var valInit = $('#stationTempCircle').val();
+			$({value: valInit}).animate({value: data.value}, {
+				duration: 500,
+				easing:'swing',
+				step: function()
+				{
+					$('#stationTempCircle').val(this.value).trigger('change');
+				}
+			})
         });
-        io.on('lastCaseH',function(data){
-            $('#stationHumCircle').val(data.value).trigger('change');
+        io.on('lastStationHum',function(data){
+            var valInit = $('#stationHumCircle').val();
+			$({value: valInit}).animate({value: data.value}, {
+				duration: 500,
+				easing:'swing',
+				step: function()
+				{
+					$('#stationHumCircle').val(this.value).trigger('change');
+				}
+			})
         });
 
         ////////////////////////////////////////////////////////////////////////
@@ -528,7 +645,12 @@
         });
 
         setInterval(function () {
-            io.emit('updateTemp')
+            io.emit('updateTemp');
+            io.emit('updatePh');
+            io.emit('updateDo');
+            io.emit('updateCond');
+            io.emit('updateStationTemp');
+            io.emit('updateStationHum');
         }, interval);
     </script> 
 
