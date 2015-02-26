@@ -9,7 +9,7 @@
 #define PH_COMMAND_MID "mid"
 #define PH_COMMAND_HIGH "high"
 #define PH_COMMAND_LOW "low"
-#define PH_COMMAND_CLEAR "clear"
+
 
 #define ATLAS_PH_DATA_QTY 1
 #define ATLAS_PH_DATA_1 "PH"

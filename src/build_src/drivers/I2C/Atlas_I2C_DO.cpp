@@ -3,36 +3,26 @@
 namespace aquarius
 {
 	
-    int Atlas_I2C_DO::command_Calibration(string parameter, string value)
+    int Atlas_I2C_DO::command_Calibration(string parameter)
     {
         string returnString;
-        string command;
+		string command = (string)I2C_COMMAND_CALIB + I2C_DELIMITER + parameter;
         int type = -1;
         
-        if(value.compare(NO_CALIBRATION_VALUE) == 0 && 
-                ( parameter.compare(PH_COMMAND_CLEAR) == 0 || 
-                    parameter.compare(I2C_COMMAND_ARG_QUEST) == 0))
-        {
-           command = (string)I2C_COMMAND_CALIB + I2C_DELIMITER + parameter;
+		if (parameter.compare(I2C_CAL_CLEAR) == 0 || parameter.compare(I2C_COMMAND_ARG_QUEST) == 0)
            type = 0;
-        }
-        else if(value.compare(NO_CALIBRATION_VALUE) != 0 && 
-                 ( parameter.compare(PH_COMMAND_MID) == 0 || 
-                    parameter.compare(PH_COMMAND_HIGH) == 0 || 
-                        parameter.compare(PH_COMMAND_LOW) == 0))
-        {
-            command = (string)I2C_COMMAND_CALIB + I2C_DELIMITER + parameter + I2C_DELIMITER + value;
+        else if(parameter.compare(DO_CAL_AIR) == 0 || parameter.compare(DO_CAL_0_O) == 0 )
             type = 1;
-        }
-        
+
         int commandResult = aquarius::i2cCommand(i2c_,command, I2C_COMMAND_CALIB_DELAY, &returnString);
         
         if(commandResult == I2C_READ_BACK_OK)
     	{
-    	    if(type)
+    	    if(type == 1)
     		    aquarius::outputCommandResult(deviceName_, (string)CALIBRATION_SUCCESSFULL_P1 + value + CALIBRATION_SUCCESSFULL_P2 + parameter);
-    		else
+			else if (type == 0)
     		    aquarius::outputCommandResult(deviceName_, (string)CALIBRATION_QUERIED + splitArguments(returnString, ',')[1]);
+				
     	}
     	else if(commandResult == I2C_READ_BACK_FAIL)
     		aquarius::outputError(deviceName_, I2C_READ_FAIL);

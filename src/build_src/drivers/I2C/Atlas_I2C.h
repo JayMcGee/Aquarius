@@ -4,6 +4,7 @@
 #include "../../../include/blacklib/BlackLib.h"
 #include "../../../include/blacklib/BlackI2C.h"
 
+
 //Commands that can be called for all modules
 #define I2C_COMMAND_CALIB "Cal"
 #define I2C_COMMAND_I "I"
@@ -28,6 +29,7 @@
 #define ATLAS_LED_CONTROL_OFF "0"
 
 #define I2C_COMMAND_ARG_QUEST "?"
+#define I2C_CAL_CLEAR "clear"
 
 #define NO_CALIBRATION_VALUE "NONE"
 

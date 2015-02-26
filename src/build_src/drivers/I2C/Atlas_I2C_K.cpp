@@ -2,24 +2,29 @@
 
 namespace aquarius
 {
-	
-    int Atlas_I2C_PH::command_Calibration(string parameter, string value)
-    {
-        string returnString;
-        string command;
-        int type = -1;
-        
-        if(value.compare(NO_CALIBRATION_VALUE) == 0 && 
-                ( parameter.compare(PH_COMMAND_CLEAR) == 0 || 
-                    parameter.compare(I2C_COMMAND_ARG_QUEST) == 0))
-        {
-           command = (string)I2C_COMMAND_CALIB + I2C_DELIMITER + parameter;
-           type = 0;
-        }
+	//TEST
+	int Atlas_I2C_K::command_Calibration(string parameter, string value)
+	{
+		string returnString;
+		string command;
+		int type = -1;
+
+		if (value.compare(NO_CALIBRATION_VALUE) == 0 &&
+			(parameter.compare(I2C_CAL_CLEAR) == 0 ||
+			parameter.compare(I2C_COMMAND_ARG_QUEST) == 0))
+		{
+			command = (string)I2C_COMMAND_CALIB + I2C_DELIMITER + parameter;
+			type = 0;
+		}
+		else if (value.compare(NO_CALIBRATION_VALUE) == 0 && parameter.compare(K_CAL_DRY) == 0))
+		{
+			command = (string)I2C_COMMAND_CALIB + I2C_DELIMITER + parameter;
+			type = 1;
+		}
         else if(value.compare(NO_CALIBRATION_VALUE) != 0 && 
-                 ( parameter.compare(PH_COMMAND_MID) == 0 || 
-                    parameter.compare(PH_COMMAND_HIGH) == 0 || 
-                        parameter.compare(PH_COMMAND_LOW) == 0))
+				(parameter.compare(K_CAL_ONE) == 0 ||
+				parameter.compare(K_CAL_LOW) == 0 ||
+				parameter.compare(K_CAL_HIGH) == 0))
         {
             command = (string)I2C_COMMAND_CALIB + I2C_DELIMITER + parameter + I2C_DELIMITER + value;
             type = 1;
@@ -45,64 +50,8 @@ namespace aquarius
     	    
         return commandResult;
     }
-/*
-    int command_Information(BlackI2C * i2c, string deviceName)
-    {
-        string returnString;
-        int commandResult = aquarius::i2cCommand(i2c, I2C_COMMAND_I, I2C_COMMAND_I_DELAY, &returnString);
-        if(commandResult == I2C_READ_BACK_OK)
-    	{
-    		 aquarius::outputCommandResult(deviceName, (string)INFORMATION_RESPONDED + returnString);
-    	}
-    	else if(commandResult == I2C_READ_BACK_FAIL)
-    	{
-    		aquarius::outputError(deviceName, I2C_READ_FAIL);
-    	}
-    	else if(commandResult == I2C_READ_BACK_PENDING)
-    	{
-    		aquarius::outputError(deviceName, I2C_READ_PENDING);
-    	}
-    	else if(commandResult == I2C_READ_BACK_NO_DATA)
-    	{
-    		aquarius::outputError(deviceName, I2C_READ_NO_DATA);
-    	}
-		else
-    	{
-    	    aquarius::outputError(deviceName, I2C_COMMS_ERROR);
-    	}
-        return commandResult;
-    }
-    
-    int command_LEDControl(BlackI2C * i2c, string deviceName, string parameter)
-    {
-        string returnString;
-       
-        int commandResult = aquarius::i2cCommand(i2c, (string)I2C_COMMAND_L + I2C_DELIMITER + parameter, I2C_COMMAND_L_DELAY, &returnString);
-       
-        if(commandResult == I2C_READ_BACK_OK)
-	    {
-		   if(parameter.compare(ATLAS_LED_CONTROL_ON) == 0 || 
-		                splitArguments(returnString, ',')[1].compare(ATLAS_LED_CONTROL_ON) == 0)
-               aquarius::outputCommandResult(deviceName, (string)LED_SET + LED_ON);
-           else if(parameter.compare(ATLAS_LED_CONTROL_OFF) == 0 ||
-                        splitArguments(returnString, ',')[1].compare(ATLAS_LED_CONTROL_OFF) == 0)
-               aquarius::outputCommandResult(deviceName, (string)LED_SET + LED_OFF);
-           else
-                aquarius::outputError(deviceName, I2C_READ_FAIL);
-    	}
-    	else if(commandResult == I2C_READ_BACK_FAIL)
-    		aquarius::outputError(deviceName, I2C_READ_FAIL);
-    	else if(commandResult == I2C_READ_BACK_PENDING)
-    		aquarius::outputError(deviceName, I2C_READ_PENDING);
-    	else if(commandResult == I2C_READ_BACK_NO_DATA)
-    		aquarius::outputError(deviceName, I2C_READ_NO_DATA);
-		else
-    	    aquarius::outputError(deviceName, I2C_COMMS_ERROR);
-    	return commandResult;
-       
-    }*/
-    
-    int Atlas_I2C_PH::command_Reading()
+	//TEST
+	int Atlas_I2C_K::command_Reading()
     {
         string returnString;
         int commandResult = aquarius::i2cCommand(i2c_, I2C_COMMAND_R, I2C_COMMAND_R_DELAY, &returnString);
@@ -135,71 +84,74 @@ namespace aquarius
     	}
 		return commandResult;
     }
-    /*
-    int command_Sleep(BlackI2C * i2c, string deviceName)
-    {
-        string returnString;
-        aquarius::i2cCommand(i2c, I2C_COMMAND_SLEEP, I2C_COMMAND_SLEEP_DELAY, &returnString);
-        aquarius::outputCommandResult(deviceName, SLEEP_MODE_ENABLED);
-        return I2C_READ_BACK_OK;
-    }
-    
-    int command_Status(BlackI2C * i2c, string deviceName)
-    {
-        string returnString;
-        int commandResult = aquarius::i2cCommand(i2c, I2C_COMMAND_STATUS, I2C_COMMAND_STATUS_DELAY, &returnString);
-        if(commandResult == I2C_READ_BACK_OK)
-    	{
-    		 aquarius::outputCommandResult(deviceName, (string)STATUS_RESPONDED + returnString);
-    	}
-    	else if(commandResult == I2C_READ_BACK_FAIL)
-    	{
-    		aquarius::outputError(deviceName, I2C_READ_FAIL);
-    	}
-    	else if(commandResult == I2C_READ_BACK_PENDING)
-    	{
-    		aquarius::outputError(deviceName, I2C_READ_PENDING);
-    	}
-    	else if(commandResult == I2C_READ_BACK_NO_DATA)
-    	{
-    		aquarius::outputError(deviceName, I2C_READ_NO_DATA);
-    	}
+	//TEST
+	int Atlas_I2C_K::command_K_Constant(string parameter)
+	{
+		string returnString;
+
+		string command = (string)K_COMMAND_K + I2C_DELIMITER + parameter;
+
+		int commandResult = aquarius::i2cCommand(i2c_, command, K_COMMAND_K_DELAY, &returnString);
+		if (commandResult == I2C_READ_BACK_OK)
+		{
+			if (parameter.compare(I2C_COMMAND_ARG_QUEST) == 0)
+				aquarius::outputCommandResult(deviceName_, (string)K_CONSTANT_AT + splitArguments(returnString, ',')[1]);
+			else
+				aquarius::outputCommandResult(deviceName_, (string)K_CONSTANT_SET + parameter);
+		}
+		else if (commandResult == I2C_READ_BACK_FAIL)
+			aquarius::outputError(deviceName_, I2C_READ_FAIL);
+		else if (commandResult == I2C_READ_BACK_PENDING)
+			aquarius::outputError(deviceName_, I2C_READ_PENDING);
+		else if (commandResult == I2C_READ_BACK_NO_DATA)
+			aquarius::outputError(deviceName_, I2C_READ_NO_DATA);
 		else
-    	{
-    	    aquarius::outputError(deviceName, I2C_COMMS_ERROR);
-    	}
-        return commandResult;
-    }
-    
-    int command_Temperature_Compensation(BlackI2C * i2c, string deviceName, string parameter)
-    {
-        string returnString;
-        int commandResult = aquarius::i2cCommand(i2c, I2C_COMMAND_T, I2C_COMMAND_T_DELAY, &returnString);
-        
-        if(commandResult == I2C_READ_BACK_OK)
-    	{
-		    if(parameter.compare(I2C_COMMAND_ARG_QUEST) == 0)
-                aquarius::outputCommandResult(deviceName, (string)COMPENSATION_RESPONDED + splitArguments(returnString, ',')[1]);
-            else
-                aquarius::outputCommandResult(deviceName, (string)COMPENSATION_SET_RESPONDED + parameter);
-    	}
-    	else if(commandResult == I2C_READ_BACK_FAIL)
-    		aquarius::outputError(deviceName, I2C_READ_FAIL);
-    	else if(commandResult == I2C_READ_BACK_PENDING)
-    		aquarius::outputError(deviceName, I2C_READ_PENDING);
-    	else if(commandResult == I2C_READ_BACK_NO_DATA)
-    		aquarius::outputError(deviceName, I2C_READ_NO_DATA);
+			aquarius::outputError(deviceName_, I2C_COMMS_ERROR);
+		return commandResult;
+
+	}
+	//TEST
+	int Atlas_I2C_K::command_Output_String_Config(string parameter, string enable)
+	{
+		string returnString;
+		string command = (string)K_COMMAND_O + I2C_DELIMITER + parameter;
+		int setting = 0;
+		if (enable.compare(NO_CALIBRATION_VALUE) != 0)
+		{
+			command += (string)I2C_DELIMITER + enable;
+			setting++;
+		}
+		int commandResult = aquarius::i2cCommand(i2c_, command, K_COMMAND_O_DELAY, &returnString);
+
+		if (commandResult == I2C_READ_BACK_OK)
+		{
+			if (setting)
+			{
+				aquarius::outputCommandResult(deviceName_, (string)K_OUTPUT_SET_AT + enable);
+			}
+			else
+			{
+				aquarius::outputCommandResult(deviceName_, (string)K_OUTPUT_IS_AT + returnString);
+			}
+		}
+		else if (commandResult == I2C_READ_BACK_FAIL)
+		{
+			aquarius::outputError(deviceName_, I2C_READ_FAIL);
+		}
+		else if (commandResult == I2C_READ_BACK_PENDING)
+		{
+			aquarius::outputError(deviceName_, I2C_READ_PENDING);
+		}
+		else if (commandResult == I2C_READ_BACK_NO_DATA)
+		{
+			aquarius::outputError(deviceName_, I2C_READ_NO_DATA);
+		}
 		else
-    	    aquarius::outputError(deviceName, I2C_COMMS_ERROR);
-    	return commandResult;
-    }
+		{
+			aquarius::outputError(deviceName_, I2C_COMMS_ERROR);
+		}
+		return commandResult;
+	}
+
     
-    int command_Factory_Reset(BlackI2C * i2c, string deviceName)
-    {
-        string returnString;
-        aquarius::i2cCommand(i2c, I2C_COMMAND_X, I2C_COMMAND_X_DELAY, &returnString);
-        aquarius::outputCommandResult(deviceName, FACTORY_RESET);
-        return I2C_READ_BACK_OK;
-    }
-    */
 }
