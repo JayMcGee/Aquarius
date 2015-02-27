@@ -19703,7 +19703,7 @@ Source: www.kingbright.com</description>
 <part name="D1" library="diode" deviceset="SCHOTTKY-DIODE" device="DO201T15"/>
 <part name="D2" library="diode" deviceset="SCHOTTKY-DIODE" device="DO201T15"/>
 <part name="SUPPLY9" library="supply2" deviceset="GND" device=""/>
-<part name="C3" library="rcl" deviceset="CPOL-US" device="D" value="4.7uF"/>
+<part name="C3" library="rcl" deviceset="CPOL-US" device="B" value="4.7uF"/>
 <part name="C5" library="rcl" deviceset="C-EU" device="C0805" value="100nF"/>
 <part name="C6" library="rcl" deviceset="C-EU" device="C0805" value="10nF"/>
 <part name="D3" library="diode" deviceset="SCHOTTKY-DIODE" device="DO201T15" value="3A"/>

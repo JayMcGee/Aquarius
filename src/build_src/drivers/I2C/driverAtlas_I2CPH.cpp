@@ -56,8 +56,6 @@ int main(int argc, char * argv[])
     
     BlackI2C myI2c(bus, address);
     myI2c.open( BlackLib::ReadWrite | BlackLib::NonBlock);
-    
-	
 	
     string command;
     command.assign(argv[2]);    

@@ -1,0 +1,62 @@
+Partlist
+
+Exported from Aquarius.brd at 2015-02-27 09:29:36
+
+EAGLE Version 6.4.0 Copyright (c) 1988-2013 CadSoft
+
+Assembly variant: 
+
+Part     Value                       Package                      Library                    Position (mil)        Orientation
+
+C1       180uF                       PANASONIC_D                  rcl                        (644.01575 1965.48031) R90
+C3       4.7uF                       PANASONIC_B                  rcl                        (883.31496 1920.48031) R90
+C4       10uF                        PANASONIC_B                  rcl                        (1086.52756 1774.18898) R270
+C5       100nF                       C0805                        rcl                        (953.51969 2104.72441) R0
+C6       10nF                        C0805                        rcl                        (-1290.49606 2196.91339) R270
+D1                                   DO201T15                     diode                      (31.44882 2360.84252) R0
+D2                                   DO201T15                     diode                      (28.44882 2612.14173) R0
+D3       3A                          DO201T15                     diode                      (-994.55118 2610.99213) R0
+D4                                   DO201T15                     diode                      (-996 2361)           R0
+IC1      74123D                      SO16                         74xx-us                    (346.65354 736.68504) R270
+J2       DS18B20                     10X03MTA                     con-amp                    (-2240.06299 1268.29134) R270
+J4       GSM/GPS                     10X05MTA                     con-amp                    (-2239.15748 2247.10236) R270
+JP1                                  JP2                          jumper                     (-1704 1023)          R0
+JP2      I2C                         1X02                         pinhead                    (-2232 981)           R90
+L1       22uH                        EPCOS-10X10                  jt-inductors               (-989.66142 2000.01575) R0
+LED1                                 CHIP-LED0805                 led                        (-1917 1035)          R0
+LM2678   LM2678KTW0007B              TO-PMOD7                     Aquarius                   (-1836.48819 2493.04724) R90
+Q1       BSS138                      SOT23                        m-pad-2.1                  (-387 120)            R0
+Q2       BSS138                      SOT23                        m-pad-2.1                  (-378 570)            R0
+Q3       BSS138                      SOT23                        m-pad-2.1                  (39 573)              R0
+*R1       100                         R0805                        adafruit                   (862.94488 -233.88976) R180
+*R2       4.7K                        R0805                        adafruit                   (709.94488 -234.31496) R180
+*R3       100                         R0805                        adafruit                   (860 -431.51181)      R180
+*R4       4.7K                        R0805                        adafruit                   (709 -432.90551)      R0
+*R5       4.7K                        R0805                        adafruit                   (-1679.25984 -98.4252) R180
+*R6       4.7K                        R0805                        adafruit                   (-1678.25984 -235)    R180
+*R7       4.7K                        R0805                        adafruit                   (849 975)             R180
+*R8       4.7K                        R0805                        adafruit                   (840 474)             R180
+*R9       4.7K                        R0805                        adafruit                   (846 369)             R180
+*R10      10K                         R0805                        adafruit                   (-567 114)            R90
+*R11      4.7K                        R0805                        adafruit                   (-650.14961 -428.51181) R0
+*R12      10K                         R0805                        adafruit                   (-429 348)            R180
+*R13      10K                         R0805                        adafruit                   (-567 552)            R90
+*R14      110K                        R0805                        adafruit                   (622.11024 846.73228) R270
+*R15      4.7K                        R0805                        adafruit                   (643.76378 56.26772)  R90
+*R16      10K                         R0805                        adafruit                   (-429 789)            R180
+*R17      10K                         R0805                        adafruit                   (-129 552)            R90
+*R18      10K                         R0805                        adafruit                   (0 792)               R180
+*R19      200                         R0805                        adafruit                   (-1992 1032)          R270
+S1                                   B3F-10XX                     switch-omron               (-1827.00787 1333.59843) R180
+SW2      Modes                       EDG-04                       special                    (-1263 1167)          R180
+U$1      BEAGLEBONE_NO_OUTLINE       BEAGLEBONE_SHIELD_NO_OUTLINE LEDscape                   (1186.93701 -1679.59843) MR0
+U$2      ATLAS_STAMP                 ATLAS_STAMP                  LEDscape                   (-1891.93701 -521.96063) R270
+U$3      ATLAS_STAMP                 ATLAS_STAMP                  LEDscape                   (-1891.93701 164.01575) R270
+U$4      ATLAS_STAMP                 ATLAS_STAMP                  LEDscape                   (-1894.93701 832.06299) R270
+U1       DHT22                       AM2302                       RHT03_DHT-22_AM2302        (-2240.38583 1701.02362) R270
+U2       DS3231SN                    SOIC127P1032X265-16N         Maxim_By_element14_Batch_1 (338.66142 160.18898) R180
+X1       Conn BNC : pH               AMP_227161                   con-coax                   (-2210.26772 -797.55118) R90
+X2       Conn BNC : Dissolved Oxygen AMP_227161                   con-coax                   (-2207.26772 -114.5748) R90
+X3       Conn BNC : Conductivity     AMP_227161                   con-coax                   (-2207.26772 556.47244) R90
+X4       Batt.1                      180G-2                       con-weidmueller-sl35       (987 2499)            R180
+X5       Batt.2                      180G-2                       con-weidmueller-sl35       (621 2499)            R180

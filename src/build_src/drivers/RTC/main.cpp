@@ -5,7 +5,12 @@
 
 #define RTC_ADD 0x68
 
-#define RTC_MIN_REG 0x08
+#define RTC_ALARM_SEC_REG 0x07
+#define RTC_ALARM_MIN_REG 0x08
+#define RTC_ALARM_HOUR_REG 0x09
+#define RTC_ALARM_DAY_REG 0x0A
+
+#define RTC_ALARM_DATA_MASK 0x0F
 
 #define RTC_ALARM_FLAG_REG 0x0F
 #define RTC_ALARM_FLAG_POS 0
@@ -81,7 +86,38 @@ int main(int argc, char * argv[])
 	}
 	else if(firstCommand.compare("SetAlarm"))
 	{
-		
+		if(commandSplitted.size() > 2)
+		{
+			string type, value;
+			type = commandSplitted[1];
+			value = commandSplitted[2];
+			
+			int valueToWrite = stoi(value);
+			
+			bool result;
+			if(type.compare("min") == 0)
+			{
+				result = writeRTCMemory(RTC_ALARM_SEC_REG, valueToWrite);
+			}
+			else if(type.compare("sec") == 0)
+			{
+				result = writeRTCMemory(RTC_ALARM_MIN_REG, valueToWrite);
+			}
+			else if(type.command("hr") == 0)
+			{
+				result = writeRTCMemory(RTC_ALARM_HOUR_REG, valueToWrite);
+			}
+			else				
+			{
+				aquarius::outputError("RTC", BAD_PARAMS);
+				return 1;
+			}
+		}
+		else
+		{
+			aquarius::outputError("RTC", NOT_ENOUGH_PARAMS);
+			return 1;
+		}
 	}
 	else if(firstCommand.compare("GetAlarm"))
 	{
@@ -90,7 +126,7 @@ int main(int argc, char * argv[])
 	else if(firstCommand.compare("ResetAlarm"))
 	{		
 		bool isAlarmEnabled = getBit(RTC_ALARM_FLAG_REG, RTC_ALARM_FLAG_POS);
-		if(isAlarmEnabled)
+		if(!isAlarmEnabled)
 		{
 			cout << "Alarm is currently at false" << endl;
 		}
@@ -109,9 +145,10 @@ int main(int argc, char * argv[])
 	else if(firstCommand.compare("GetAlarm"))
 	{
 		bool isAlarmEnabled = readRTCMemory(RTC_ALARM_FLAG_REG, RTC_ALARM_FLAG_POS);
+		cout << "Alarm is : " << isAlarmEnabled << endl;
 	}
 	
-	
+	return 1;
 }
 
 bool writeRTCMemory(int powerCtl_Addr, int powerCtlReg)
