@@ -36,7 +36,7 @@ namespace aquarius
 		public:
 			Atlas_I2C_DO(string deviceName, BlackI2C * i2c)  : Atlas_I2C(deviceName,i2c){};
 			
-			int command_Calibration(string parameter);
+			int command_Calibration(string parameter, string value = NO_CALIBRATION_VALUE);
 			
 		    int command_Reading();
 			

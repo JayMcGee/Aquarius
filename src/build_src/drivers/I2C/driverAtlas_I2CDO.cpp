@@ -84,7 +84,7 @@ int main(int argc, char * argv[])
 		}
 		else
 		{
-			aquarius::outputError(PH_TEMP_NAME, NOT_ENOUGH_PARAMS);
+			aquarius::outputError(DO_TEMP_NAME, NOT_ENOUGH_PARAMS);
 			return 1;
 		}
 	}

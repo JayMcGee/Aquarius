@@ -25,9 +25,9 @@
 
 #define ATLAS_K_DATA_QTY 4
 #define ATLAS_K_DATA_1 "EC"
-#define ATLAS_K_DATA_1 "TDS"
-#define ATLAS_K_DATA_1 "S"
-#define ATLAS_K_DATA_1 "SG"
+#define ATLAS_K_DATA_2 "TDS"
+#define ATLAS_K_DATA_3 "S"
+#define ATLAS_K_DATA_4 "SG"
 
 namespace aquarius
 {

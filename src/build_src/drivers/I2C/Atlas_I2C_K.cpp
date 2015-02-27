@@ -1,4 +1,4 @@
-#include "Atlas_I2C_PH.h"
+#include "Atlas_I2C_K.h"
 
 namespace aquarius
 {
@@ -16,7 +16,7 @@ namespace aquarius
 			command = (string)I2C_COMMAND_CALIB + I2C_DELIMITER + parameter;
 			type = 0;
 		}
-		else if (value.compare(NO_CALIBRATION_VALUE) == 0 && parameter.compare(K_CAL_DRY) == 0))
+		else if (value.compare(NO_CALIBRATION_VALUE) == 0 && parameter.compare(K_CAL_DRY) == 0)
 		{
 			command = (string)I2C_COMMAND_CALIB + I2C_DELIMITER + parameter;
 			type = 1;
@@ -58,6 +58,8 @@ namespace aquarius
         
     	if(commandResult == I2C_READ_BACK_OK)
     	{
+    		cout << "returned string : " << returnString << endl;
+    		/*
     		string dataName[] = { ATLAS_PH_DATA_1 };
     		
     		string tempPH = returnString.substr(1);
@@ -65,6 +67,7 @@ namespace aquarius
     		float datas[] = { (float)atof(tempPH.c_str()) };
     		
     		aquarius::outputReadData(deviceName_, ATLAS_PH_DATA_QTY, dataName, datas);
+    		*/
     	}
     	else if(commandResult == I2C_READ_BACK_FAIL)
     	{

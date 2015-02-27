@@ -3,7 +3,7 @@
 namespace aquarius
 {
 	
-    int Atlas_I2C_DO::command_Calibration(string parameter)
+    int Atlas_I2C_DO::command_Calibration(string parameter, string value)
     {
         string returnString;
 		string command = (string)I2C_COMMAND_CALIB + I2C_DELIMITER + parameter;
@@ -19,7 +19,7 @@ namespace aquarius
         if(commandResult == I2C_READ_BACK_OK)
     	{
     	    if(type == 1)
-    		    aquarius::outputCommandResult(deviceName_, (string)CALIBRATION_SUCCESSFULL_P1 + value + CALIBRATION_SUCCESSFULL_P2 + parameter);
+    		    aquarius::outputCommandResult(deviceName_, (string)CALIBRATION_SUCCESSFULL_P1 + parameter);
 			else if (type == 0)
     		    aquarius::outputCommandResult(deviceName_, (string)CALIBRATION_QUERIED + splitArguments(returnString, ',')[1]);
 				
@@ -43,14 +43,17 @@ namespace aquarius
         
     	if(commandResult == I2C_READ_BACK_OK)
     	{
+    		cout << "Returned string : " << returnString << endl;
+    		/*
     		string dataName[] = { ATLAS_DO_DATA_1,  ATLAS_DO_DATA_2};
     		
     		string tempPrct = returnString.substr(1);
 			string tempDO;
     		
-    		float datas[] = { (float)atof(tempPH.c_str()) };
+    		float datas[] = { (float)atof(tempPrct.c_str()) };
     		
     		aquarius::outputReadData(deviceName_, ATLAS_DO_DATA_QTY, dataName, datas);
+    		*/
     	}
     	else if(commandResult == I2C_READ_BACK_FAIL)
     	{

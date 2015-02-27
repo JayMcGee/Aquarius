@@ -1,7 +1,7 @@
 all: driverDHT22 copylibs copyexec
 
-driverDHT22: main.cpp bbb_dht_read.o bbb_mmio.o common_dht_read.o dht22Device.o commun.o
-	g++ -std=c++0x -lrt main.cpp bbb_dht_read.o bbb_mmio.o common_dht_read.o dht22Device.o commun.o -o driverDHT22Exec
+driverDHT22: main.cpp bbb_dht_read.o bbb_mmio.o common_dht_read.o dht22Device.o BlackI2C.o BlackCore.o commun.o
+	g++ -std=c++0x -lrt main.cpp bbb_dht_read.o bbb_mmio.o common_dht_read.o dht22Device.o BlackI2C.o BlackCore.o commun.o -o driverDHT22Exec
 
 dht22Device.o: dht22Device.cpp
 	g++ -std=c++0x -c dht22Device.cpp
@@ -18,7 +18,14 @@ common_dht_read.o: libs/common_dht_read.c
 commun.o: ../../commun.cpp
 	g++ -std=c++0x -o commun.o -c ../../commun.cpp	
 	
-clean: rm *.o
+BlackI2C.o: ../../../include/blacklib/BlackI2C.cpp
+	g++ -std=c++0x -c ../../../include/blacklib/BlackI2C.cpp
+
+BlackCore.o: ../../../include/blacklib/BlackCore.cpp
+	g++ -std=c++0x -c ../../../include/blacklib/BlackCore.cpp
+	
+clean: 
+		rm *.o
 		rm driverDHT22Exec
 
 copylibs:

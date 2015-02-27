@@ -107,7 +107,7 @@ namespace aquarius
         if(commandResult == I2C_READ_BACK_OK)
     	{
 		    if(parameter.compare(I2C_COMMAND_ARG_QUEST) == 0)
-                aquarius::outputCommandResult(deviceName_, (string)COMPENSATION_RESPONDED + splitArguments(returnString, ',')[1]);
+                aquarius::outputCommandResult(deviceName_, (string)COMPENSATION_RESPONDED + returnString);
             else
                 aquarius::outputCommandResult(deviceName_, (string)COMPENSATION_SET_RESPONDED + parameter);
     	}
