@@ -6,7 +6,12 @@ namespace aquarius
     int Atlas_I2C_DO::command_Calibration(string parameter, string value)
     {
         string returnString;
-		string command = (string)I2C_COMMAND_CALIB + I2C_DELIMITER + parameter;
+		string command;
+		
+		if(parameter.compare("") == 0)
+			command = (string)I2C_COMMAND_CALIB;
+		else
+			command = (string)I2C_COMMAND_CALIB + I2C_DELIMITER + parameter;
         int type = -1;
         
 		if (parameter.compare(I2C_CAL_CLEAR) == 0 || parameter.compare(I2C_COMMAND_ARG_QUEST) == 0)
@@ -74,7 +79,7 @@ namespace aquarius
 		return commandResult;
     }
 	
-	int Atlas_I2C_DO::command_Output_String_Config(string parameter, string enable = NO_CALIBRATION_VALUE)
+	int Atlas_I2C_DO::command_Output_String_Config(string parameter, string enable)
 	{
 		string returnString;
 		string command = (string)DO_COMMAND_O + I2C_DELIMITER + parameter;

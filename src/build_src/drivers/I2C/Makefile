@@ -1,4 +1,4 @@
-all:driverAtlasI2CDO driverAtlasI2CPH driverAtlasI2CK copylibs copyexec 
+all:driverAtlasI2CDO driverAtlasI2CPH driverAtlasI2CK copylibs copyexec cleanObject
 	
 driverAtlasI2CDO: BlackI2C.o BlackCore.o Atlas_I2C_DO.o Atlas_I2C.o commun.o
 	g++ -std=c++0x driverAtlas_I2CDO.cpp BlackI2C.o BlackCore.o Atlas_I2C_DO.o Atlas_I2C.o commun.o -o driverAtlasI2CDO
@@ -35,6 +35,9 @@ copylibs:
 	
 copyexec:
 	cp driverAtlasI2C* ../../exec/
+
+cleanObject:
+	rm *.o
 	
 clean: 
 	rm *.o

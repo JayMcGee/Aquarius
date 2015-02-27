@@ -16,7 +16,7 @@ namespace aquarius
 			command = (string)I2C_COMMAND_CALIB + I2C_DELIMITER + parameter;
 			type = 0;
 		}
-		else if (value.compare(NO_CALIBRATION_VALUE) == 0 && parameter.compare(K_CAL_DRY) == 0)
+		else if (parameter.compare(K_CAL_DRY) == 0)
 		{
 			command = (string)I2C_COMMAND_CALIB + I2C_DELIMITER + parameter;
 			type = 1;

@@ -40,7 +40,7 @@ namespace aquarius
 			
 		    int command_Reading();
 			
-			int command_Output_String_Config(string parameter, string enable);
+			int command_Output_String_Config(string parameter, string enable = NO_CALIBRATION_VALUE);
 			
 			int command_Pressure(string parameter);
 			

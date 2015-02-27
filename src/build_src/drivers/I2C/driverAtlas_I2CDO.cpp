@@ -74,18 +74,13 @@ int main(int argc, char * argv[])
 	if (firstCommand.compare(I2C_COMMAND_CALIB) == 0)
 	{
 		//Verify that there is the minimum second argument
-		if (commandSplitted.size() > 2)
-		{
-			return DO.command_Calibration(commandSplitted[1], commandSplitted[2]);
-		}
-		else if (commandSplitted.size() > 1)
+		if (commandSplitted.size() > 1)
 		{
 			return DO.command_Calibration(commandSplitted[1]);
 		}
 		else
 		{
-			aquarius::outputError(DO_TEMP_NAME, NOT_ENOUGH_PARAMS);
-			return 1;
+			return DO.command_Calibration("");
 		}
 	}
 	//Device LED control
@@ -159,6 +154,8 @@ int main(int argc, char * argv[])
 	{
 		if (commandSplitted.size() > 2)
 			return DO.command_Output_String_Config(commandSplitted[1], commandSplitted[2]);
+		else if (commandSplitted.size() > 1)
+		    return DO.command_Output_String_Config(commandSplitted[1]);
 		else
 			aquarius::outputError(DO_TEMP_NAME, NOT_ENOUGH_PARAMS);
 		return 1;
