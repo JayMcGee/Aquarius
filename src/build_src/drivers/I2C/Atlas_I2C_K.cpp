@@ -59,15 +59,30 @@ namespace aquarius
     	if(commandResult == I2C_READ_BACK_OK)
     	{
     		cout << "returned string : " << returnString << endl;
-    		/*
-    		string dataName[] = { ATLAS_PH_DATA_1 };
     		
-    		string tempPH = returnString.substr(1);
+			vector<string> split = aquarius::splitArguments(returnString, ',');
+			
+			if(split >= 4)
+			{
+				string dataName[] = { ATLAS_K_DATA_1, ATLAS_K_DATA_2, ATLAS_K_DATA_3, ATLAS_K_DATA_4 };
     		
-    		float datas[] = { (float)atof(tempPH.c_str()) };
-    		
-    		aquarius::outputReadData(deviceName_, ATLAS_PH_DATA_QTY, dataName, datas);
-    		*/
+				string ec = split[0].substr(1);
+				string tds = split[1];
+				string sal = split[2];
+				string sg = split[3];
+				
+				float datas[] = { (float)atof(ec.c_str()),
+									(float)atof(tds.c_str()),
+									(float)atof(sal.c_str()),
+									(float)atof(sg.c_str())};
+				
+				aquarius::outputReadData(deviceName_, ATLAS_K_DATA_QTY, dataName, datas);
+			}
+			else
+			{
+				commandResult = I2C_READ_BACK_FAIL;
+				aquarius::outputError(deviceName_, I2C_READ_FAIL);
+			}    		
     	}
     	else if(commandResult == I2C_READ_BACK_FAIL)
     	{
