@@ -62,7 +62,7 @@ namespace aquarius
     		
 			vector<string> split = aquarius::splitArguments(returnString, ',');
 			
-			if(split >= 4)
+			if(split >= ATLAS_K_DATA_QTY)
 			{
 				string dataName[] = { ATLAS_K_DATA_1, ATLAS_K_DATA_2, ATLAS_K_DATA_3, ATLAS_K_DATA_4 };
     		
