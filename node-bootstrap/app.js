@@ -108,12 +108,12 @@ connection.connect(function(err){
         return;
     }
 
-    drawSeparator()
+    drawSeparator();
     log('Connected as id ' + connection.threadId, 2);
-    drawSeparator()
+    drawSeparator();
 
     //Calls configuration read from aquariusTools, callsback to assignConfigurationValues
-    aquariusTools.init(connection)
+    aquariusTools.init(connection);
     aquariusTools.readConfig(connection, assignConfigurationValues);
 });
 
@@ -130,6 +130,8 @@ function autoMode(){
         fileWatch = watchdog();
         fs.writeSync(fileWatch, "\n");
     }
+    
+    sh.exec("sh /var/lib/cloud9/Aquarius/exec/close_usr_led.sh");
     
     writeToWatchDog(fileWatch);
     log("Auto mode", 2);
@@ -192,7 +194,7 @@ function updateDates(){
         var currentSysDate = Date.parse(strCurrentSysDate);
         
         //Get a date object from last known date from configuration
-        var lastDate = Date.parse(CONFIG_Last_Date)
+        var lastDate = Date.parse(CONFIG_Last_Date);
     
         log("Current Sys date : " + strCurrentSysDate, 2);
         log("Last known date : " + CONFIG_Last_Date, 2);
@@ -1040,11 +1042,12 @@ function startServer(){
            var service = sh.exec("systemctl restart aquarius.service").stdout; 
         });
         
-        socket.on("exportDatabase", fucntion(){
+        socket.on("exportDatabase", function(){
             var removeOldFile = sh.exec("rm /var/lib/cloud9/Aquarius/export.csv");
-            aquariusTools.ExportDatabase(function(err, rows, fields){
-                app.get('/', function (req, res) {
-                  res.sendfile('/var/lib/cloud9/Aquarius/export.csv');
+            aquariusTools.ExportDatabase(connection, function(err, rows, fields){
+                var moveFile = sh.exec("mv /tmp/export.csv /var/lib/cloud9/");
+                app.('/', function (req, res) {
+                  res.sendfile('/var/lib/cloud9/export.csv');
                 })
             });
         });
