@@ -35,6 +35,4 @@ OK		AT+CGDCONT=1,"IP","\T"
 OK		ATDT*99***2#
 TIMEOUT		22
 CONNECT		""
-ogin: wapuser1
-ssword: wap
 
