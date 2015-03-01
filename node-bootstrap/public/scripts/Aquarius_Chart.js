@@ -13,7 +13,7 @@ io.on('ReceiveSensors',function(data){
 			var chartMax = entry.Max
 			var chartMin = entry.Min
 			var chartColor = entry.Color
-			
+			var minDate = new Date().getTime();
 			var highcharts ={chart:{
 					            type: 'line',
 					            zoomType: 'xy',
@@ -24,7 +24,11 @@ io.on('ReceiveSensors',function(data){
 						        },
 						        colors: [],
 						        xAxis: {
-						            type: 'datetime'
+					                type: 'datetime',
+                                    title: {
+                                        text: 'Date',
+                                        minRange: 15 * 24 * 3600000,
+                                    }
 						        },
 						        yAxis: {
 						            floor: -30,
@@ -50,7 +54,7 @@ io.on('ReceiveSensors',function(data){
 						        tooltip: {
 						            formatter: function () {
 						                return '<b>' + this.series.name + '</b><br/>' +
-						                    Highcharts.dateFormat('%Y-%m-%d %H:%M', this.x) + '<br/>' +
+						                    Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br/>' +
 						                    Highcharts.numberFormat(this.y, 2) + " °C";
 						            }
 						        },
@@ -64,7 +68,7 @@ io.on('ReceiveSensors',function(data){
 		highcharts.colors[0] = chartColor;
 		highcharts.yAxis.title.text = chartUnit;
 		
-		var htmlContainer = '<div class="row-fluid">' + '<div class="box-header">' + '<h2><i class="halflings-icon list-alt"></i><span class="break"></span>'+ chartName + '</h2>' + '<div class="box-icon">  </div> </div>' + '<div class="box-content"> <div id="' + "chart"+chartID +'" style="min-width: 310px; height: 400px; margin: 0 auto"></div> </div>' + '</div><!--/row-->';
+		var htmlContainer = '<div class="row-fluid">' + '<div class="box-header">' + '<h2><i class="halflings-icon list-alt"></i><span class="break"></span>'+ chartName + '</h2>' + '<div class="box-icon"><a id="' + "btn"+chartID +'" class="btn-setting btn-aquarius" onclick="getMeasure('+ chartID +')"> Update <i class="halflings-icon repeat"></i></a></div> </div>' + '<div class="box-content"> <div id="' + "chart"+chartID +'" style="min-width: 310px; height: 400px; margin: 0 auto"></div> </div>' + '</div><!--/row-->';
 		$("#content").append(htmlContainer);
 		
 		

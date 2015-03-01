@@ -244,6 +244,7 @@ body {
 }
 
 a {
+	cursor:pointer; cursor:hand;
 	color: #646464;
 }
 
