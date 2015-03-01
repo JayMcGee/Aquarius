@@ -2,8 +2,16 @@ var express = require('express.io');                    //Express and Socket.io 
 var mysql   = require('mysql');   //Javascript mySql Connector
 var exec    = require('child_process').exec,child;      //Execute shell command
 var tty     = require('tty.js');                        //Terminal access from web-client
+var schedule= require('node-schedule');
 
 var interval = 10000; //enter the time between sensor queries here (in milliseconds)
+
+//Prepare Scheduler
+var rule = new schedule.RecurrenceRule();
+rule.second = null;
+//rule.minute = 0;
+//rule.minute = 30;
+
 
 //////////////////////////////////////////////////////////
 //Establishing connection to Station database (local DB)    
@@ -138,3 +146,70 @@ function sendTempFromDB(rowCount,socket){
                 socket.emit('tempData', {'array': rows});
         });
 }
+
+function readSensor(execLine,position){
+           //Execute Temperature driver 
+    child = exec(execLine , function(error,stdout,stderr)
+    {
+        var splittedStdOutput = stdout.split(';');
+        var value = splittedStdOutput[position];
+        if(error !== null)
+        {
+            console.log('Exec error' + error);
+            return "Error";
+        }
+        else
+        {
+            return value;
+        }
+    });
+}
+
+//Scheduler
+var getData = schedule.scheduleJob(rule,function()
+    {
+        var date,newTemp,newPh,newDo,newCond,newStationTemp,newStationHum;
+        var Step = 0;
+        
+        console.log("Scheduled Event Started")
+        date = new Date().toISOString().slice(0, 19).replace('T', ' '); //Converts JS Date format to MySql Format
+        
+
+        while(Step !== 4)
+        {
+            if ( Step ==0 ) //Read Sensors
+            {
+                //All sensor are Read ( Asynchronously)
+                //Get Temperature data
+                newTemp = readSensor("/var/lib/cloud9/Aquarius/src/build_src/exec/driverOneWireExec 28-000006052315",5);
+                newPh = readSensor("/var/lib/cloud9/Aquarius/src/build_src/exec/driverAtlasI2CPH 1:97 R",5);
+                newDo = readSensor("/var/lib/cloud9/Aquarius/src/build_src/exec/driverAtlasI2CDO 1:100 R",5);
+                newCond = readSensor("/var/lib/cloud9/Aquarius/src/build_src/exec/driverAtlasI2CK 1:103 R",5);
+                newStationTemp = readSensor("/var/lib/cloud9/Aquarius/src/build_src/exec/driverDHT22Exec",5);
+                newStationHum = readSensor("/var/lib/cloud9/Aquarius/src/build_src/exec/driverDHT22Exec",5);
+                Step = 1;
+
+            }
+            else if( Step ==1) //Confirm Data
+            {
+                Step = 2;
+            }
+            else if (Step == 2) //Update DataBase
+            {
+                //if All child exec are executed withSucces
+                //Insert Data in DataBase
+                connection.query('USE `aquariusStation`');
+                var post = {date:date,water_temp:newTemp,water_conduc:newCond, water_do:newDo, water_ph:newPh, case_temp:newStationTemp, case_humidity:newStationHum}
+                var query = connection.query('INSERT INTO sensorData SET ?' ,post, function(error,result){
+                    console.log(query.sql);
+                    if(error !== null)
+                    {
+                        console.log('Query error' + error);
+                        success = false;
+                    }
+                    console.log("Scheduled Event Ended")
+                });
+            }
+        }
+    }); 
+    
