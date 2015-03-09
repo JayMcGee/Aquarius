@@ -58,11 +58,11 @@ namespace aquarius
         
     	if(commandResult == I2C_READ_BACK_OK)
     	{
-    		cout << "returned string : " << returnString << endl;
+    		//cout << "returned string : " << returnString << endl;
     		
 			vector<string> split = aquarius::splitArguments(returnString, ',');
 			
-			if(split >= ATLAS_K_DATA_QTY)
+			if(split.size() >= ATLAS_K_DATA_QTY)
 			{
 				string dataName[] = { ATLAS_K_DATA_1, ATLAS_K_DATA_2, ATLAS_K_DATA_3, ATLAS_K_DATA_4 };
     		

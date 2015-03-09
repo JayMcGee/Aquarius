@@ -8,9 +8,9 @@ var interval = 10000; //enter the time between sensor queries here (in milliseco
 
 //Prepare Scheduler
 var rule = new schedule.RecurrenceRule();
-rule.second = null;
-//rule.minute = 0;
-//rule.minute = 30;
+//ule.second = [0,10,20,30,40,50];
+rule.minute = [0,30];
+var date,newTemp,newPh,newDo,newCond,newStationTemp,newStationHum;
 
 
 //////////////////////////////////////////////////////////
@@ -147,48 +147,91 @@ function sendTempFromDB(rowCount,socket){
         });
 }
 
-function readSensor(execLine,position){
-           //Execute Temperature driver 
-    child = exec(execLine , function(error,stdout,stderr)
-    {
-        var splittedStdOutput = stdout.split(';');
-        var value = splittedStdOutput[position];
-        if(error !== null)
-        {
-            console.log('Exec error' + error);
-            return "Error";
-        }
-        else
-        {
-            return value;
-        }
-    });
-}
+
 
 //Scheduler
 var getData = schedule.scheduleJob(rule,function()
     {
-        var date,newTemp,newPh,newDo,newCond,newStationTemp,newStationHum;
-        var Step = 0;
+       var Step = 0;
         
         console.log("Scheduled Event Started")
         date = new Date().toISOString().slice(0, 19).replace('T', ' '); //Converts JS Date format to MySql Format
         
-
         while(Step !== 4)
         {
-            if ( Step ==0 ) //Read Sensors
+            if ( Step == 0 ) //Read Sensors
             {
+                var allExecsEnded = false;
                 //All sensor are Read ( Asynchronously)
                 //Get Temperature data
-                newTemp = readSensor("/var/lib/cloud9/Aquarius/src/build_src/exec/driverOneWireExec 28-000006052315",5);
-                newPh = readSensor("/var/lib/cloud9/Aquarius/src/build_src/exec/driverAtlasI2CPH 1:97 R",5);
-                newDo = readSensor("/var/lib/cloud9/Aquarius/src/build_src/exec/driverAtlasI2CDO 1:100 R",5);
-                newCond = readSensor("/var/lib/cloud9/Aquarius/src/build_src/exec/driverAtlasI2CK 1:103 R",5);
-                newStationTemp = readSensor("/var/lib/cloud9/Aquarius/src/build_src/exec/driverDHT22Exec",5);
-                newStationHum = readSensor("/var/lib/cloud9/Aquarius/src/build_src/exec/driverDHT22Exec",5);
-                Step = 1;
+                console.log("Reading sensors");
+                //////////////////////////////////////////////    TEMPERATURE READING    ///////////////////////////////////////////////////
+                child = exec("/var/lib/cloud9/Aquarius/src/build_src/exec/driverOneWireExec 28-000006052315" , function(error,stdout,stderr)
+                {
+                    var splittedStdOutput = stdout.split(';');
+                    var value = splittedStdOutput[5];
+                    if(error !== null)
+                    {
+                        console.log('Exec error' + error);
+                    }
+                    else
+                    {
+                        newTemp = value;
+                    }
+                });
+                
+                //////////////////////////////////////////////         PH READING          ///////////////////////////////////////////////////
+                child = exec("/var/lib/cloud9/Aquarius/src/build_src/exec/driverAtlasI2CPH 1:99 R" , function(error,stdout,stderr)
+                {
+                    var splittedStdOutput = stdout.split(';');
+                    var value = splittedStdOutput[5];
+                    newPh = value;
+                });
+                
+                //////////////////////////////////////////////         DO READING          ///////////////////////////////////////////////////
+                child = exec("/var/lib/cloud9/Aquarius/src/build_src/exec/driverAtlasI2CDO 1:97 R" , function(error,stdout,stderr)
+                {
+                    var splittedStdOutput = stdout.split(';');
+                    var value = splittedStdOutput[7];
+                    console.log(stdout + " : " + value);
+                    newDo = value;
+                });
+                
+                //////////////////////////////////////////////       COND READING      ///////////////////////////////////////////////////
+                child = exec("/var/lib/cloud9/Aquarius/src/build_src/exec/driverAtlasI2CK 1:100 R" , function(error,stdout,stderr)
+                {
+                    var splittedStdOutput = stdout.split(';');
+                    var value = splittedStdOutput[5];
+                    console.log(stdout + " : " + value);
+                    newCond = value;
+                });
+                
+                //////////////////////////////////////////////       INTERNAL READING      ///////////////////////////////////////////////////
+                child = exec("/var/lib/cloud9/Aquarius/src/build_src/exec/driverDHT22Exec 1:14" , function(error,stdout,stderr)
+                {
+                    var splittedStdOutput = stdout.split(';');
+                    var value1 = splittedStdOutput[5];
+                    var value2 = splittedStdOutput[7];
+                    if(error !== null)
+                    {
+                        console.log('Exec error' + error);
+                    }
+                    else
+                    {
+                        newStationTemp = value1;
+                        newStationHum = value2;
+                    }
+                });
 
+                console.log("Reading Complete");
+                console.log("Temp = " + newTemp);
+                console.log("Ph = " + newPh);
+                console.log("Do = " + newDo);
+                console.log("Cond = " + newCond);
+                console.log("S. Temp = " + newStationTemp);
+                console.log("S. Hum = " + newStationHum);
+                //Next Step
+                Step = 1;
             }
             else if( Step ==1) //Confirm Data
             {
@@ -209,6 +252,7 @@ var getData = schedule.scheduleJob(rule,function()
                     }
                     console.log("Scheduled Event Ended")
                 });
+                Step = 4;
             }
         }
     }); 
