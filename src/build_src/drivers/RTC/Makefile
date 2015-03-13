@@ -1,6 +1,6 @@
 all: driverRTC copylibs copyexec
 
-driverRTC: BlackI2C.o BlackCore.o commun.o
+driverRTC: main.cpp BlackI2C.o BlackCore.o commun.o
 	g++ -std=c++0x main.cpp BlackI2C.o BlackCore.o commun.o -o driverRTC
 
 commun.o: ../../commun.cpp

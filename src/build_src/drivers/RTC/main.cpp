@@ -23,13 +23,14 @@ BlackI2C * i2c_;
 bool writeRTCMemory(int powerCtl_Addr, int powerCtlReg);
 int readRTCMemory(int registerAddr);
 
-bool getBit(int registerAddr, int mask);
+bool readBit(int registerAddr, int mask);
+bool writeBit(int registerAddr, int mask, bool bit);
 
 int main(int argc, char * argv[])
 {
 	if(argc < 3)
     {
-        cout << aquarius::Atlas_I2C::output_missingArguments() << endl;
+        cout << "Not enough args" << endl;
         return 1;
     }
     string deviceLocation;
@@ -76,15 +77,15 @@ int main(int argc, char * argv[])
     vector<string> commandSplitted{aquarius::splitArguments(command, ':')};
 	string firstCommand = commandSplitted[0];
 	
-	if(firstCommand.compare("SetDate"))
+	if(firstCommand.compare("SetDate") == 0)
 	{
 		
 	}
-	else if(firstCommand.compare("GetDate"))
+	else if(firstCommand.compare("GetDate") == 0)
 	{
 		
 	}
-	else if(firstCommand.compare("SetAlarm"))
+	else if(firstCommand.compare("SetAlarm") == 0)
 	{
 		if(commandSplitted.size() > 2)
 		{
@@ -103,7 +104,7 @@ int main(int argc, char * argv[])
 			{
 				result = writeRTCMemory(RTC_ALARM_MIN_REG, valueToWrite);
 			}
-			else if(type.command("hr") == 0)
+			else if(type.compare("hr") == 0)
 			{
 				result = writeRTCMemory(RTC_ALARM_HOUR_REG, valueToWrite);
 			}
@@ -119,13 +120,13 @@ int main(int argc, char * argv[])
 			return 1;
 		}
 	}
-	else if(firstCommand.compare("GetAlarm"))
+	else if(firstCommand.compare("GetAlarm") == 0)
 	{
 		
 	}
-	else if(firstCommand.compare("ResetAlarm"))
+	else if(firstCommand.compare("ResetAlarm") == 0)
 	{		
-		bool isAlarmEnabled = getBit(RTC_ALARM_FLAG_REG, RTC_ALARM_FLAG_POS);
+		bool isAlarmEnabled = readBit(RTC_ALARM_FLAG_REG, RTC_ALARM_FLAG_POS);
 		if(!isAlarmEnabled)
 		{
 			cout << "Alarm is currently at false" << endl;
@@ -136,24 +137,52 @@ int main(int argc, char * argv[])
 			do{
 				cout << "trying to set as false" << endl;
 				writeBit(RTC_ALARM_FLAG_REG, RTC_ALARM_FLAG_POS, false);
-				isAlarmEnabled = getBit(RTC_ALARM_FLAG_REG, RTC_ALARM_FLAG_POS);
+				isAlarmEnabled = readBit(RTC_ALARM_FLAG_REG, RTC_ALARM_FLAG_POS);
 				cpt++;				
 			}while (isAlarmEnabled && cpt < 5);
 			cout << "Alarm is now : " << isAlarmEnabled << endl;
 		}
 	}
-	else if(firstCommand.compare("GetAlarm"))
+	else if(firstCommand.compare("GetAlarm") == 0)
 	{
-		bool isAlarmEnabled = readRTCMemory(RTC_ALARM_FLAG_REG, RTC_ALARM_FLAG_POS);
+		bool isAlarmEnabled = readRTCMemory(RTC_ALARM_FLAG_REG);
 		cout << "Alarm is : " << isAlarmEnabled << endl;
 	}
-	
+	else if(firstCommand.compare("TestSet") == 0)
+	{
+		cout << "Set" << endl;
+		writeBit(0x0E, 0, 1);
+	}
+	else if(firstCommand.compare("TestReset") == 0)
+	{
+		cout << "Reset" << endl;
+		writeBit(0x0E, 0, 0);
+	}
+	else if(firstCommand.compare("GetByte") == 0)
+	{
+		if(commandSplitted.size() > 1)
+			cout << "Byte is at : " << readRTCMemory(atoi(commandSplitted[1].c_str())) << endl;
+		else
+			cout << "Not enough args " << endl;
+	}
+	else if(firstCommand.compare("GetBit") == 0)
+	{
+		if(commandSplitted.size() > 2)
+			cout << "Bit is at : " << readBit(atoi(commandSplitted[1].c_str()),atoi(commandSplitted[2].c_str())) << endl;
+		else
+			cout << "Not enough args " << endl;
+		
+	}
+	else
+	{
+		cout << "No command " << endl;
+	}
 	return 1;
 }
 
-bool writeRTCMemory(int powerCtl_Addr, int powerCtlReg)
+bool writeRTCMemory(int addr, int reg)
 {
-	return i2c_->writeByte((u_int8_t)powerCtl_Addr, (u_int8_t)powerCtlReg);
+	return i2c_->writeByte((u_int8_t)addr, (u_int8_t)reg);
 }
 
 int readRTCMemory(int registerAddr)
@@ -161,7 +190,7 @@ int readRTCMemory(int registerAddr)
 	return (int)i2c_->readByte((u_int8_t)registerAddr);
 }
 
-bool getBit(int registerAddr, int mask)
+bool readBit(int registerAddr, int mask)
 {
 	return ((readRTCMemory(registerAddr) >> mask) & 0x01);
 }
@@ -169,6 +198,19 @@ bool getBit(int registerAddr, int mask)
 bool writeBit(int registerAddr, int mask, bool bit)
 {
 	int data = readRTCMemory(registerAddr);	
-	data = data | ((int)bit << mask);	
+	cout << "Before modification : " << data << endl;
+	if(bit)
+	{
+		int temp = 0;
+		temp |= (1 << mask);
+		data |= temp;
+	}
+	else
+	{
+		int temp = 0xFF;
+		temp |= (0 << mask);
+		data &= temp;
+	}
+	cout << "After modification : " << data << endl;
 	return writeRTCMemory(registerAddr, data);
 }
