@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.05" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
+<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="no" active="no"/>
 <layer number="2" name="Route2" color="1" fill="3" visible="no" active="no"/>
@@ -18327,6 +18327,7 @@ Source: www.kingbright.com</description>
 <text x="179.07" y="-76.2" size="1.778" layer="91">P</text>
 <text x="176.53" y="-68.58" size="1.778" layer="91">Vcc</text>
 <text x="176.53" y="-78.74" size="1.778" layer="91">Gnd</text>
+<text x="101.6" y="30.48" size="1.778" layer="91">Should be SDA on TX and SCL on RX</text>
 </plain>
 <instances>
 <instance part="SUPPLY2" gate="GND" x="58.42" y="-25.4"/>
