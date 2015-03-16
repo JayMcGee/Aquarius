@@ -1,15 +1,31 @@
 var express = require('express.io');                    //Express and Socket.io integration
 var mysql   = require('mysql');   //Javascript mySql Connector
-var exec    = require('child_process').exec,child;      //Execute shell command
+var exec    = require('child_process').exec,child,pHc,DOc,Kc,OWc,DHTc;      //Execute shell command
 var tty     = require('tty.js');                        //Terminal access from web-client
 var schedule= require('node-schedule');
+var sh      = require('execSync');
 
 var interval = 10000; //enter the time between sensor queries here (in milliseconds)
 
+StepsReadings = {
+    Begin : 1,
+    pH : 2,
+    DO : 3,
+    K : 4,
+    DS18 : 5,
+    DHT : 6,
+    PutDB : 7,
+    Done : 8,
+    End : 9,
+    DontDoShit : 10
+}
+
+var Step = StepsReadings.Begin;
+
 //Prepare Scheduler
 var rule = new schedule.RecurrenceRule();
-//ule.second = [0,10,20,30,40,50];
-rule.minute = [0,30];
+rule.second = [0,30];
+//rule.minute = [0,30];
 var date,newTemp,newPh,newDo,newCond,newStationTemp,newStationHum;
 
 
@@ -48,7 +64,6 @@ function startTerminal(){
     });
     appTTY.listen();
 }
-
 
 
 ////////////////////////////////////////////////////////////
@@ -129,13 +144,6 @@ app.io.on('connection',function(socket){
     
 });
 
-//receive start terminal
-app.io.on('connection',function(socket){
-    socket.on('startTerminal',function(){
-            startTerminal();
-            socket.emit('terminalStarted');
-    });
-});
 
 //Send from database Functiions
 function sendTempFromDB(rowCount,socket){
@@ -148,81 +156,76 @@ function sendTempFromDB(rowCount,socket){
 }
 
 
-
 //Scheduler
 var getData = schedule.scheduleJob(rule,function()
     {
-       var Step = 0;
+        Step = StepsReadings.Begin;
         
         console.log("Scheduled Event Started")
         date = new Date().toISOString().slice(0, 19).replace('T', ' '); //Converts JS Date format to MySql Format
         
-        while(Step !== 4)
+        while( Step !== StepsReadings.End )
         {
-            if ( Step == 0 ) //Read Sensors
+            if ( Step == StepsReadings.Begin ) //Initial
             {
-                var allExecsEnded = false;
-                //All sensor are Read ( Asynchronously)
-                //Get Temperature data
-                console.log("Reading sensors");
-                //////////////////////////////////////////////    TEMPERATURE READING    ///////////////////////////////////////////////////
-                child = exec("/var/lib/cloud9/Aquarius/src/build_src/exec/driverOneWireExec 28-000006052315" , function(error,stdout,stderr)
-                {
-                    var splittedStdOutput = stdout.split(';');
-                    var value = splittedStdOutput[5];
-                    if(error !== null)
-                    {
-                        console.log('Exec error' + error);
-                    }
-                    else
-                    {
-                        newTemp = value;
-                    }
-                });
-                
+                console.log("Reading sensors")
+                newTemp = null
+                newPh = null
+                newDo = null
+                newCond = null
+                newStationTemp = null
+                newStationHum = null
+                Step = StepsReadings.pH
+            }
+            else if( Step == StepsReadings.pH )
+            {
                 //////////////////////////////////////////////         PH READING          ///////////////////////////////////////////////////
-                child = exec("/var/lib/cloud9/Aquarius/src/build_src/exec/driverAtlasI2CPH 1:99 R" , function(error,stdout,stderr)
-                {
-                    var splittedStdOutput = stdout.split(';');
-                    var value = splittedStdOutput[5];
-                    newPh = value;
-                });
-                
-                //////////////////////////////////////////////         DO READING          ///////////////////////////////////////////////////
-                child = exec("/var/lib/cloud9/Aquarius/src/build_src/exec/driverAtlasI2CDO 1:97 R" , function(error,stdout,stderr)
-                {
-                    var splittedStdOutput = stdout.split(';');
-                    var value = splittedStdOutput[7];
-                    console.log(stdout + " : " + value);
-                    newDo = value;
-                });
-                
+                var resultPh = sh.exec("/var/lib/cloud9/Aquarius/src/build_src/exec/driverAtlasI2CPH 1:99 R")
+                var splittedStdOutput = resultPh.stdout.split(';')
+                var value = splittedStdOutput[5]
+                newPh = value
+                Step = StepsReadings.DO
+            }
+            else if ( Step == StepsReadings.DO )
+            {
+                 //////////////////////////////////////////////         DO READING          ///////////////////////////////////////////////////
+                var resultDo = sh.exec("/var/lib/cloud9/Aquarius/src/build_src/exec/driverAtlasI2CDO 1:97 R")
+                var splittedStdOutput = resultDo.stdout.split(';')
+                var value = splittedStdOutput[7]
+                newDo = value
+                Step = StepsReadings.K
+            }
+            else if ( Step == StepsReadings.K )
+            {
                 //////////////////////////////////////////////       COND READING      ///////////////////////////////////////////////////
-                child = exec("/var/lib/cloud9/Aquarius/src/build_src/exec/driverAtlasI2CK 1:100 R" , function(error,stdout,stderr)
-                {
-                    var splittedStdOutput = stdout.split(';');
-                    var value = splittedStdOutput[5];
-                    console.log(stdout + " : " + value);
-                    newCond = value;
-                });
-                
+                var resultK = sh.exec("/var/lib/cloud9/Aquarius/src/build_src/exec/driverAtlasI2CK 1:100 R")
+                var splittedStdOutput = resultK.stdout.split(';')
+                var value = splittedStdOutput[5]
+                newCond = value
+                Step = StepsReadings.DS18
+            }
+            else if ( Step == StepsReadings.DS18 )
+            {
+                //////////////////////////////////////////////    TEMPERATURE READING    ///////////////////////////////////////////////////
+                resultOW = sh.exec("/var/lib/cloud9/Aquarius/src/build_src/exec/driverOneWireExec 28-000006700658")
+                var splittedStdOutput = resultOW.stdout.split(';')
+                var value = splittedStdOutput[5]
+                newTemp = value
+                Step = StepsReadings.DHT
+            }
+            else if ( Step == StepsReadings.DHT )   
+            {
                 //////////////////////////////////////////////       INTERNAL READING      ///////////////////////////////////////////////////
-                child = exec("/var/lib/cloud9/Aquarius/src/build_src/exec/driverDHT22Exec 1:14" , function(error,stdout,stderr)
-                {
-                    var splittedStdOutput = stdout.split(';');
-                    var value1 = splittedStdOutput[5];
-                    var value2 = splittedStdOutput[7];
-                    if(error !== null)
-                    {
-                        console.log('Exec error' + error);
-                    }
-                    else
-                    {
-                        newStationTemp = value1;
-                        newStationHum = value2;
-                    }
-                });
-
+                var resultDHT = sh.exec("/var/lib/cloud9/Aquarius/src/build_src/exec/driverDHT22Exec 1:14")
+                var splittedStdOutput = resultDHT.stdout.split(';')
+                var value1 = splittedStdOutput[5]
+                var value2 = splittedStdOutput[7]
+                newStationTemp = value1
+                newStationHum = value2
+                Step = StepsReadings.PutDB
+            }
+            else if( Step == StepsReadings.PutDB ) //Confirm Data
+            {
                 console.log("Reading Complete");
                 console.log("Temp = " + newTemp);
                 console.log("Ph = " + newPh);
@@ -230,17 +233,7 @@ var getData = schedule.scheduleJob(rule,function()
                 console.log("Cond = " + newCond);
                 console.log("S. Temp = " + newStationTemp);
                 console.log("S. Hum = " + newStationHum);
-                //Next Step
-                Step = 1;
-            }
-            else if( Step ==1) //Confirm Data
-            {
-                Step = 2;
-            }
-            else if (Step == 2) //Update DataBase
-            {
-                //if All child exec are executed withSucces
-                //Insert Data in DataBase
+                
                 connection.query('USE `aquariusStation`');
                 var post = {date:date,water_temp:newTemp,water_conduc:newCond, water_do:newDo, water_ph:newPh, case_temp:newStationTemp, case_humidity:newStationHum}
                 var query = connection.query('INSERT INTO sensorData SET ?' ,post, function(error,result){
@@ -251,9 +244,21 @@ var getData = schedule.scheduleJob(rule,function()
                         success = false;
                     }
                     console.log("Scheduled Event Ended")
+                    
                 });
-                Step = 4;
+                
+                Step = StepsReadings.Done;
             }
+            else if (Step == StepsReadings.Done) //Update DataBase
+            {
+                //if All child exec are executed withSucces
+                //Insert Data in DataBase
+                
+                Step = StepsReadings.End;
+            }
+            else if (Step == StepsReadings.DontDoShit )
+                console.log("Don't do shit")
+            
         }
     }); 
     
