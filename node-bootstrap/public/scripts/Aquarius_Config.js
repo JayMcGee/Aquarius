@@ -11,8 +11,17 @@
 */
 
 //Var Global
-
 var dbRows = []
+
+/**
+ * @brief Display the datePicker in the right format
+ * 
+ */
+$('#datetimepicker1').datetimepicker({
+    format: 'dd/MM/yyyy hh:mm:ss',
+    language: 'pt-BR'
+});
+var picker = $('#datetimepicker1').data('datetimepicker')
 
 io = io.connect()
 io.emit('ready')
@@ -63,9 +72,11 @@ function sendConfig(KeyName,Value){
     io.emit('UpdateConfig',{'Name': KeyName, 'Value': Value})
 }
 
-
-
 $("#saveButton" ).click(function() {
+    
+     var localDate = picker.getLocalDate()
+     alert(localDate)
+     
      for ( var i = 0; i < dbRows.length; i++)
 	    {
 	        var id    = dbRows[i].Id
