@@ -8,7 +8,7 @@
     "stylus": "*",
     "http":"*",
     "mysql":"*",
-    "tty.js":"*",
+    "execSync":"*",
 	"serve-favicon": "*",
 	"morgan": "*",
 	"body-parser": "*",

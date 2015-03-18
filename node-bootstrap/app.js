@@ -1,7 +1,6 @@
 var express = require('express.io');                    //Express and Socket.io integration
 var mysql   = require('mysql');   //Javascript mySql Connector
-var exec    = require('child_process').exec,child,pHc,DOc,Kc,OWc,DHTc;      //Execute shell command
-var tty     = require('tty.js');                        //Terminal access from web-client
+var exec    = require('child_process').exec,child,pHc,DOc,Kc,OWc,DHTc;      //Execute shell command                     //Terminal access from web-client
 var schedule= require('node-schedule');
 var sh      = require('execSync');
 
@@ -34,7 +33,7 @@ var date,newTemp,newPh,newDo,newCond,newStationTemp,newStationHum;
 var connection = mysql.createConnection({
   host     : 'localhost',
   user     : 'root',
-  password : 'poutine'
+  password : 'snoopy'
 });
 
 connection.connect(function(err) {
