@@ -7,6 +7,9 @@ var databaseHelper = require('./aquariusSensorHelper')
 
 var interval = 10000; //enter the time between sensor queries here (in milliseconds)
 
+var rtcPath = "python /var/lib/cloud9/Aquarius/exec/driverRTC.py"
+var sw1Path = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw1.py"
+
 StepsReadings = {
     Begin : 1,
     pH : 2,
@@ -17,8 +20,7 @@ StepsReadings = {
     PutDB : 7,
     Done : 8,
     End : 9,
-    DontDoShit : 10,
-    ConfigNotRead : 11
+    ConfigNotRead : 10
 }
 
 var Step = StepsReadings.Begin;
@@ -145,113 +147,129 @@ function sendTempFromDB(rowCount,socket){
 
 databaseHelper.readConfig(connection, configurationReadCallback)
 
-databaseHelper.setConfig(connection, "READ_INTERVAL", 30, configurationSetCallBack);
+//databaseHelper.setConfig(connection, "READ_INTERVAL", 30, configurationSetCallBack);
+
+//var rtcPath
+//var sw1Path 
 
 
 //Scheduler
-var getData = schedule.scheduleJob(rule,function()
+
+var currentMode = sh.exec(sw1Path)
+console.log("Read mode : " + currentMode.stdout)
+if( currentMode.stdout.indexOf("HIGH") > -1)
+{
+    console.log("Auto mode")
+    console.log("Enabling schedule")
+    aquariusSchedule()
+}
+else
+{
+    console.log("Manual mode")    
+    console.log("Waiting ")
+}
+
+function aquariusSchedule()
+{
+    Step = StepsReadings.Begin;
+    
+    console.log("Sensor read function entered")
+    
+    while( Step !== StepsReadings.End )
     {
-        Step = StepsReadings.Begin;
-        
-        console.log("Scheduled Event Started")
-        date = new Date().toISOString().slice(0, 19).replace('T', ' '); //Converts JS Date format to MySql Format
-        
-        while( Step !== StepsReadings.End )
+        if ( Step == StepsReadings.Begin ) //Initial
         {
-            if ( Step == StepsReadings.Begin ) //Initial
-            {
-                console.log("Reading sensors")
-                newTemp = null
-                newPh = null
-                newDo = null
-                newCond = null
-                newStationTemp = null
-                newStationHum = null
-                Step = StepsReadings.pH
-            }
-            else if( Step == StepsReadings.pH )
-            {
-                //////////////////////////////////////////////         PH READING          ///////////////////////////////////////////////////
-                var resultPh = sh.exec("/var/lib/cloud9/Aquarius/exec/driverAtlasI2CPH 1:99 R")
-                var splittedStdOutput = resultPh.stdout.split(';')
-                var value = splittedStdOutput[5]
-                newPh = value
-                Step = StepsReadings.DO
-            }
-            else if ( Step == StepsReadings.DO )
-            {
-                 //////////////////////////////////////////////         DO READING          ///////////////////////////////////////////////////
-                var resultDo = sh.exec("/var/lib/cloud9/Aquarius/exec/driverAtlasI2CDO 1:97 R")
-                var splittedStdOutput = resultDo.stdout.split(';')
-                var value = splittedStdOutput[7]
-                newDo = value
-                Step = StepsReadings.K
-            }
-            else if ( Step == StepsReadings.K )
-            {
-                //////////////////////////////////////////////       COND READING      ///////////////////////////////////////////////////
-                var resultK = sh.exec("/var/lib/cloud9/Aquarius/exec/driverAtlasI2CK 1:100 R")
-                var splittedStdOutput = resultK.stdout.split(';')
-                var value = splittedStdOutput[5]
-                newCond = value
-                Step = StepsReadings.DS18
-            }
-            else if ( Step == StepsReadings.DS18 )
-            {
-                //////////////////////////////////////////////    TEMPERATURE READING    ///////////////////////////////////////////////////
-                resultOW = sh.exec("/var/lib/cloud9/Aquarius/exec/driverOneWireExec 28-000006700658")
-                var splittedStdOutput = resultOW.stdout.split(';')
-                var value = splittedStdOutput[5]
-                newTemp = value
-                Step = StepsReadings.DHT
-            }
-            else if ( Step == StepsReadings.DHT )   
-            {
-                //////////////////////////////////////////////       INTERNAL READING      ///////////////////////////////////////////////////
-                var resultDHT = sh.exec("/var/lib/cloud9/Aquarius/exec/driverDHT22Exec 1:14")
-                var splittedStdOutput = resultDHT.stdout.split(';')
-                var value1 = splittedStdOutput[5]
-                var value2 = splittedStdOutput[7]
-                newStationTemp = value1
-                newStationHum = value2
-                Step = StepsReadings.PutDB
-            }
-            else if( Step == StepsReadings.PutDB ) //Confirm Data
-            {
-                console.log("Reading Complete");
-                console.log("Temp = " + newTemp);
-                console.log("Ph = " + newPh);
-                console.log("Do = " + newDo);
-                console.log("Cond = " + newCond);
-                console.log("S. Temp = " + newStationTemp);
-                console.log("S. Hum = " + newStationHum);
-                
-                connection.query('USE `aquariusStation`');
-                var post = {date:date,water_temp:newTemp,water_conduc:newCond, water_do:newDo, water_ph:newPh, case_temp:newStationTemp, case_humidity:newStationHum}
-                var query = connection.query('INSERT INTO sensorData SET ?' ,post, function(error,result){
-                    console.log(query.sql);
-                    if(error !== null)
-                    {
-                        console.log('Query error' + error);
-                        success = false;
-                    }
-                    console.log("Scheduled Event Ended")
-                    
-                });
-                
-                Step = StepsReadings.Done;
-            }
-            else if (Step == StepsReadings.Done) //Update DataBase
-            {
-                //if All child exec are executed withSucces
-                //Insert Data in DataBase
-                
-                Step = StepsReadings.End;
-            }
-            else if (Step == StepsReadings.DontDoShit )
-                console.log("Don't do shit")
+            date = new Date().toISOString().slice(0, 19).replace('T', ' '); //Converts JS Date format to MySql Format
+            newTemp = null
+            newPh = null
+            newDo = null
+            newCond = null
+            newStationTemp = null
+            newStationHum = null
+            Step = StepsReadings.pH
+            console.log("Reading sensors")
         }
-    }); 
+        else if( Step == StepsReadings.pH )
+        {
+            //////////////////////////////////////////////         PH READING          ///////////////////////////////////////////////////
+            var resultPh = sh.exec("/var/lib/cloud9/Aquarius/exec/driverAtlasI2CPH 1:99 R")
+            var splittedStdOutput = resultPh.stdout.split(';')
+            var value = splittedStdOutput[5]
+            newPh = value
+            Step = StepsReadings.DO
+        }
+        else if ( Step == StepsReadings.DO )
+        {
+             //////////////////////////////////////////////         DO READING          ///////////////////////////////////////////////////
+            var resultDo = sh.exec("/var/lib/cloud9/Aquarius/exec/driverAtlasI2CDO 1:97 R")
+            var splittedStdOutput = resultDo.stdout.split(';')
+            var value = splittedStdOutput[7]
+            newDo = value
+            Step = StepsReadings.K
+        }
+        else if ( Step == StepsReadings.K )
+        {
+            //////////////////////////////////////////////       COND READING      ///////////////////////////////////////////////////
+            var resultK = sh.exec("/var/lib/cloud9/Aquarius/exec/driverAtlasI2CK 1:100 R")
+            var splittedStdOutput = resultK.stdout.split(';')
+            var value = splittedStdOutput[5]
+            newCond = value
+            Step = StepsReadings.DS18
+        }
+        else if ( Step == StepsReadings.DS18 )
+        {
+            //////////////////////////////////////////////    TEMPERATURE READING    ///////////////////////////////////////////////////
+            resultOW = sh.exec("/var/lib/cloud9/Aquarius/exec/driverOneWireExec 28-000006700658")
+            var splittedStdOutput = resultOW.stdout.split(';')
+            var value = splittedStdOutput[5]
+            newTemp = value
+            Step = StepsReadings.DHT
+        }
+        else if ( Step == StepsReadings.DHT )   
+        {
+            //////////////////////////////////////////////       INTERNAL READING      ///////////////////////////////////////////////////
+            var resultDHT = sh.exec("/var/lib/cloud9/Aquarius/exec/driverDHT22Exec 1:14")
+            var splittedStdOutput = resultDHT.stdout.split(';')
+            var value1 = splittedStdOutput[5]
+            var value2 = splittedStdOutput[7]
+            newStationTemp = value1
+            newStationHum = value2
+            Step = StepsReadings.PutDB
+        }
+        else if( Step == StepsReadings.PutDB ) //Confirm Data
+        {
+            console.log("Reading Complete");
+            console.log("Temp = " + newTemp);
+            console.log("Ph = " + newPh);
+            console.log("Do = " + newDo);
+            console.log("Cond = " + newCond);
+            console.log("S. Temp = " + newStationTemp);
+            console.log("S. Hum = " + newStationHum);
+            
+            connection.query('USE `aquariusStation`');
+            var post = {date:date,water_temp:newTemp,water_conduc:newCond, water_do:newDo, water_ph:newPh, case_temp:newStationTemp, case_humidity:newStationHum}
+            var query = connection.query('INSERT INTO sensorData SET ?' ,post, function(error,result){
+                console.log(query.sql);
+                if(error !== null)
+                {
+                    console.log('Query error' + error);
+                    success = false;
+                }
+                console.log("Scheduled Event Ended")
+                
+            });
+            
+            Step = StepsReadings.Done;
+        }
+        else if (Step == StepsReadings.Done) //Update DataBase
+        {
+            //if All child exec are executed withSucces
+            //Insert Data in DataBase
+            
+            Step = StepsReadings.End;
+        }
+    }
+} 
     
 function configurationReadCallback(err, rows, fields){
     if (err) {
