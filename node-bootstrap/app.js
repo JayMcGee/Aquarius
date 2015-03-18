@@ -145,6 +145,8 @@ function sendTempFromDB(rowCount,socket){
 
 databaseHelper.readConfig(connection, configurationReadCallback)
 
+databaseHelper.setConfig(connection, "READ_INTERVAL", 30, configurationSetCallBack);
+
 
 //Scheduler
 var getData = schedule.scheduleJob(rule,function()
@@ -284,4 +286,11 @@ function configurationReadCallback(err, rows, fields){
             CONFIG_Last_Date = currentValue
         }
     }
+}
+
+/**
+ * 
+ */
+function configurationSetCallBack(err, result){
+    console.log("Configuration result : " + result)
 }
