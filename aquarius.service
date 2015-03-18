@@ -1,0 +1,14 @@
+[Unit]
+Description=Aquarius autorun
+
+[Service]
+WorkingDirectory=/var/lib/cloud9/Aquarius/node-bootstrap
+ExecStart=/usr/bin/node app.js
+StandardOuput=syslog
+StandardError=syslog
+SyslogIdentifier=Aquarius-autorun
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
