@@ -3,6 +3,7 @@ CFLAGS=-std=c++0x -Wall
 LDFLAGS=
 EXECUTABLE=AquariusFullDataUpdate
 MAKE=make
+DIR_EXEC=/var/lib/cloud9/Aquarius/exec/
 
 all: driver $(EXECUTABLE)
 

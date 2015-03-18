@@ -40,17 +40,16 @@ def setAlarm( hours, minutes ):
     i2c.readU8(0x0E)
     
     #Set Seconds bit
-    i2c.write8(0x07, 0x01)
+    i2c.write8(0x07, setBit(i2c.readU8(0x07), 0, 7))
     
     #Set minutes bit
-    get = 0x40
-    i2c.write8(0x08, get)
+    i2c.write8(0x08, setBit(i2c.readU8(0x08), 0, 7))
     
     #Set hours bit
-    i2c.write8(0x09, 0x80)
+    i2c.write8(0x09, setBit(i2c.readU8(0x09), 7, ))
     
     #Set Day
-    i2c.write8(0x0A, 0x80)
+    i2c.write8(0x0A, setBit(i2c.readU8(0x0A), 7, 1))
     
     return 
 #///////////////////////////////////////////////////////////////
@@ -113,13 +112,21 @@ def setDateFromRTC():
 
 #Function to set alarm minutes
 def setAlarmMinutes( minutes ):
-    i2c.write8(0x08, get)
+    m = int(minutes)
+    i2c.write8(0x07, setBit(i2c.readU8(0x07), 7, 0))
+    i2c.write8(0x08, setBit(((m / 10) << 4) | ((m % 10)), 7, 0))
+    i2c.write8(0x09,setBit(i2c.readU8(0x09), 7, 1))
+    i2c.write8(0x0A,setBit(i2c.readU8(0x0A), 7, 1))
     return
 #///////////////////////////////////////////////////////////////
 
 #Function to set alarm hour
 def setAlarmHour( hour ):
-    i2c.write8(0x09, 0x80)
+    h = int(hour)
+    i2c.write8(0x07, setBit(i2c.readU8(0x07), 7, 0))
+    i2c.write8(0x08, setBit(i2c.readU8(0x08), 7, 0))
+    i2c.write8(0x09,setBit(((h / 10) << 4) | ((h % 10)), 7, 1))
+    i2c.write8(0x0A,setBit(i2c.readU8(0x0A), 7, 1))
     return
 #///////////////////////////////////////////////////////////////
 
@@ -131,10 +138,9 @@ def getTimeFrom( register ):
         print "Current time : " + str(getDayFromRegister( var[4] )) + "/" +str( getMonthFromRegister( var[5] )) + "/" + str(getYearFromRegister( var[6] )) + " " + str(getHoursFromRegister( var[2] )) + ":" +str( getMinutesFromRegister( var[1] )) + ":" +str( getSecondsFromRegister( var[0] ))
     elif register == "alarm1":
         var = i2c.readList(0x07, 4)
-        
+        print "Current alarm : " + str(getHoursFromRegister(var[2])) + ":" + str(getMinutesFromRegister(var[1])) + ":" + str(getSecondsFromRegister(var[0]))
     else:
-        print str(register) + " is not a valid option "
-    
+        print "Invalid arguments"
     return
 #///////////////////////////////////////////////////////////////
 
@@ -168,7 +174,7 @@ def getMonthFromRegister( byte ):
     return (((byte >> 4) & 0x01) * 10) + (byte & 0x0F)
 #///////////////////////////////////////////////////////////////
 
-print 'Number of arguments:pyht', len(sys.argv), 'arguments.'
+print 'Number of arguments: ', len(sys.argv), 'arguments.'
 print 'Argument List:', str(sys.argv)
 
 if len(sys.argv) > 1:
@@ -193,8 +199,8 @@ if len(sys.argv) > 1:
         getTimeFrom(sys.argv[2])
  
 #Read lines again
-#var = i2c.readList(0x00, 19)
-#print var
+var = i2c.readList(0x00, 19)
+print var
 
 if False:
     call(["shutdown", "-h", "now"])
