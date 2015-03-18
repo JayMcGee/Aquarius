@@ -47,22 +47,6 @@ connection.connect(function(err) {
   connection.query('USE `aquariusStation`');
 }); 
 
-///////////////////////////////////////////////////////////
-//Creating the terminal server
-function startTerminal(){
-    var appTTY = tty.createServer({
-        shell: 'bash',
-        users:{
-            root: 'poutine'
-        },
-        port:8089
-    });
-    //Wait for user and password
-    appTTY.get('/root',function(req,res,next){
-        res.send('poutine');
-    });
-    appTTY.listen();
-}
 
 
 ////////////////////////////////////////////////////////////
@@ -84,8 +68,8 @@ app.get('/', function(req, res) {
 app.get('/index.html', function(req, res) {
     res.sendfile(__dirname + '/index.html')
 })
-app.get('/ui.html', function(req, res) {
-    res.sendfile(__dirname + '/ui.html')
+app.get('/form.html', function(req, res) {
+    res.sendfile(__dirname + '/form.html')
 })
 app.get('/chart.html', function(req, res) {
     res.sendfile(__dirname + '/chart.html')
@@ -116,6 +100,12 @@ app.io.on('connection',function(socket){
 
 //Receive update Command
 app.io.on('connection',function(socket){
+    
+    socket.on('configInterval',function(data){
+       var interval = data.interval;
+       console.log("Interval = " + interval)
+    });
+    
     socket.on('updateTemp',function(){
         var randomnumber=(Math.random()*41.1)
         socket.emit('lastTemp',{'value':randomnumber});
