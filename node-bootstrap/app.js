@@ -45,14 +45,15 @@ var connection = mysql.createConnection({
 });
 
 connection.connect(function(err) {
-  if (err) {
-    console.error('error connecting: ' + err.stack);
-    return;
-  }
+    if (err) {
+        console.error('Error connecting: ' + err.stack);
+        return;
+    }
 
-  console.log('connected as id ' + connection.threadId);
-  
-  connection.query('USE `aquariusStation`', main);
+    drawSeparator()
+    console.log('Connected as id ' + connection.threadId);
+    drawSeparator()
+    connection.query('USE `aquariusStation`', databaseHelper.readConfig(connection, configurationReadCallback));
 }); 
 
 
@@ -155,125 +156,52 @@ function sendTempFromDB(rowCount,socket){
 
 //Scheduler
 function main(){
-    databaseHelper.readConfig(connection, configurationReadCallback)
+    
     var currentMode = sh.exec(sw1Path)
-    console.log("Read mode : " + currentMode.stdout)
+
+    drawSeparator()
+    console.log("Resetting RTC")
+    var rtcReset = sh.exec(rtcPath + " disablealarm")
+    console.log("Getting date from RTC")
+    var rtcGetDate = sh.exec(rtcPath + " getdate")
+    console.log(sh.exec("date").stdout)
+    drawSeparator()
+    console.log()
+
+    drawSeparator()
+    console.log("Reading mode : " + currentMode.stdout)
     if( currentMode.stdout.indexOf("HIGH") > -1)
     {
         console.log("Auto mode")
-        console.log("Enabling schedule")
-        //aquariusSchedule()
+
+        console.log("Reading new sensor values")
+        drawSeparator()
+        console.log()
+
         databaseHelper.getSensors(connection, getSensorReadingCallback)
+
+        var date = new Date()
+
+        drawSeparator()
+        console.log("Date without added interval : " + date.toISOString().slice(0, 19).replace('T', ' '))
+        date.setMinutes(date.getMinutes() + parseInt(CONFIG_Interval))
+        console.log("New date with added interval : " + date.toISOString().slice(0, 19).replace('T', ' '))
+        drawSeparator()
+        console.log("Setting up rtc to wake up at : " + date.getMinutes())
+        var rtcSetAlarm = sh.exec(rtcPath + " setalarm -m " + date.getMinutes())
+        drawSeparator()
+        var rtcSetAlarm = sh.exec(rtcPath + " enablealarm")
+        drawSeparator()
+        
+        var shutdown = sh.exec("shutdown -h now")
     }
     else
     {
         console.log("Manual mode")    
-        console.log("Waiting ")
+        console.log("Waiting")
+        drawSeparator()
     }
 }
-
-
-function aquariusSchedule()
-{
-    Step = StepsReadings.Begin;
-    
-    console.log("Sensor read function entered")
-    
-    while( Step !== StepsReadings.End )
-    {
-        if ( Step == StepsReadings.Begin ) //Initial
-        {
-            
-            newTemp = null
-            newPh = null
-            newDo = null
-            newCond = null
-            newStationTemp = null
-            newStationHum = null
-            Step = StepsReadings.pH
-            console.log("Reading sensors")
-        }
-        else if( Step == StepsReadings.pH )
-        {
-            //////////////////////////////////////////////         PH READING          ///////////////////////////////////////////////////
-            var resultPh = sh.exec("/var/lib/cloud9/Aquarius/exec/driverAtlasI2CPH 1:99 R")
-            var splittedStdOutput = resultPh.stdout.split(';')
-            var value = splittedStdOutput[5]
-            newPh = value
-            Step = StepsReadings.DO
-        }
-        else if ( Step == StepsReadings.DO )
-        {
-             //////////////////////////////////////////////         DO READING          ///////////////////////////////////////////////////
-            var resultDo = sh.exec("/var/lib/cloud9/Aquarius/exec/driverAtlasI2CDO 1:97 R")
-            var splittedStdOutput = resultDo.stdout.split(';')
-            var value = splittedStdOutput[7]
-            newDo = value
-            Step = StepsReadings.K
-        }
-        else if ( Step == StepsReadings.K )
-        {
-            //////////////////////////////////////////////       COND READING      ///////////////////////////////////////////////////
-            var resultK = sh.exec("/var/lib/cloud9/Aquarius/exec/driverAtlasI2CK 1:100 R")
-            var splittedStdOutput = resultK.stdout.split(';')
-            var value = splittedStdOutput[5]
-            newCond = value
-            Step = StepsReadings.DS18
-        }
-        else if ( Step == StepsReadings.DS18 )
-        {
-            //////////////////////////////////////////////    TEMPERATURE READING    ///////////////////////////////////////////////////
-            resultOW = sh.exec("/var/lib/cloud9/Aquarius/exec/driverOneWireExec 28-000006700658")
-            var splittedStdOutput = resultOW.stdout.split(';')
-            var value = splittedStdOutput[5]
-            newTemp = value
-            Step = StepsReadings.DHT
-        }
-        else if ( Step == StepsReadings.DHT )   
-        {
-            //////////////////////////////////////////////       INTERNAL READING      ///////////////////////////////////////////////////
-            var resultDHT = sh.exec("/var/lib/cloud9/Aquarius/exec/driverDHT22Exec 1:14")
-            var splittedStdOutput = resultDHT.stdout.split(';')
-            var value1 = splittedStdOutput[5]
-            var value2 = splittedStdOutput[7]
-            newStationTemp = value1
-            newStationHum = value2
-            Step = StepsReadings.PutDB
-        }
-        else if( Step == StepsReadings.PutDB ) //Confirm Data
-        {
-            console.log("Reading Complete");
-            console.log("Temp = " + newTemp);
-            console.log("Ph = " + newPh);
-            console.log("Do = " + newDo);
-            console.log("Cond = " + newCond);
-            console.log("S. Temp = " + newStationTemp);
-            console.log("S. Hum = " + newStationHum);
-            
-            connection.query('USE `aquariusStation`');
-            var post = {date:date,water_temp:newTemp,water_conduc:newCond, water_do:newDo, water_ph:newPh, case_temp:newStationTemp, case_humidity:newStationHum}
-            var query = connection.query('INSERT INTO sensorData SET ?' ,post, function(error,result){
-                console.log(query.sql);
-                if(error !== null)
-                {
-                    console.log('Query error' + error);
-                    success = false;
-                }
-                console.log("Scheduled Event Ended")
-                
-            });
-            
-            Step = StepsReadings.Done;
-        }
-        else if (Step == StepsReadings.Done) //Update DataBase
-        {
-            //if All child exec are executed withSucces
-            //Insert Data in DataBase
-            
-            Step = StepsReadings.End;
-        }
-    }
-} 
     
 function configurationReadCallback(err, rows, fields){
     if (err) {
@@ -308,6 +236,7 @@ function configurationReadCallback(err, rows, fields){
             CONFIG_Last_Date = currentValue
         }
     }
+    main()
 }
 
 /**
@@ -324,6 +253,9 @@ function t_Data_insertCallBack(err, result){
     console.log("Insert result : " + result)
 }
 
+/**
+*
+*/
 function getSensorReadingCallback(err, rows, fields){
     if (err) {
         throw err;
@@ -373,4 +305,8 @@ function getSensorReadingCallback(err, rows, fields){
            }
         }
     }
+}
+
+function drawSeparator(){
+    console.log("///////////////////////////////////////////")
 }

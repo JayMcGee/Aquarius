@@ -199,8 +199,8 @@ if len(sys.argv) > 1:
         getTimeFrom(sys.argv[2])
  
 #Read lines again
-var = i2c.readList(0x00, 19)
-print var
+#var = i2c.readList(0x00, 19)
+#print var
 
-if False:
-    call(["shutdown", "-h", "now"])
+#if False:
+    #call(["shutdown", "-h", "now"])
