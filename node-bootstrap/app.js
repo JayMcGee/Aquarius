@@ -91,27 +91,21 @@ app.get('*', function(req, res){
 //On connection to the client send the most recent data from the DB
 //Send  
 app.io.on('connection',function(socket){
-        connection.query('SELECT date AS DateReading, water_temp AS TempWater, water_ph AS PhWater, water_do AS DoWater, water_conduc AS ConducWater, case_temp AS TempCase, case_humidity as HumCase FROM `sensorData` ORDER BY date DESC LIMIT 10;',
-        function(err, rows, fields){
-            if (err) throw err;      
-            socket.emit('lastTemp', {'value': rows[0].TempWater});
-            socket.emit('lastPh',   {'value': rows[0].PhWater});
-            socket.emit('lastDo',   {'value': rows[0].DoWater});
-            socket.emit('lastCondu',{'value': rows[0].ConducWater});
-            socket.emit('lastCaseT',{'value': rows[0].TempCase});
-            socket.emit('lastCaseH',{'value': rows[0].HumCase});
-            sendTempFromDB(10,socket);
-        });
+    socket.on('requestConfig',function(){
+        databaseHelper.readConfig(connection, configurationReadCallback)
+        socket.emit('receiveConfig',{'stationID':CONFIG_Station_ID, 
+                                     'cloudiaAddr':CONFIG_Cloudia_Address,
+                                     'lastDate':CONFIG_Last_Date,
+                                     'interval' : CONFIG_Interval})
+    });
 });
 
 //Receive update Command
 app.io.on('connection',function(socket){
-    
     socket.on('configInterval',function(data){
        var interval = data.interval;
        console.log("Interval = " + interval)
     });
-    
     socket.on('updateTemp',function(){
         var randomnumber=(Math.random()*41.1)
         socket.emit('lastTemp',{'value':randomnumber});
@@ -136,7 +130,6 @@ app.io.on('connection',function(socket){
         var randomnumber=(Math.random()*100)
         socket.emit('lastStationHum',{'value':randomnumber});
     });
-    
 });
 
 
@@ -255,7 +248,6 @@ var getData = schedule.scheduleJob(rule,function()
             }
             else if (Step == StepsReadings.DontDoShit )
                 console.log("Don't do shit")
-            
         }
     }); 
     
