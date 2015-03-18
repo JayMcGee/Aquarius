@@ -121,7 +121,7 @@
 							  <div class="control-group">
 								<label class="control-label">Last update </label>
 								<div class="controls">
-								  <span class="input-xlarge uneditable-input">18 MAR 2015 11:03:00</span>
+								  <span id='dateInput' class="input-xlarge uneditable-input">18 MAR 2015 11:03:00</span>
 								</div>
 							  </div>
 							  
@@ -214,10 +214,16 @@
     				$("#idInput").val(data.stationID);
     				$("#addressInput").val(data.cloudiaAddr);
     				$("#intervalInput").val(data.interval);
+    				$("#dateInput").html(data.lastDate);
     			});
     		
 			$("#saveButton" ).click(function() {
+				var id = $("#idInput").va();
+				var adresse = $("addresseInput").val)();
 				var interval = $( "#intervalInput" ).val();
+				var date = $("#dateInput").html();
+				
+				
 			 	if( interval > 0 && interval <= 3600)
 			 	{
 			 		io.emit('configInterval', { interval: interval });
