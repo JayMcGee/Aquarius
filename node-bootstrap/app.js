@@ -52,7 +52,7 @@ connection.connect(function(err) {
 
   console.log('connected as id ' + connection.threadId);
   
-  connection.query('USE `aquariusStation`');
+  connection.query('USE `aquariusStation`', main);
 }); 
 
 
@@ -145,7 +145,7 @@ function sendTempFromDB(rowCount,socket){
         });
 }
 
-databaseHelper.readConfig(connection, configurationReadCallback)
+
 
 //databaseHelper.setConfig(connection, "READ_INTERVAL", 30, configurationSetCallBack);
 
@@ -154,20 +154,24 @@ databaseHelper.readConfig(connection, configurationReadCallback)
 
 
 //Scheduler
+function main(){
+    databaseHelper.readConfig(connection, configurationReadCallback)
+    var currentMode = sh.exec(sw1Path)
+    console.log("Read mode : " + currentMode.stdout)
+    if( currentMode.stdout.indexOf("HIGH") > -1)
+    {
+        console.log("Auto mode")
+        console.log("Enabling schedule")
+        //aquariusSchedule()
+        databaseHelper.getSensors(connection, getSensorReadingCallback)
+    }
+    else
+    {
+        console.log("Manual mode")    
+        console.log("Waiting ")
+    }
+}
 
-var currentMode = sh.exec(sw1Path)
-console.log("Read mode : " + currentMode.stdout)
-if( currentMode.stdout.indexOf("HIGH") > -1)
-{
-    console.log("Auto mode")
-    console.log("Enabling schedule")
-    aquariusSchedule()
-}
-else
-{
-    console.log("Manual mode")    
-    console.log("Waiting ")
-}
 
 function aquariusSchedule()
 {
@@ -179,7 +183,7 @@ function aquariusSchedule()
     {
         if ( Step == StepsReadings.Begin ) //Initial
         {
-            date = new Date().toISOString().slice(0, 19).replace('T', ' '); //Converts JS Date format to MySql Format
+            
             newTemp = null
             newPh = null
             newDo = null
@@ -311,4 +315,62 @@ function configurationReadCallback(err, rows, fields){
  */
 function configurationSetCallBack(err, result){
     console.log("Configuration result : " + result)
+}
+
+/**
+*
+*/
+function t_Data_insertCallBack(err, result){
+    console.log("Insert result : " + result)
+}
+
+function getSensorReadingCallback(err, rows, fields){
+    if (err) {
+        throw err;
+        console.log("Could not read sensors table")
+    }
+    console.log("Reading and adding data")
+
+    alreadyDone = []
+
+    for (index = 0; index < rows.length; ++index) {
+
+        var Driver = rows[index].Driver
+        var Address = rows[index].UnitAddress
+        var UnitName = rows[index].UnitName
+        var CloudiaID = rows[index].CloudiaID
+        var CloudiaSensorID = rows[index].CloudiaSensorID
+        var Measure = rows[index].MeasureUnit
+        var Position = rows[index].Positions
+
+        if(alreadyDone.indexOf(CloudiaID) == -1)
+        {
+            console.log("Reading : " + UnitName)
+            alreadyDone[alreadyDone.length] = CloudiaID
+            
+            var result = sh.exec(Driver + " " + Address + " R")
+            /////////////////////////////////////
+            console.log(Driver + " " + Address + " R")
+            /////////////////////////////////////
+            var splittedStdOutput = result.stdout.split(';')
+            
+            
+            console.log("Executed : " + splittedStdOutput)
+
+            for(i = 0; i < rows.length; ++i){
+                if(rows[i].CloudiaID == CloudiaID){
+
+                    if(splittedStdOutput.length > rows[i].Position)
+                    {
+                        var value = splittedStdOutput[rows[i].Position]
+                        databaseHelper.setData(connection, value, rows[i].UnitID, 0,  t_Data_insertCallBack)
+                    }
+                    else
+                    {
+                        console.log("Missing data")
+                    }
+                }
+           }
+        }
+    }
 }
