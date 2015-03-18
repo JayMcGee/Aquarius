@@ -3,6 +3,7 @@ var mysql   = require('mysql');   //Javascript mySql Connector
 var exec    = require('child_process').exec,child,pHc,DOc,Kc,OWc,DHTc;      //Execute shell command                     //Terminal access from web-client
 var schedule= require('node-schedule');
 var sh      = require('execSync');
+var databaseHelper = require('./aquariusSensorHelper')
 
 var interval = 10000; //enter the time between sensor queries here (in milliseconds)
 
@@ -16,11 +17,16 @@ StepsReadings = {
     PutDB : 7,
     Done : 8,
     End : 9,
-    DontDoShit : 10
+    DontDoShit : 10,
+    ConfigNotRead : 11
 }
 
 var Step = StepsReadings.Begin;
-
+//Config
+var CONFIG_Station_ID = null;
+var CONFIG_Cloudia_Address = null;
+var CONFIG_Last_Date = null;
+var CONFIG_Interval = null;
 //Prepare Scheduler
 var rule = new schedule.RecurrenceRule();
 rule.second = [0,30];
@@ -251,3 +257,37 @@ var getData = schedule.scheduleJob(rule,function()
         }
     }); 
     
+function configurationReadCallback(err, rows, fields){
+    if (err) {
+        throw err;
+        console.log("Could not read config table")
+    }
+    console.log("Assigning config data")
+
+    for (index = 0; index < rows.length; ++index) {
+        currentName = rows[index].Name
+        currentValue = rows[index].Value
+        
+        console.log("Data : "  + currentName + " value : " + currentValue)
+        if(currentName == "STATION_ID")
+        {
+            console.log("Assigned station id")
+            CONFIG_Station_ID = currentValue
+        }
+        else if(currentName == "READ_INTERVAL")
+        {
+            console.log("Assigned read interval")
+            CONFIG_Interval = currentValue
+        }
+        else if(currentName == "SEND_ADDRESS")
+        {
+            console.log("Assigned send address")
+            CONFIG_Cloudia_Address = currentValue
+        }
+        else if(currentName == "LAST_KNOWN_DATE")
+        {
+            console.log("Assigned last known date")
+            CONFIG_Last_Date = currentValue
+        }
+    }
+}
