@@ -149,7 +149,7 @@ function sendTempFromDB(rowCount,socket){
                 socket.emit('tempData', {'array': rows});
         });
 }
-
+databaseHelper.readConfig(connection, configurationReadCallback)
 
 //Scheduler
 var getData = schedule.scheduleJob(rule,function()
