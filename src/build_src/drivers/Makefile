@@ -1,6 +1,7 @@
 CC=g++
 CFLAGS=-std=c++0x -c -Wall
 MAKE=make
+export DIR_EXEC=/var/lib/cloud9/Aquarius/exec/
 
 all: DHT22Driver OneWireDriver I2CDriver RTCDriver GPIODriver
 
