@@ -149,7 +149,9 @@ function sendTempFromDB(rowCount,socket){
                 socket.emit('tempData', {'array': rows});
         });
 }
+
 databaseHelper.readConfig(connection, configurationReadCallback)
+
 
 //Scheduler
 var getData = schedule.scheduleJob(rule,function()
@@ -175,7 +177,7 @@ var getData = schedule.scheduleJob(rule,function()
             else if( Step == StepsReadings.pH )
             {
                 //////////////////////////////////////////////         PH READING          ///////////////////////////////////////////////////
-                var resultPh = sh.exec("/var/lib/cloud9/Aquarius/src/build_src/exec/driverAtlasI2CPH 1:99 R")
+                var resultPh = sh.exec("/var/lib/cloud9/Aquarius/exec/driverAtlasI2CPH 1:99 R")
                 var splittedStdOutput = resultPh.stdout.split(';')
                 var value = splittedStdOutput[5]
                 newPh = value
@@ -184,7 +186,7 @@ var getData = schedule.scheduleJob(rule,function()
             else if ( Step == StepsReadings.DO )
             {
                  //////////////////////////////////////////////         DO READING          ///////////////////////////////////////////////////
-                var resultDo = sh.exec("/var/lib/cloud9/Aquarius/src/build_src/exec/driverAtlasI2CDO 1:97 R")
+                var resultDo = sh.exec("/var/lib/cloud9/Aquarius/exec/driverAtlasI2CDO 1:97 R")
                 var splittedStdOutput = resultDo.stdout.split(';')
                 var value = splittedStdOutput[7]
                 newDo = value
@@ -193,7 +195,7 @@ var getData = schedule.scheduleJob(rule,function()
             else if ( Step == StepsReadings.K )
             {
                 //////////////////////////////////////////////       COND READING      ///////////////////////////////////////////////////
-                var resultK = sh.exec("/var/lib/cloud9/Aquarius/src/build_src/exec/driverAtlasI2CK 1:100 R")
+                var resultK = sh.exec("/var/lib/cloud9/Aquarius/exec/driverAtlasI2CK 1:100 R")
                 var splittedStdOutput = resultK.stdout.split(';')
                 var value = splittedStdOutput[5]
                 newCond = value
@@ -202,7 +204,7 @@ var getData = schedule.scheduleJob(rule,function()
             else if ( Step == StepsReadings.DS18 )
             {
                 //////////////////////////////////////////////    TEMPERATURE READING    ///////////////////////////////////////////////////
-                resultOW = sh.exec("/var/lib/cloud9/Aquarius/src/build_src/exec/driverOneWireExec 28-000006700658")
+                resultOW = sh.exec("/var/lib/cloud9/Aquarius/exec/driverOneWireExec 28-000006700658")
                 var splittedStdOutput = resultOW.stdout.split(';')
                 var value = splittedStdOutput[5]
                 newTemp = value
@@ -211,7 +213,7 @@ var getData = schedule.scheduleJob(rule,function()
             else if ( Step == StepsReadings.DHT )   
             {
                 //////////////////////////////////////////////       INTERNAL READING      ///////////////////////////////////////////////////
-                var resultDHT = sh.exec("/var/lib/cloud9/Aquarius/src/build_src/exec/driverDHT22Exec 1:14")
+                var resultDHT = sh.exec("/var/lib/cloud9/Aquarius/exec/driverDHT22Exec 1:14")
                 var splittedStdOutput = resultDHT.stdout.split(';')
                 var value1 = splittedStdOutput[5]
                 var value2 = splittedStdOutput[7]
