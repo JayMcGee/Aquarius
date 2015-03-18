@@ -41,7 +41,7 @@ CREATE TABLE `t_Types` (
 
 LOCK TABLES `t_Types` WRITE;
 /*!40000 ALTER TABLE `t_Types` DISABLE KEYS */;
-INSERT INTO `t_Types` VALUES (1,'Atlas I2C DO','/var/lib/cloud9/Aquarius/src/build_src/exec/driverAtlasI2CDO'),(2,'Atlas I2C PH','/var/lib/cloud9/Aquarius/src/build_src/exec/driverAtlasI2CPH'),(3,'Atlas I2C K','/var/lib/cloud9/Aquarius/src/build_src/exec/driverAtlasI2CK'),(4,'One Wire ','/var/lib/cloud9/Aquarius/src/build_src/exec/driverOneWireExec '),(5,'DHT22','/var/lib/cloud9/Aquarius/src/build_src/exec/driverDHT22Exec');
+INSERT INTO `t_Types` VALUES (1,'Atlas I2C DO','/var/lib/cloud9/Aquarius/exec/driverAtlasI2CDO'),(2,'Atlas I2C PH','/var/lib/cloud9/Aquarius/exec/driverAtlasI2CPH'),(3,'Atlas I2C K','/var/lib/cloud9/Aquarius/exec/driverAtlasI2CK'),(4,'One Wire ','/var/lib/cloud9/Aquarius/exec/driverOneWireExec '),(5,'DHT22','/var/lib/cloud9/Aquarius/exec/driverDHT22Exec');
 /*!40000 ALTER TABLE `t_Types` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -54,4 +54,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-03-18  9:32:29
+-- Dump completed on 2015-03-18  9:42:54
