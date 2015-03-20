@@ -112,7 +112,7 @@
 								<label class="control-label" for="appendedInput">Read Attempts</label>
 								<div class="controls">
 								  <div class="input-append">
-									<input id="attemptsInput" size="16" type="text" value="0001"><span class="add-on">#</span>
+									<input id="retriesInput" size="16" type="text" value="0001"><span class="add-on">#</span>
 								  </div>
 								  <span class="help-inline">Number of attemps on sensor errors</span>
 								</div>
@@ -214,33 +214,8 @@
 		<script src="js/custom.js"></script>
 		
 		<script src="/socket.io/socket.io.js"></script>
-    	<script>
-    		io = io.connect();
-    		io.emit('ready');
-    		
-    		io.emit('requestConfig');
-    		
-    		io.on('receiveConfig',function(data)
-    			{
-    				$("#idInput").val(data.stationID);
-    				$("#addressInput").val(data.cloudiaAddr);
-    				$("#intervalInput").val(data.interval);
-    				$("#dateInput").html(data.lastDate);
-    			});
-    		
-			$("#saveButton" ).click(function() {
-				var id = $("#idInput").va();
-				var adresse = $("addresseInput").val();
-				var interval = $( "#intervalInput" ).val();
-				var date = $("#dateInput").html();
-				
-				
-			 	if( interval > 0 && interval <= 1440)
-			 	{
-			 		io.emit('configInterval', { interval: interval });
-			 	}
-			});
-		</script>
+		
+		<script src="/scripts/Aquarius_Config.js"></script>
 	<!-- end: JavaScript-->
 	
 </body>
