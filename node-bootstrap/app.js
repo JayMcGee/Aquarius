@@ -155,7 +155,9 @@ function main(){
         
     }
     else if (lastDate >= currentSysDate){
-        console.log("Last date is in the future ?")
+        console.log("Last date is in the future ? Setting date to last known, please update me")
+        var execSetCurrentSysDate = sh.exec('date -s "' + CONFIG_Last_Date + '"')
+        var rtcSetDate = sh.exec(rtcExecPath + " setdate")
     }
     
     drawSeparator()
