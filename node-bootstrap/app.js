@@ -114,9 +114,12 @@ app.io.on('connection',function(socket){
 });
 
 
-//Send from database Functiions
+//Send from database Functions
 function sendTempFromDB(rowCount,socket){
-   connection.query('SELECT date AS DateReading, water_temp AS TempWater FROM `sensorData` ORDER BY date DESC LIMIT 10;',
+   
+    console.log("DEPRECATED")
+
+    connection.query('SELECT date AS DateReading, water_temp AS TempWater FROM `sensorData` ORDER BY date DESC LIMIT 10;',
         function(err, rows, fields){
             if(err) throw err;
                 //send temperature reading out to connected clients
@@ -124,15 +127,9 @@ function sendTempFromDB(rowCount,socket){
         });
 }
 
-
-
-//databaseHelper.setConfig(connection, "READ_INTERVAL", 30, configurationSetCallBack);
-
-//var rtcExecPath
-//var modeSwitchExec 
-
-
-//Scheduler
+/**
+*
+*/
 function main(){
     
     var currentMode = sh.exec(modeSwitchExec)
@@ -156,7 +153,7 @@ function main(){
         drawSeparator()
         console.log()
 
-        databaseHelper.getSensors(connection, getSensorReadingCallback)
+        readAllSensorsInDataBase()        
 
         var date = new Date()
 
@@ -176,11 +173,15 @@ function main(){
     else
     {
         console.log("Manual mode")    
+        readAllSensorsInDataBase()
         console.log("Waiting")
         drawSeparator()
     }
 }
     
+/**
+*
+*/
 function configurationReadCallback(err, rows, fields){
     if (err) {
         throw err;
@@ -249,9 +250,6 @@ function getSensorReadingCallback(err, rows, fields){
         var Address = rows[index].UnitAddress
         var UnitName = rows[index].UnitName
         var CloudiaID = rows[index].CloudiaID
-        var CloudiaSensorID = rows[index].CloudiaSensorID
-        var Measure = rows[index].MeasureUnit
-        var Position = rows[index].Positions
 
         if(alreadyDone.indexOf(CloudiaID) == -1)
         {
@@ -273,6 +271,7 @@ function getSensorReadingCallback(err, rows, fields){
                     if(splittedStdOutput.length > rows[i].Position)
                     {
                         var value = splittedStdOutput[rows[i].Position]
+                        console.log("Inserting into database value : " + value + rows[i].MeasureUnit)
                         databaseHelper.setData(connection, value, rows[i].UnitID, 0,  t_Data_insertCallBack)
                     }
                     else
@@ -283,6 +282,11 @@ function getSensorReadingCallback(err, rows, fields){
            }
         }
     }
+}
+
+function readAllSensorsInDataBase()
+{
+    databaseHelper.getSensors(connection, getSensorReadingCallback)
 }
 
 function drawSeparator(){
