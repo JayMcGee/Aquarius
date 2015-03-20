@@ -78,7 +78,7 @@
 			<!-- start: Content -->
 			<div id="content" class="span10">
 			
-			<div class="row-fluid sortable">
+			<div class="row-fluid">
 				<div class="box span12">
 					<div class="box-header" data-original-title>
 						<h2><i class="halflings-icon edit"></i><span class="break"></span> Configuration </h2>
@@ -104,7 +104,7 @@
 								  <div class="input-append">
 									<input id="intervalInput" size="16" type="text" value="30"><span class="add-on">Minutes</span>
 								  </div>
-								  <span class="help-inline">Time between each input ( 1 - 3600 )</span>
+								  <span class="help-inline">Time between each input ( 1 - 1440 )</span>
 								</div>
 							  </div>
 							  
@@ -224,7 +224,7 @@
 				var date = $("#dateInput").html();
 				
 				
-			 	if( interval > 0 && interval <= 3600)
+			 	if( interval > 0 && interval <= 1440)
 			 	{
 			 		io.emit('configInterval', { interval: interval });
 			 	}

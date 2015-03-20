@@ -66,7 +66,6 @@
             <div class="box-header">
     			<h2><i class="halflings-icon list-alt"></i><span class="break"></span>Most recent values</h2>
     			<div class="box-icon">
-    				<a href="#" class="btn-setting"><i class="halflings-icon wrench"></i></a>
     				<a href="#" class="btn-minimize"><i class="halflings-icon chevron-up"></i></a>
     			</div>
 			</div>
@@ -187,29 +186,6 @@
 		</p>
 	</footer>
 	
-<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-      <h3 id="myModalLabel">Aquarius Settings</h3>
-    </div>
-  
-    <div class="modal-body">
-  
-      <form id="InfroText" method="POST">
-  
-      <input type="hidden" name="InfroText" value="1">
-  
-      <table>
-        <tbody><tr><td>Interval : </td><td><input type="text" name="interval" id="interval" style="width:100px"><span class="help-inline"> Milliseconds </span></td></tr>
-      </tbody></table>
-      </form>
-    </div>
-    <div class="modal-footer">
-      <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-      <button class="btn btn-primary" data-dismiss="modal" id="InfroTextSubmit">Save changes</button>
-    </div>
-</div>
-
 	<!-- start: JavaScript-->
 
 		<script src="js/jquery-1.9.1.min.js"></script>
@@ -270,76 +246,15 @@
 		<script src="js/retina.js"></script>
 
 		<script src="js/custom.js"></script>
+		
+		<!-- Aquarius Script  -->
+		<script src="scripts/Aquarius_Calibrate.js"></script>
+		<script src="scripts/Aquarius_DataCircle.js"></script>
 	
-	<!-- JQuery Knobs -->
-	<script>
-	    $(function() {
-	    	var knobWidthHeight,
-            windowObj;
-            // store reference to div obj
-            windowObj = $('.circleStatsItemBox');
-            // if the window is higher than it is wider
-            if(windowObj.height() > windowObj.width()){
-                    // use 75% width
-                knobWidthHeight = Math.round(windowObj.width()*0.75);
-            } else {
-                // else if the window is wider than it is higher
-                // use 75% height
-                knobWidthHeight = Math.round(windowObj.height()*0.75);
-            }
-            // change the data-width and data-height attributes of the input to either 75%
-            // of the width or 75% of the height
-            $('.whiteCircle').attr('data-width',knobWidthHeight).attr('data-height',knobWidthHeight);
-
-	        $(".whiteCircle").knob({
-	        	  draw : function () {
-	        	  		$(".whiteCircle").css("font-size","25px");
-	        	  		$("#condCircle").css("font-size","20px");
-                        // "tron" case
-                        if(this.$.data('skin') == 'tron') {
-                            this.cursorExt = 0.3;
-                            var a = this.arc(this.cv)  // Arc
-                                , pa                   // Previous arc
-                                , r = 1;
-                            this.g.lineWidth = this.lineWidth;
-                            if (this.o.displayPrevious) {
-                                pa = this.arc(this.v);
-                                this.g.beginPath();
-                                this.g.strokeStyle = this.pColor;
-                                this.g.arc(this.xy, this.xy, this.radius - this.lineWidth, pa.s, pa.e, pa.d);
-                                this.g.stroke();
-                            }
-                            this.g.beginPath();
-                            this.g.strokeStyle = r ? this.o.fgColor : this.fgColor ;
-                            this.g.arc(this.xy, this.xy, this.radius - this.lineWidth, a.s, a.e, a.d);
-                            this.g.stroke();
-                            this.g.lineWidth = 2;
-                            this.g.beginPath();
-                            this.g.strokeStyle = this.o.fgColor;
-                            this.g.arc( this.xy, this.xy, this.radius - this.lineWidth + 1 + this.lineWidth * 2 / 3, 0, 2 * Math.PI, false);
-                            this.g.stroke();
-                            return false;
-                        }
-                    }
-	        });
-			//var width = document.getElementById('tempCircle').offsetWidth;
-	        $('.whiteCircle').trigger(
-		        'configure',
-		        {
-		        	//"width" : width,
-		        	"thickness" : 0.15,
-		            "fgColor":"#EEF8F2",
-		            "inputColor" :"#EEF8F2",
-		        }
-		    );
-	    });
-
-	</script>
-
+	
 	<!-- Get Data from station -->
     <script src="/socket.io/socket.io.js"></script>
     <script>
-
         ////////////////////////////////////////////////////////////////////////
         // Connect the web client to the Station Server
         // Sends a ready event
@@ -347,104 +262,6 @@
         // Emit ready event.
         io.emit('ready');
         var interval = 2000; //initiate interval timer
-        	    
-        $(function(){
-            $('#tempChart').highcharts({
-                chart:{
-                    type: 'line',
-                    zoomType: 'xy',
-                    marginRight: 10
-                },
-                title: {
-                text: 'Temperature'
-	            },
-	            colors: ['#FF9900'],
-	            xAxis: {
-	                type: 'datetime'
-	            },
-	            yAxis: {
-	                floor: -30,
-	                ceiling: 100,
-	                title: {
-	                    text: 'Celcius'
-	                }
-	            },
-	            plotOptions: {
-		            area: {
-		                marker: {
-		                    enabled: true,
-		                    symbol: 'circle',
-		                    radius: 2.5,
-		                    states: {
-		                        hover: {
-		                            enabled: true
-		                        }
-		                    }
-		                }
-		            }
-		        },
-	            tooltip: {
-	                formatter: function () {
-	                    return '<b>' + this.series.name + '</b><br/>' +
-	                        Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br/>' +
-	                        Highcharts.numberFormat(this.y, 2) + " °C";
-	                }
-	            },
-	                series:[{
-	                    name: "Temperature sensor",
-	                    data:[null]
-	                }]
-	            })
-        });
-        
-        $(function(){
-            $('#phChart').highcharts({
-                chart:{
-                    type: 'line',
-                    zoomType: 'xy',
-                    marginRight: 10
-                },
-                title: {
-                text: 'pH'
-	            },
-	            colors: ['#FF1100'],
-	            xAxis: {
-	                type: 'datetime'
-	            },
-	            yAxis: {
-	                floor: -30,
-	                ceiling: 100,
-	                title: {
-	                    text: 'pH'
-	                }
-	            },
-	            plotOptions: {
-		            area: {
-		                marker: {
-		                    enabled: true,
-		                    symbol: 'circle',
-		                    radius: 2.5,
-		                    states: {
-		                        hover: {
-		                            enabled: true
-		                        }
-		                    }
-		                }
-		            }
-		        },
-	            tooltip: {
-	                formatter: function () {
-	                    return '<b>' + this.series.name + '</b><br/>' +
-	                        Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br/>' +
-	                        Highcharts.numberFormat(this.y, 2) + " °C";
-	                }
-	            },
-	                series:[{
-	                    name: "pH sensor",
-	                    data:[null]
-	                }]
-	            })
-        });
         
         io.on('tempData',function(data){
             var chart = $('#tempChart').highcharts();
@@ -581,67 +398,5 @@
             io.emit('updateStationHum');
         }, interval);
     </script> 
-
-    <!-- Calibration button and boxes -->	
-	<script>
-	$( "#btnTemp" ).click(function() {
-		$( "#boxCalibrate" ).switchClass("red blue green orange pinkDark","yellow");
-		$( "#boxCalibrate" ).show("slow","swing");
-		if( $("#boxCalibrate").hasClass("yellow") )
-			 {
-			 	$( "#boxCalibrate" ).hide("slow","swing");
-			 	$( "#boxCalibrate" ).removeClass("yellow","slow","swing");
-			 }
-	});
-
-	$( "#btnPh" ).click(function() {
-		$( "#boxCalibrate" ).switchClass("yellow blue green orange pinkDark","red");
-		$( "#boxCalibrate" ).show("slow","swing");
-		if( $("#boxCalibrate").hasClass("red") )
-			 {
-			 	$( "#boxCalibrate" ).hide("slow","swing");
-			 	$( "#boxCalibrate" ).removeClass("red","slow","swing");
-			 }
-	});
-
-	$( "#btnDo" ).click(function() {
-		$( "#boxCalibrate" ).switchClass("yellow red green orange pinkDark","blue");
-		$( "#boxCalibrate" ).show("slow","swing");
-		if( $("#boxCalibrate").hasClass("blue") )
-			 {
-			 	$( "#boxCalibrate" ).hide("slow","swing");
-			 	$( "#boxCalibrate" ).removeClass("blue","slow","swing");
-			 }
-	});
-
-	$( "#btnCond" ).click(function() {
-		$( "#boxCalibrate" ).switchClass("yellow blue red orange pinkDark","green");
-		$( "#boxCalibrate" ).show("slow","swing");
-		if( $("#boxCalibrate").hasClass("green") )
-			 {
-			 	$( "#boxCalibrate" ).hide("slow","swing");
-			 	$( "#boxCalibrate" ).removeClass("green","slow","swing");
-			 }
-	});
-
-	$( "#btnSTemp" ).click(function() {
-		$( "#boxCalibrate" ).switchClass("yellow blue green red pinkDark","orange");
-		$( "#boxCalibrate" ).show("slow","swing");
-		if( $("#boxCalibrate").hasClass("orange") )
-			 {
-			 	$( "#boxCalibrate" ).hide("slow","swing");
-			 	$( "#boxCalibrate" ).removeClass("orange","slow","swing");
-			 }
-	});
-	$( "#btnSHum" ).click(function() {
-		$( "#boxCalibrate" ).switchClass("yellow blue green orange red","pinkDark");
-		$( "#boxCalibrate" ).show("slow","swing");
-		if( $("#boxCalibrate").hasClass("pinkDark") )
-			 {
-			 	$( "#boxCalibrate" ).hide("slow","swing");
-			 	$( "#boxCalibrate" ).removeClass("pinkDark","slow","swing");
-			 }
-	});
-	</script>
 </body>
 </html>
