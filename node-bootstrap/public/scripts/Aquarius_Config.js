@@ -10,6 +10,10 @@
  * @version : 0.1.1
 */
 
+//Var Global
+
+var dbRows = []
+
 io = io.connect()
 io.emit('ready')
 
@@ -17,7 +21,7 @@ io.emit('requestConfig')
 
 io.on('receiveConfig',function(data)
 	{
-	    var dbRows = data.rows
+	    dbRows = data.rows
 	    
 	    for ( var i = 0; i < dbRows.length; i++)
 	    {
@@ -55,21 +59,54 @@ io.on('receiveConfig',function(data)
  * @param KeyName (string)
  * @param Value (var)
  */
-function configSave(){
-    
+function sendConfig(KeyName,Value){
+    io.emit('UpdateConfig',{'Name': KeyName, 'Value': Value})
 }
 
 
 
 $("#saveButton" ).click(function() {
-	var id = $("#idInput").va()
-	var adresse = $("addresseInput").val()
-	var interval = $( "#intervalInput" ).val()
-	var date = $("#dateInput").html()
-	
-	
- 	if( interval > 0 && interval <= 1440)
- 	{
- 		io.emit('configInterval', { interval: interval })
- 	}
+     for ( var i = 0; i < dbRows.length; i++)
+	    {
+	        var id    = dbRows[i].Id
+	        var name  = dbRows[i].Name
+	        var value = dbRows[i].Value
+	        var desc  = dbRows[i].Description
+	        
+	        if(name == "STATION_ID")
+	        {
+	           if( $("#idInput").val() !== value )
+	           {
+	               sendConfig(name,value)
+	           }
+	        }
+	        else if(name == "NUMBER_RETRIES")
+	        {
+	            if($("#retriesInput").val() !== value)
+	            {
+	                sendConfig(name,value)
+	            }
+	        }
+	        else if(name == "SEND_ADDRESS")
+	        {
+	            if($("#addressInput").val() !== value)
+	            {
+	                sendConfig(name,value)
+	            }
+	        }
+	        else if (name == "READ_INTERVAL")
+	        {
+	         	if($("#intervalInput").val(value) !== value)
+	         	{
+	         	    sendConfig(name,value)
+	         	}
+	        }
+	        else if (name == "LAST_KNOWN_DATE")
+	        {
+	            if($("#dateInput").html(value) !== value)
+	            {
+	                sendConfig(name,value)
+	            }
+	        }
+	    }
 })
