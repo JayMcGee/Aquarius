@@ -15,6 +15,7 @@ var CONFIG_Station_ID = null;
 var CONFIG_Cloudia_Address = null;
 var CONFIG_Last_Date = null;
 var CONFIG_Interval = null;
+var CONFIG_Number_Retrys = null;
 
 //////////////////////////////////////////////////////////
 //Establishing connection to Station database (local DB)    
@@ -33,7 +34,7 @@ connection.connect(function(err) {
     drawSeparator()
     console.log('Connected as id ' + connection.threadId);
     drawSeparator()
-    databaseHelper.readConfig(connection, configurationReadCallback);
+    readConfig(configurationReadCallback);
 }); 
 
 ////////////////////////////////////////////////////////////
@@ -72,14 +73,13 @@ app.get('*', function(req, res){
 //On connection to the client send the most recent data from the DB
 //Send  
 app.io.on('connection',function(socket){
-    socket.on('requestConfig',function(){
-        databaseHelper.readConfig(connection, configurationReadCallback)
-        socket.emit('receiveConfig',{'stationID':CONFIG_Station_ID, 
-                                     'cloudiaAddr':CONFIG_Cloudia_Address,
-                                     'lastDate':CONFIG_Last_Date,
-                                     'interval' : CONFIG_Interval})
-    });
-});
+    socket.on('RequestConfig',function(){
+        databaseHelper.readConfig(connection, sendConfigToWeb)
+    })
+    socket.on('UpdateConfig', function(data){
+        databaseHelper.setConfig(connection, data.Name, data.Value, configurationSetCallBack)
+    })
+})
 
 //Receive update Command
 app.io.on('connection',function(socket){
@@ -112,7 +112,7 @@ app.io.on('connection',function(socket){
         socket.emit('lastStationHum',{'value':randomnumber});
     });
 });
-
+setConfig
 
 //Send from database Functions
 function sendTempFromDB(rowCount,socket){
@@ -184,6 +184,19 @@ function main(){
 */
 function configurationReadCallback(err, rows, fields){
     if (err) {
+        console.log("Could not read config table")
+        throw err;
+    }
+    assignConfigurationValues(err, rows, fields)
+    main()
+}
+
+/**
+*
+*/
+function assignConfigurationValues(err, rows, fields)
+{
+    if (err) {
         throw err;
         console.log("Could not read config table")
     }
@@ -214,8 +227,12 @@ function configurationReadCallback(err, rows, fields){
             console.log("Assigned last known date")
             CONFIG_Last_Date = currentValue
         }
+        else if(currentName == "NUMBER_RETRYS")
+        {
+            console.log("Assigned retry attempts")
+            CONFIG_Number_Retrys = currentValue
+        }
     }
-    main()
 }
 
 /**
@@ -223,6 +240,7 @@ function configurationReadCallback(err, rows, fields){
  */
 function configurationSetCallBack(err, result){
     console.log("Configuration result : " + result)
+    databaseHelper.readConfig(connection, sendConfigToWeb)
 }
 
 /**
@@ -247,6 +265,8 @@ function getSensorReadingCallback(err, rows, fields){
     for (index = 0; index < rows.length; ++index) {
 
         var Driver = rows[index].Driver
+ 
+
         var Address = rows[index].UnitAddress
         var UnitName = rows[index].UnitName
         var CloudiaID = rows[index].CloudiaID
@@ -284,11 +304,29 @@ function getSensorReadingCallback(err, rows, fields){
     }
 }
 
+/**
+*
+*/
 function readAllSensorsInDataBase()
 {
     databaseHelper.getSensors(connection, getSensorReadingCallback)
 }
 
+/**
+*
+*/
+function sendConfigToWeb(err, rows, fields){
+    if (err) {
+        throw err;
+        console.log("Could not read config table")
+    }
+    socket.emit('ReceiveConfig', {'rows' : rows})
+}
+
+/**
+*
+*/
 function drawSeparator(){
     console.log("///////////////////////////////////////////")
 }
+

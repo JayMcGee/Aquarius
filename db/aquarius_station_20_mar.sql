@@ -40,7 +40,7 @@ CREATE TABLE `t_Config` (
 
 LOCK TABLES `t_Config` WRITE;
 /*!40000 ALTER TABLE `t_Config` DISABLE KEYS */;
-INSERT INTO `t_Config` VALUES (1,'READ_INTERVAL','5','Minutes between each read operation'),(2,'SEND_ADDRESS','www.cloudiaproject.org/c/data.json','ClouDIA data send address'),(3,'LAST_KNOWN_DATE','Wed Mar 18 09:24:40 UTC 2015','Last known operating date'),(4,'STATION_ID','sta001','ClouDIA station ID'),(5,'NUMBER_RETRYS','5','Number of read attempts on sensors');
+INSERT INTO `t_Config` VALUES (1,'READ_INTERVAL','5','Minutes between each read operation'),(2,'SEND_ADDRESS','www.cloudiaproject.org/c/data.json','ClouDIA data send address'),(3,'LAST_KNOWN_DATE','Wed Mar 18 09:24:40 UTC 2015','Last known operating date'),(4,'STATION_ID','sta001','ClouDIA station ID'),(5,'NUMBER_RETRIES','5','Number of read attempts on sensors');
 /*!40000 ALTER TABLE `t_Config` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -173,4 +173,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-03-20  9:15:41
+-- Dump completed on 2015-03-20 11:02:34
