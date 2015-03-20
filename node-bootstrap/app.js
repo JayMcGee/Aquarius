@@ -10,7 +10,6 @@ var interval = 10000; //enter the time between sensor queries here (in milliseco
 var rtcExecPath = "python /var/lib/cloud9/Aquarius/exec/driverRTC.py"
 var modeSwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw1.py"
 
-var Step = StepsReadings.Begin;
 //Config
 var CONFIG_Station_ID = null;
 var CONFIG_Cloudia_Address = null;
@@ -34,7 +33,7 @@ connection.connect(function(err) {
     drawSeparator()
     console.log('Connected as id ' + connection.threadId);
     drawSeparator()
-    connection.query('USE `aquariusStation`', databaseHelper.readConfig(connection, configurationReadCallback));
+    databaseHelper.readConfig(connection, configurationReadCallback);
 }); 
 
 ////////////////////////////////////////////////////////////

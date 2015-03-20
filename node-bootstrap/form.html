@@ -108,6 +108,16 @@
 								</div>
 							  </div>
 							  
+							   <div class="control-group">
+								<label class="control-label" for="appendedInput">Read Attempts</label>
+								<div class="controls">
+								  <div class="input-append">
+									<input id="attemptsInput" size="16" type="text" value="0001"><span class="add-on">#</span>
+								  </div>
+								  <span class="help-inline">Number of attemps on sensor errors</span>
+								</div>
+							  </div>
+							  
 							  <div class="control-group">
 								<label class="control-label" for="appendedInput">Database Address</label>
 								<div class="controls">
@@ -206,6 +216,7 @@
 		<script src="/socket.io/socket.io.js"></script>
     	<script>
     		io = io.connect();
+    		io.emit('ready');
     		
     		io.emit('requestConfig');
     		
@@ -219,7 +230,7 @@
     		
 			$("#saveButton" ).click(function() {
 				var id = $("#idInput").va();
-				var adresse = $("addresseInput").val)();
+				var adresse = $("addresseInput").val();
 				var interval = $( "#intervalInput" ).val();
 				var date = $("#dateInput").html();
 				
