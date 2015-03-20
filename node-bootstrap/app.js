@@ -34,7 +34,7 @@ connection.connect(function(err) {
     drawSeparator()
     console.log('Connected as id ' + connection.threadId);
     drawSeparator()
-    databaseHelper.readConfig(connection, configurationReadCallback);
+    databaseHelper.readConfig(connection, assignConfigurationValues);
 }); 
 
 ////////////////////////////////////////////////////////////
@@ -141,16 +141,23 @@ function main(){
     var rtcReset = sh.exec(rtcExecPath + " disablealarm")
     console.log("Getting date from RTC")
     var rtcGetDate = sh.exec(rtcExecPath + " getdate")
-    var currentSysDate = sh.exec("date").stdout
-    console.log()
-    if(Date.parse(CONFIG_Last_Date) < Date.parse(currentSysDate))
-    {
+    
+    var strCurrentSysDate = sh.exec("date").stdout
+    var currentSysDate = Date.parse(strCurrentSysDate)
+    var lastDate = Date.parse(CONFIG_Last_Date)
+    
+    console.log("Current date : " + strCurrentSysDate)
+    console.log("Last date : " + CONFIG_Last_Date)
+    
+    if(lastDate < currentSysDate){
+        console.log("Last date is being updated to now : " + strCurrentSysDate)
+        databaseHelper.setConfig(connection, 'LAST_KNOWN_DATE', strCurrentSysDate, configurationSetCallBack)
         
     }
-    else if (Date.parse(CONFIG_Last_Date) < Date.parse(currentSysDate))
-    {
-        console.log()
+    else if (lastDate >= currentSysDate){
+        console.log("Last date is in the future ?")
     }
+    
     drawSeparator()
     console.log()
 
@@ -198,7 +205,7 @@ function configurationReadCallback(err, rows, fields){
         console.log("Could not read config table")
         throw err;
     }
-    main()
+    
 }
 
 /**
@@ -243,6 +250,7 @@ function assignConfigurationValues(err, rows, fields)
             CONFIG_Number_Retrys = currentValue
         }
     }
+    main()
 }
 
 /**

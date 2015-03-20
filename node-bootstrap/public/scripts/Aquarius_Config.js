@@ -78,6 +78,7 @@ $("#saveButton" ).click(function() {
 	           if( $("#idInput").val() !== value )
 	           {
 	               sendConfig(name,$("#idInput").val())
+	               dbRows[i].Value = $("#idInput").val()
 	           }
 	        }
 	        else if(name == "NUMBER_RETRIES")
@@ -85,6 +86,7 @@ $("#saveButton" ).click(function() {
 	            if($("#retriesInput").val() !== value)
 	            {
 	                sendConfig(name,$("#retriesInput").val())
+	                dbRows[i].Value = $("#retriesInput").val()
 	            }
 	        }
 	        else if(name == "SEND_ADDRESS")
@@ -92,6 +94,7 @@ $("#saveButton" ).click(function() {
 	            if($("#addressInput").val() !== value)
 	            {
 	                sendConfig(name,$("#addressInput").val())
+	                dbRows[i].Value = $("#addressInput").val()
 	            }
 	        }
 	        else if (name == "READ_INTERVAL")
@@ -99,6 +102,7 @@ $("#saveButton" ).click(function() {
 	         	if($("#intervalInput").val() !== value)
 	         	{
 	         	    sendConfig(name,$("#intervalInput").val())
+	         	    dbRows[i].Value = $("#intervalInput").val()
 	         	}
 	        }
 	        else if (name == "LAST_KNOWN_DATE")
@@ -106,6 +110,7 @@ $("#saveButton" ).click(function() {
 	            if($("#dateInput").html() !== value)
 	            {
 	                sendConfig(name,$("#dateInput").html())
+	                dbRows[i].Value = $("#dateInput").html()
 	            }
 	        }
 	    }
