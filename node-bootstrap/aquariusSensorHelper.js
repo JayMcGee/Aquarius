@@ -7,7 +7,7 @@ module.exports = {
         connection.query('USE `station_aquarius`;')
         
         console.log("Querying")
-        connection.query('SELECT config_id AS ID, config_key_name AS Name, config_key_value AS Value FROM `t_Config`;', callBackToApp)
+        connection.query('SELECT config_id AS ID, config_key_name AS Name, config_key_value AS Value, config_key_description AS Description FROM `t_Config`;', callBackToApp)
     },
     
     setConfig : function( connection , name , value , callBackToApp){

@@ -7,21 +7,8 @@ var databaseHelper = require('./aquariusSensorHelper')
 
 var interval = 10000; //enter the time between sensor queries here (in milliseconds)
 
-var rtcPath = "python /var/lib/cloud9/Aquarius/exec/driverRTC.py"
-var sw1Path = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw1.py"
-
-StepsReadings = {
-    Begin : 1,
-    pH : 2,
-    DO : 3,
-    K : 4,
-    DS18 : 5,
-    DHT : 6,
-    PutDB : 7,
-    Done : 8,
-    End : 9,
-    ConfigNotRead : 10
-}
+var rtcExecPath = "python /var/lib/cloud9/Aquarius/exec/driverRTC.py"
+var modeSwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw1.py"
 
 var Step = StepsReadings.Begin;
 //Config
@@ -29,12 +16,6 @@ var CONFIG_Station_ID = null;
 var CONFIG_Cloudia_Address = null;
 var CONFIG_Last_Date = null;
 var CONFIG_Interval = null;
-//Prepare Scheduler
-var rule = new schedule.RecurrenceRule();
-rule.second = [0,30];
-//rule.minute = [0,30];
-var date,newTemp,newPh,newDo,newCond,newStationTemp,newStationHum;
-
 
 //////////////////////////////////////////////////////////
 //Establishing connection to Station database (local DB)    
@@ -55,8 +36,6 @@ connection.connect(function(err) {
     drawSeparator()
     connection.query('USE `aquariusStation`', databaseHelper.readConfig(connection, configurationReadCallback));
 }); 
-
-
 
 ////////////////////////////////////////////////////////////
 //Starting web-client server
@@ -150,20 +129,20 @@ function sendTempFromDB(rowCount,socket){
 
 //databaseHelper.setConfig(connection, "READ_INTERVAL", 30, configurationSetCallBack);
 
-//var rtcPath
-//var sw1Path 
+//var rtcExecPath
+//var modeSwitchExec 
 
 
 //Scheduler
 function main(){
     
-    var currentMode = sh.exec(sw1Path)
+    var currentMode = sh.exec(modeSwitchExec)
 
     drawSeparator()
     console.log("Resetting RTC")
-    var rtcReset = sh.exec(rtcPath + " disablealarm")
+    var rtcReset = sh.exec(rtcExecPath + " disablealarm")
     console.log("Getting date from RTC")
-    var rtcGetDate = sh.exec(rtcPath + " getdate")
+    var rtcGetDate = sh.exec(rtcExecPath + " getdate")
     console.log(sh.exec("date").stdout)
     drawSeparator()
     console.log()
@@ -188,9 +167,9 @@ function main(){
         console.log("New date with added interval : " + date.toISOString().slice(0, 19).replace('T', ' '))
         drawSeparator()
         console.log("Setting up rtc to wake up at : " + date.getMinutes())
-        var rtcSetAlarm = sh.exec(rtcPath + " setalarm -m " + date.getMinutes())
+        var rtcSetAlarm = sh.exec(rtcExecPath + " setalarm -m " + date.getMinutes())
         drawSeparator()
-        var rtcSetAlarm = sh.exec(rtcPath + " enablealarm")
+        var rtcSetAlarm = sh.exec(rtcExecPath + " enablealarm")
         drawSeparator()
         
         var shutdown = sh.exec("shutdown -h now")
