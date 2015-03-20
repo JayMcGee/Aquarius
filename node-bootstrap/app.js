@@ -141,7 +141,16 @@ function main(){
     var rtcReset = sh.exec(rtcExecPath + " disablealarm")
     console.log("Getting date from RTC")
     var rtcGetDate = sh.exec(rtcExecPath + " getdate")
-    console.log(sh.exec("date").stdout)
+    var currentSysDate = sh.exec("date").stdout
+    console.log()
+    if(Date.parse(CONFIG_Last_Date) < Date.parse(currentSysDate))
+    {
+        
+    }
+    else if (Date.parse(CONFIG_Last_Date) < Date.parse(currentSysDate))
+    {
+        console.log()
+    }
     drawSeparator()
     console.log()
 

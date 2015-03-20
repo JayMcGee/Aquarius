@@ -16,14 +16,11 @@ var dbRows = []
 
 io = io.connect()
 io.emit('ready')
-alert("Happening")
 
 io.emit('RequestConfig')
 
 io.on('ReceiveConfig',function( data )
 {
-	
-	alert(data.toSource())
     dbRows = data.row
     
     for ( var i = 0; i < dbRows.length; i++)
@@ -80,35 +77,35 @@ $("#saveButton" ).click(function() {
 	        {
 	           if( $("#idInput").val() !== value )
 	           {
-	               sendConfig(name,value)
+	               sendConfig(name,$("#idInput").val())
 	           }
 	        }
 	        else if(name == "NUMBER_RETRIES")
 	        {
 	            if($("#retriesInput").val() !== value)
 	            {
-	                sendConfig(name,value)
+	                sendConfig(name,$("#retriesInput").val())
 	            }
 	        }
 	        else if(name == "SEND_ADDRESS")
 	        {
 	            if($("#addressInput").val() !== value)
 	            {
-	                sendConfig(name,value)
+	                sendConfig(name,$("#addressInput").val())
 	            }
 	        }
 	        else if (name == "READ_INTERVAL")
 	        {
-	         	if($("#intervalInput").val(value) !== value)
+	         	if($("#intervalInput").val() !== value)
 	         	{
-	         	    sendConfig(name,value)
+	         	    sendConfig(name,$("#intervalInput").val())
 	         	}
 	        }
 	        else if (name == "LAST_KNOWN_DATE")
 	        {
-	            if($("#dateInput").html(value) !== value)
+	            if($("#dateInput").html() !== value)
 	            {
-	                sendConfig(name,value)
+	                sendConfig(name,$("#dateInput").html())
 	            }
 	        }
 	    }

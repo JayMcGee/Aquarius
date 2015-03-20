@@ -33,7 +33,7 @@ module.exports = {
         connection.query('USE `station_aquarius`;')
         
         console.log("Querying")
-        sql = 'UPDATE `t_Config` SET `config_key_value` = ' + value + ' WHERE `config_key_name` = "' + name + '";';
+        sql = 'UPDATE `t_Config` SET `config_key_value` = "' + value + '" WHERE `config_key_name` = "' + name + '";';
         console.log(sql)
         return connection.query(sql, callBackToApp)
     },
