@@ -293,6 +293,8 @@ function getSensorReadingCallback(err, rows, fields){
             }    
         }
     }
+    
+    finishedReadingSensors()
 }
 
 
@@ -321,6 +323,36 @@ function sendConfigToWeb(err, rows, fields){
 */
 function drawSeparator(){
     console.log("///////////////////////////////////////////")
+}
+
+function finishedReadingSensors()
+{
+    if( CONFIG_Operation_Mode == 1 ) 
+    {
+        var date = new Date()
+
+        //Creates a date with added minutes from the interval configuration
+        drawSeparator()
+        console.log("Date without added interval : " + date.toISOString().slice(0, 19).replace('T', ' '))
+        date.setMinutes(date.getMinutes() + parseInt(CONFIG_Interval))
+        console.log("New date with added interval : " + date.toISOString().slice(0, 19).replace('T', ' '))
+        drawSeparator()
+
+        //Setup the alarm on the RTC
+        console.log("Setting up rtc to wake up at : " + date.getMinutes())
+        var rtcSetAlarm = sh.exec(rtcExecPath + " setalarm -m " + date.getMinutes())
+        drawSeparator()
+        var rtcSetAlarm = sh.exec(rtcExecPath + " enablealarm")
+        drawSeparator()
+        
+        //Execute a shutdown
+        var shutdown = sh.exec("shutdown -h now")
+    }
+    else
+    {
+        console.log("Reading sensor finished")
+    }
+        
 }
 
 ////////////////////////////////////////////////////////////
