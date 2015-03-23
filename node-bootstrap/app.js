@@ -25,21 +25,17 @@
 var express = require('express.io');                    //Express and Socket.io integration
 var mysql   = require('mysql');                         //Javascript mySql Connector
 //TODO Wait what ?
-var exec    = require('child_process').exec,child,pHc,DOc,Kc,OWc,DHTc;      //Execute shell command                     //Terminal access from web-client
-//Still used ?
+var exec    = require('child_process').exec,child,pHc,DOc,Kc,OWc,DHTc;      //Execute shell command                 
 var schedule= require('node-schedule');                 //In application schedule creator
 
 var sh      = require('execSync');                      //Permits the execution of external applications synchronously
 
 var databaseHelper = require('./aquariusSensorHelper')  //External file that helps the connection and querying to the database
 
-//TODO Is necessary ?
-var interval = 10000; //enter the time between sensor queries here (in milliseconds)
-
-
 //Execution path for the RTC driver and Switches
 var rtcExecPath = "python /var/lib/cloud9/Aquarius/exec/driverRTC.py"
 var modeSwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw1.py"
+
 //Still not used
 var _2SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw2.py"
 var _3SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw3.py"
