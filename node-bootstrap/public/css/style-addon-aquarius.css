@@ -1,3 +1,19 @@
+.modeDisplay-Auto {
+    color:red;
+	margin-top: 2px;
+	margin-right: 10px;
+	width:100%;
+	border: 0px solid #a7a9aa;
+	font-size: 30px;
+}
+.modeDisplay-Man {
+    color:#5BE643;
+	margin-top: 2px;
+	margin-right: 10px;
+	width:100%;
+	border: 0px solid #a7a9aa;
+	font-size: 30px;
+}
 .btn-update {
 	margin-top: 10px;
 	width:100%;
