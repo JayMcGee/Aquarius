@@ -32,4 +32,4 @@ copylibs:
 	cp *.o ../../libs/
 
 copyexec:
-	cp driverDHT22Exec ../../exec/
+	cp driverDHT22Exec ../../../../exec/

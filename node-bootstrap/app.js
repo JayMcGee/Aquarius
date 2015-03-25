@@ -25,21 +25,24 @@
 var express = require('express.io');                    //Express and Socket.io integration
 var mysql   = require('mysql');                         //Javascript mySql Connector
 //TODO Wait what ?
-var exec    = require('child_process').exec,child,pHc,DOc,Kc,OWc,DHTc;      //Execute shell command                 
+var exec    = require('child_process').exec; 
 var schedule= require('node-schedule');                 //In application schedule creator
 
 var sh      = require('execSync');                      //Permits the execution of external applications synchronously
 
 var databaseHelper = require('./aquariusSensorHelper')  //External file that helps the connection and querying to the database
 
-//Execution path for the RTC driver and Switches
+//Execution path for the RTC driver and Switches and Watchdog feeder
 var rtcExecPath = "python /var/lib/cloud9/Aquarius/exec/driverRTC.py"
 var modeSwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw1.py"
+var watchdogFeeder = "python /var/lib/cloud9/Aquarius/exec/feeder.py"
 
 //Still not used
 var _2SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw2.py"
 var _3SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw3.py"
 var _4SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw4.py"
+
+
 
 //Config vars
 //This one is used to store the StationID used to id it in ClouDIA 
@@ -54,6 +57,9 @@ var CONFIG_Interval = null;
 var CONFIG_Number_Retries = null;
 //Indicates which mode is active (manual or auto)
 var CONFIG_Operation_Mode = null;
+
+var Sensors_Count = null
+var Sensors_Done = null
 
 //////////////////////////////////////////////////////////
 //Establishing connection to Station database (local DB)    
@@ -130,27 +136,9 @@ function main(){
         console.log("Reading new sensor values")
         drawSeparator()
         console.log()
-        //Reads all sensors in the data base
-        readAllSensorsInDataBase(getSensorReadingCallback)        
-
-        var date = new Date()
-
-        //Creates a date with added minutes from the interval configuration
-        drawSeparator()
-        console.log("Date without added interval : " + date.toISOString().slice(0, 19).replace('T', ' '))
-        date.setMinutes(date.getMinutes() + parseInt(CONFIG_Interval))
-        console.log("New date with added interval : " + date.toISOString().slice(0, 19).replace('T', ' '))
-        drawSeparator()
-
-        //Setup the alarm on the RTC
-        console.log("Setting up rtc to wake up at : " + date.getMinutes())
-        var rtcSetAlarm = sh.exec(rtcExecPath + " setalarm -m " + date.getMinutes())
-        drawSeparator()
-        var rtcSetAlarm = sh.exec(rtcExecPath + " enablealarm")
-        drawSeparator()
         
-        //Execute a shutdown
-        var shutdown = sh.exec("shutdown -h now")
+        //Reads all sensors in the data base
+        readAllSensorsInDataBase(getSensorReadingCallback)       
     }
     else
     {
@@ -158,6 +146,7 @@ function main(){
         readAllSensorsInDataBase(getSensorReadingCallback)
         console.log("Waiting")
         drawSeparator()
+       
     }
 }
 
@@ -208,7 +197,7 @@ function assignConfigurationValues(err, rows, fields)
     var currentMode = sh.exec(modeSwitchExec).stdout
     console.log("Switch is  : " + currentMode)
 
-    if(currentMode == "HIGH"){
+    if(currentMode.indexOf("HIGH") > -1){
         CONFIG_Operation_Mode = 1
         console.log("Operation mode is  : AUTO")
     }
@@ -234,6 +223,11 @@ function configurationSetCallBack(err, result){
 */
 function t_Data_insertCallBack(err, result){
     console.log("Insert result : " + result)
+    Sensors_Done++
+    if(Sensors_Count <= Sensors_Done)
+    {
+        finishedReadingSensors()
+    }
 }
 
 /**
@@ -251,6 +245,9 @@ function getSensorReadingCallback(err, rows, fields){
     console.log("Reading and adding data")
 
     alreadyDone = []
+    
+    Sensors_Count = rows.length
+    Sensors_Done = 0
 
     for (index = 0; index < rows.length; ++index) {
         var Driver = rows[index].Driver
@@ -284,13 +281,12 @@ function getSensorReadingCallback(err, rows, fields){
                     else
                     {
                         console.log("Missing data")
+                        Sensors_Done++
                     }
                 }
             }    
         }
     }
-    
-    finishedReadingSensors()
 }
 
 

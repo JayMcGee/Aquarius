@@ -34,7 +34,7 @@ copylibs:
 	cp *.o ../../libs/
 	
 copyexec:
-	cp driverAtlasI2C* ../../exec/
+	cp driverAtlasI2C* ../../../../exec/
 
 cleanObject:
 	rm *.o

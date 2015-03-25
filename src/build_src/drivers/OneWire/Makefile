@@ -23,4 +23,4 @@ copylibs:
 	cp *.o ../../libs/
 	
 copyexec:
-	cp driverOneWireExec ../../exec/
+	cp driverOneWireExec ../../../../exec/
