@@ -251,14 +251,14 @@ function getSensorReadingCallback(err, rows, fields){
 
     for (index = 0; index < rows.length; ++index) {
         var Driver = rows[index].Driver
-        var Address = rows[index].UnitAddress
+        var Address = rows[index].PhysicalAddress
         var UnitName = rows[index].UnitName
-        var CloudiaID = rows[index].CloudiaID
+        var CloudiaUnitID = rows[index].CloudiaUnitID
 
-        if(alreadyDone.indexOf(CloudiaID) == -1)
+        if(alreadyDone.indexOf(CloudiaUnitID) == -1)
         {
             console.log("Reading : " + UnitName)
-            alreadyDone[alreadyDone.length] = CloudiaID
+            alreadyDone[alreadyDone.length] = CloudiaUnitID
             
             var result = sh.exec(Driver + " " + Address + " R")
             /////////////////////////////////////
@@ -270,18 +270,22 @@ function getSensorReadingCallback(err, rows, fields){
             console.log("Executed : " + splittedStdOutput)
 
             for(i = 0; i < rows.length; ++i){
-                if(rows[i].CloudiaID == CloudiaID){
+                if(rows[i].CloudiaUnitID == CloudiaUnitID){
 
                     if(splittedStdOutput.length > rows[i].Position)
                     {
                         var value = splittedStdOutput[rows[i].Position]
-                        console.log("Inserting into database value : " + value + rows[i].MeasureUnit)
-                        databaseHelper.setData(connection, value, rows[i].UnitID, 0,  t_Data_insertCallBack)
+                        console.log("Inserting into database value : " + value + " " + rows[i].MeasureUnit)
+                        databaseHelper.setData(connection, value, rows[i].VirtualID, 0,  t_Data_insertCallBack)
                     }
                     else
                     {
                         console.log("Missing data")
                         Sensors_Done++
+                        if(Sensors_Count <= Sensors_Done)
+                        {
+                            finishedReadingSensors()
+                        }
                     }
                 }
             }    
