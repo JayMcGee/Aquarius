@@ -54,13 +54,13 @@ DROP TABLE IF EXISTS `t_Data`;
 CREATE TABLE `t_Data` (
   `idt_Data` int(11) NOT NULL AUTO_INCREMENT,
   `data_value` float NOT NULL,
-  `data_t_unit` int(11) NOT NULL,
+  `data_t_virtual` int(11) NOT NULL,
   `data_date` datetime NOT NULL,
   `data_is_sent` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`idt_Data`),
   UNIQUE KEY `idt_Data_UNIQUE` (`idt_Data`),
-  KEY `fk_t_data_unit_idx` (`data_t_unit`),
-  CONSTRAINT `fk_t_data_unit` FOREIGN KEY (`data_t_unit`) REFERENCES `t_VirtualSensor` (`virtual_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  KEY `fk_t_data_unit_idx` (`data_t_virtual`),
+  CONSTRAINT `fk_t_data_unit` FOREIGN KEY (`data_t_virtual`) REFERENCES `t_VirtualSensor` (`virtual_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=749 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -173,4 +173,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-03-25 11:56:32
+-- Dump completed on 2015-03-25 12:17:08
