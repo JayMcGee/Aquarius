@@ -421,15 +421,16 @@ function createJSONfromDatabase(err, rows, fields) {
                 {
                     databaseHelper.setDataAsSent(connection, ids[s], idWasSet)
                 }
+                Finalise()
             },
             error     : function(e) {
                 console.log( "FAILED! RETRY PUBLISH!", e ); 
-                
+                Finalise()
             }
         });
             
     }
-    Finalise()
+    
 }
 
 function idWasSet(err, result){
