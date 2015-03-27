@@ -30,8 +30,8 @@ var schedule = require('node-schedule'); //In application schedule creator
 var fs = require('fs');
 var sh = require('execSync'); //Permits the execution of external applications synchronously
 
+
 var databaseHelper = require('./aquariusSensorHelper') //External file that helps the connection and querying to the database
-var JSONHelper = require('./aquariusJSONhelper')
 
 //Execution path for the RTC driver and Switches and Watchdog feeder
 var rtcExecPath = "python /var/lib/cloud9/Aquarius/exec/driverRTC.py"
@@ -43,7 +43,7 @@ var _2SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw2.py"
 var _3SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw3.py"
 var _4SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw4.py"
 
-
+var test_val = 1;
 
 //Config vars
 //This one is used to store the StationID used to id it in ClouDIA 
@@ -136,11 +136,12 @@ function main() {
 
     //If current mode is HIGH, enter auto mode. Read all sensors, set RTC to wake up and shutdown
     if (CONFIG_Operation_Mode == 1) {
+        watchdog()
         log("Auto mode")
         log("Reading new sensor values")
         drawSeparator()
         console.log()
-
+        
         //Reads all sensors in the data base
         readAllSensorsInDataBase(getSensorReadingCallback)
     }
@@ -148,6 +149,7 @@ function main() {
         log("Manual mode")
         readAllSensorsInDataBase(getSensorReadingCallback)
         log("Waiting")
+        
         drawSeparator()
 
     }
@@ -324,7 +326,75 @@ function drawSeparator() {
 }
 
 function finishedReadingSensors() {
+    
+    readDataFromSensorsNotSent(createJSONfromDatabase);
+    
+}
+
+function createJSONfromDatabase(err, rows, fields) {
+    if (err) {
+        throw err;
+        console.log("Could not get Sensors Info")
+    }
+    else
+    {
+        //var baseEvent = { 'sensorunitid' :  'data': [] }
+        //JSON Formatter
+        var stationDateTime = new Date().toISOString()
+        var stationID = CONFIG_Station_ID
+        
+        var JSONsession = 
+        {
+    	    "stationmessage": 
+        	{
+            	"datetime": stationDateTime,
+            	"stationid": stationID,
+            	"eventtype": "regularreading",
+            	"event": []
+        	}
+        }
+        
+        var currentEvent = null
+        var previousSensorUnitID = null
+        var sensorUnitID;
+        
+        for (var i = 0; i < rows.length; i++)
+        {
+            // Get current SensorUnitID (Physical sensor)
+            sensorUnitID = rows[i].CloudiaUnitID
+            
+            // If the last sensorunitID is not the same as the current one
+            if(previousSensorUnitID !==  sensorUnitID){
+                // If it is not the first iteration
+                if(previousSensorUnitID !== null)
+                    JSONsession.stationmessage.event.push(currentEvent)
+                //Create a new event for the physical ID
+                currentEvent = { 'sensorunitid' : sensorUnitID, 'data': [] }
+            }
+            
+            var sensorsubunitid = rows[i].CloudiaSubUnitID
+            var value =rows[i].ReadValue
+            var valuetype = rows[i].UnitType
+            var datetime = rows[i].ReadDate
+            
+            var JSON_sensorData = {'id': sensorsubunitid, 'valuetytpe':"as is", 'value':value, 'datetime':datetime}
+            
+            currentEvent.data.push(JSON_sensorData)
+            
+            previousSensorUnitID = sensorUnitID
+        }
+        JSONsession.stationmessage.event.push(currentEvent)
+        log(JSON.stringify(JSONsession))
+        
+    }
+    Finalise()
+}
+
+function Finalise()
+ {
     if (CONFIG_Operation_Mode == 1) {
+
+
         var date = new Date()
 
         //Creates a date with added minutes from the interval configuration
@@ -341,17 +411,36 @@ function finishedReadingSensors() {
         var rtcSetAlarm = sh.exec(rtcExecPath + " enablealarm")
         drawSeparator()
 
+        test_val = 0
         //Prepare Data for server ( Format to Json )
-        readDataFromSensorsNotSent(createJSONfromDatabase);
-
         //Execute a shutdown
         var shutdown = sh.exec("shutdown -h now")
     }
     else {
            //Prepare Data for server ( Format to Json )
-        readDataFromSensorsNotSent(createJSONfromDatabase);
         log("Reading sensor finished")
     }
+ }
+
+function log(dataToAppend)
+{
+    dataToAppend =  "[" + new Date().toISOString() + "]: " + dataToAppend + "\r"
+    console.log(dataToAppend)
+    fs.appendFileSync(CONFIG_Log_File_Directory + 'log.txt', dataToAppend)
+}
+
+function watchdog()
+{
+    fs.open('/dev/watchdog', 'w', function(err, fd){
+        if(err) throw err;
+        setInterval(function() {
+            if (test_val) {
+                console.log("This is the file desc : " + fd)
+                fs.writeSync(fd, "\n")
+            }
+            else log("Did not write to watchdoge")       
+         }, 1000)
+    })
 }
 
 
@@ -465,65 +554,4 @@ function sendTempFromDB(rowCount, socket) {
     });
 }
 
-function createJSONfromDatabase(err, rows, fields) {
-    if (err) {
-        throw err;
-        console.log("Could not get Sensors Info")
-    }
-    else
-    {
-        //var baseEvent = { 'sensorunitid' :  'data': [] }
-        //JSON Formatter
-        var stationDateTime = new Date().toISOString()
-        var stationID = CONFIG_Station_ID
-        
-        var JSONsession = 
-        {
-    	    "stationmessage": 
-        	{
-            	"datetime": stationDateTime,
-            	"stationid": stationID,
-            	"eventtype": "regularreading",
-            	"event": []
-        	}
-        }
-        
-        var currentEvent
-        var previousSensorUnitID = null
-        var sensorUnitID;
-        
-        for (var i = 0; i<rows.length;i++)
-        {
-            // Get current SensorUnitID (Physical sensor)
-            sensorUnitID = rows[i].CloudiaUnitID
-            
-            // If the last sensorunitID is not the same as the current one
-            if(previousSensorUnitID !==  sensorUnitID){
-                // If it is not the first iteration
-                if(previousSensorUnitID !== null)
-                    JSONsession.stationmessage.event.push(currentEvent)
-                //Create a new event for the physical ID
-                currentEvent = { 'sensorunitid' : sensorUnitID, 'data': [] }
-            }
-            
-            var sensorsubunitid = rows[i].CloudiaSubUnitID
-            var value =rows[i].ReadValue
-            var valuetype = rows[i].UnitType
-            var datetime = rows[i].ReadDate
-            
-            var JSON_sensorData = {'id': sensorsubunitid, 'valuetytpe':"as is", 'value':value, 'datetime':datetime}
-            
-            currentEvent.data.push(JSON_sensorData)
-            
-            previousSensorUnitID = sensorUnitID
-        }
-        log(JSON.stringify(JSONsession))
-    }
-}
 
-function log(dataToAppend)
-{
-    dataToAppend =  "[" + new Date().toISOString() + "]: " + dataToAppend + "\r"
-    console.log(dataToAppend)
-    fs.appendFileSync(CONFIG_Log_File_Directory + 'log.txt', dataToAppend)
-}
