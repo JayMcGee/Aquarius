@@ -30,6 +30,20 @@ var schedule = require('node-schedule'); //In application schedule creator
 var fs = require('fs');
 var sh = require('execSync'); //Permits the execution of external applications synchronously
 
+var pubnub = require("pubnub")({
+    ssl           : true,  // <- enable TLS Tunneling over TCP 
+    publish_key   : "pub-c-abfe0a2b-859f-4c0a-a513-03568a39e142",
+    subscribe_key : "sub-c-9e6a1140-d4a9-11e4-8323-02ee2ddab7fe"
+});
+
+pubnub.subscribe({
+    channel  : "my_channel",
+    callback : function(message) {
+        console.log( " > ", message );
+    }
+});
+ 
+
 
 var databaseHelper = require('./aquariusSensorHelper') //External file that helps the connection and querying to the database
 
@@ -149,7 +163,6 @@ function main() {
         log("Manual mode")
         readAllSensorsInDataBase(getSensorReadingCallback)
         log("Waiting")
-        
         drawSeparator()
 
     }
@@ -383,9 +396,18 @@ function createJSONfromDatabase(err, rows, fields) {
             
             previousSensorUnitID = sensorUnitID
         }
+        
         JSONsession.stationmessage.event.push(currentEvent)
         log(JSON.stringify(JSONsession))
         
+        var message = JSON.stringify(JSONsession);
+        pubnub.publish({ 
+            channel   : 'Aquarius',
+            message   : message,
+            callback  : function(e) { console.log( "SUCCESS!", e ); },
+            error     : function(e) { console.log( "FAILED! RETRY PUBLISH!", e ); }
+        });
+            
     }
     Finalise()
 }
