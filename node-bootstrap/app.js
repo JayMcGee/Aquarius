@@ -465,13 +465,14 @@ function sendTempFromDB(rowCount, socket) {
     });
 }
 
- function createJSONfromDatabase(err, rows, fields) {
+function createJSONfromDatabase(err, rows, fields) {
     if (err) {
         throw err;
         console.log("Could not get Sensors Info")
     }
     else
     {
+        //var baseEvent = { 'sensorunitid' :  'data': [] }
         //JSON Formatter
         var stationDateTime = new Date().toISOString()
         var stationID = CONFIG_Station_ID
@@ -487,15 +488,36 @@ function sendTempFromDB(rowCount, socket) {
         	}
         }
         
-        var sensorunitid = rows[0].CloudiaSubUnitID
-        var value =rows[0].ReadValue
-        var valuetype = rows[0].UnitType
-        var datetime = rows[0].ReadDate
+        var currentEvent
+        var previousSensorUnitID = null
+        var sensorUnitID;
         
-        var JSON_sensorData = {'id': sensorunitid, 'valuetytpe':"asis", 'value':value, 'datetime':datetime}
-        
-        JSONsession.stationmessage.event.push(JSON_sensorData)
-        console.log(JSON.stringify(JSONsession))
+        for (var i = 0; i<rows.length;i++)
+        {
+            // Get current SensorUnitID (Physical sensor)
+            sensorUnitID = rows[i].CloudiaUnitID
+            
+            // If the last sensorunitID is not the same as the current one
+            if(previousSensorUnitID !==  sensorUnitID){
+                // If it is not the first iteration
+                if(previousSensorUnitID !== null)
+                    JSONsession.stationmessage.event.push(currentEvent)
+                //Create a new event for the physical ID
+                currentEvent = { 'sensorunitid' : sensorUnitID, 'data': [] }
+            }
+            
+            var sensorsubunitid = rows[i].CloudiaSubUnitID
+            var value =rows[i].ReadValue
+            var valuetype = rows[i].UnitType
+            var datetime = rows[i].ReadDate
+            
+            var JSON_sensorData = {'id': sensorsubunitid, 'valuetytpe':"as is", 'value':value, 'datetime':datetime}
+            
+            currentEvent.data.push(JSON_sensorData)
+            
+            previousSensorUnitID = sensorUnitID
+        }
+        log(JSON.stringify(JSONsession))
     }
 }
 
