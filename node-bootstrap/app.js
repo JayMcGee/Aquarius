@@ -32,6 +32,8 @@ var sh      = require('execSync');                      //Permits the execution 
 
 var databaseHelper = require('./aquariusSensorHelper')  //External file that helps the connection and querying to the database
 
+var fs = require('fs');
+
 //Execution path for the RTC driver and Switches and Watchdog feeder
 var rtcExecPath = "python /var/lib/cloud9/Aquarius/exec/driverRTC.py"
 var modeSwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw1.py"
@@ -57,6 +59,8 @@ var CONFIG_Interval = null;
 var CONFIG_Number_Retries = null;
 //Indicates which mode is active (manual or auto)
 var CONFIG_Operation_Mode = null;
+//Log file name
+var CONFIG_Log_File_Directory = null;
 
 var Sensors_Count = null
 var Sensors_Done = null
@@ -82,7 +86,7 @@ connection.connect(function(err) {
     }
 
     drawSeparator()
-    console.log('Connected as id ' + connection.threadId);
+    log('Connected as id ' + connection.threadId);
     drawSeparator()
 
     //Calls configuration read from databasehelper, callsback to assignConfigurationValues
@@ -94,12 +98,14 @@ connection.connect(function(err) {
 */
 function main(){
 
+    CONFIG_Log_File_Directory = '/var/lib/cloud9/Aquarius/'
+
     drawSeparator()
     //Reset RTC so it does not retrigger or stay at low logic
-    console.log("Resetting RTC")
+    log("Resetting RTC")
     sh.exec(rtcExecPath + " disablealarm")
     //Get date from the RTC and set it to system date
-    console.log("Getting date from RTC")
+    log("Getting date from RTC")
     sh.exec(rtcExecPath + " getdate")
     
     //Get current system date from output of date command
@@ -109,42 +115,41 @@ function main(){
     //Get a date object from last known date from configuration
     var lastDate = Date.parse(CONFIG_Last_Date)
     
-    console.log("Current date : " + strCurrentSysDate)
-    console.log("Last date : " + CONFIG_Last_Date)
+    log("Current date : " + strCurrentSysDate)
+    log("Last date : " + CONFIG_Last_Date)
     
     //If last known date is behind current system date, set last known to current and imply its correct
     if(lastDate < currentSysDate){
-        console.log("Last date is being updated to now : " + strCurrentSysDate)
+        log("Last date is being updated to now : " + strCurrentSysDate)
         databaseHelper.setConfig(connection, 'LAST_KNOWN_DATE', strCurrentSysDate, configurationSetCallBack)
         
     }
     //If last known date is after current system date, set current system and rtc date to last known
     else if (lastDate >= currentSysDate){
-        console.log("Last date is in the future ? Setting date to last known, please update me")
+        log("Last date is in the future ? Setting date to last known, please update me")
         var execSetCurrentSysDate = sh.exec('date -s "' + CONFIG_Last_Date + '"')
         var rtcSetDate = sh.exec(rtcExecPath + " setdate")
     }
     
     drawSeparator()
-    console.log()
+    log()
     drawSeparator()    
 
     //If current mode is HIGH, enter auto mode. Read all sensors, set RTC to wake up and shutdown
     if( CONFIG_Operation_Mode == 1 ) 
     {        
-        console.log("Auto mode")
-        console.log("Reading new sensor values")
+        log("Auto mode")
+        log("Reading new sensor values")
         drawSeparator()
-        console.log()
         
         //Reads all sensors in the data base
         readAllSensorsInDataBase(getSensorReadingCallback)       
     }
     else
     {
-        console.log("Manual mode")    
+        log("Manual mode")    
         readAllSensorsInDataBase(getSensorReadingCallback)
-        console.log("Waiting")
+        log("Waiting")
         drawSeparator()
        
     }
@@ -161,49 +166,49 @@ function assignConfigurationValues(err, rows, fields)
 {
     if (err) {
         throw err;
-        console.log("Could not read config table")
+        log("Could not read config table")
     }
-    console.log("Assigning config data")
+    log("Assigning config data")
 
     //For each row returned, get value and key name, and use name to assign to good var
     for (index = 0; index < rows.length; ++index){
         currentName = rows[index].Name
         currentValue = rows[index].Value
         
-        console.log("Data : "  + currentName + " value : " + currentValue)
+        log("Data : "  + currentName + " value : " + currentValue)
         if(currentName == "STATION_ID"){
-            console.log("Assigned station id")
+            log("Assigned station id")
             CONFIG_Station_ID = currentValue
         }
         else if(currentName == "READ_INTERVAL"){
-            console.log("Assigned read interval")
+            log("Assigned read interval")
             CONFIG_Interval = currentValue
         }
         else if(currentName == "SEND_ADDRESS"){
-            console.log("Assigned send address")
+            log("Assigned send address")
             CONFIG_Cloudia_Address = currentValue
         }
         else if(currentName == "LAST_KNOWN_DATE"){
-            console.log("Assigned last known date")
+            log("Assigned last known date")
             CONFIG_Last_Date = currentValue
         }
         else if(currentName == "NUMBER_RETRYS"){
-            console.log("Assigned retry attempts")
+            log("Assigned retry attempts")
             CONFIG_Number_Retries = currentValue
         }
     }
 
     //Get current mode of operation
     var currentMode = sh.exec(modeSwitchExec).stdout
-    console.log("Switch is  : " + currentMode)
+    log("Switch is  : " + currentMode)
 
     if(currentMode.indexOf("HIGH") > -1){
         CONFIG_Operation_Mode = 1
-        console.log("Operation mode is  : AUTO")
+        log("Operation mode is  : AUTO")
     }
     else {
         CONFIG_Operation_Mode = 0
-        console.log("Operation mode is  : MANUAL")
+        log("Operation mode is  : MANUAL")
     }
 
     main()
@@ -215,14 +220,14 @@ function assignConfigurationValues(err, rows, fields)
  * 
  */
 function configurationSetCallBack(err, result){
-    console.log("Configuration result : " + result)
+    log("Configuration result : " + result)
 }
 
 /**
 *
 */
 function t_Data_insertCallBack(err, result){
-    console.log("Insert result : " + result)
+    log("Insert result : " + result)
     Sensors_Done++
     if(Sensors_Count <= Sensors_Done)
     {
@@ -240,9 +245,9 @@ function t_Data_insertCallBack(err, result){
 function getSensorReadingCallback(err, rows, fields){
     if (err) {
         throw err;
-        console.log("Could not read sensors table")
+        log("Could not read sensors table")
     }
-    console.log("Reading and adding data")
+    log("Reading and adding data")
 
     alreadyDone = []
     
@@ -257,17 +262,17 @@ function getSensorReadingCallback(err, rows, fields){
 
         if(alreadyDone.indexOf(CloudiaUnitID) == -1)
         {
-            console.log("Reading : " + UnitName)
+            log("Reading : " + UnitName)
             alreadyDone[alreadyDone.length] = CloudiaUnitID
             
             var result = sh.exec(Driver + " " + Address + " R")
             /////////////////////////////////////
-            console.log(Driver + " " + Address + " R")
+            log(Driver + " " + Address + " R")
             /////////////////////////////////////
             var splittedStdOutput = result.stdout.split(';')
             
             
-            console.log("Executed : " + splittedStdOutput)
+            log("Executed : " + splittedStdOutput)
 
             for(i = 0; i < rows.length; ++i){
                 if(rows[i].CloudiaUnitID == CloudiaUnitID){
@@ -275,12 +280,12 @@ function getSensorReadingCallback(err, rows, fields){
                     if(splittedStdOutput.length > rows[i].Position)
                     {
                         var value = splittedStdOutput[rows[i].Position]
-                        console.log("Inserting into database value : " + value + " " + rows[i].MeasureUnit)
+                        log("Inserting into database value : " + value + " " + rows[i].MeasureUnit)
                         databaseHelper.setData(connection, value, rows[i].VirtualID, 0,  t_Data_insertCallBack)
                     }
                     else
                     {
-                        console.log("Missing data")
+                        log("Missing data for : " + UnitName)
                         Sensors_Done++
                         if(Sensors_Count <= Sensors_Done)
                         {
@@ -309,7 +314,7 @@ function readAllSensorsInDataBase(callback)
 function sendConfigToWeb(err, rows, fields){
     if (err) {
         throw err;
-        console.log("Could not read config table")
+        log("Could not read config table")
     }
     socket.emit('ReceiveConfig', {'row' : rows})
 }
@@ -329,13 +334,13 @@ function finishedReadingSensors()
 
         //Creates a date with added minutes from the interval configuration
         drawSeparator()
-        console.log("Date without added interval : " + date.toISOString().slice(0, 19).replace('T', ' '))
+        log("Date without added interval : " + date.toISOString().slice(0, 19).replace('T', ' '))
         date.setMinutes(date.getMinutes() + parseInt(CONFIG_Interval))
-        console.log("New date with added interval : " + date.toISOString().slice(0, 19).replace('T', ' '))
+        log("New date with added interval : " + date.toISOString().slice(0, 19).replace('T', ' '))
         drawSeparator()
 
         //Setup the alarm on the RTC
-        console.log("Setting up rtc to wake up at : " + date.getMinutes())
+        log("Setting up rtc to wake up at : " + date.getMinutes())
         var rtcSetAlarm = sh.exec(rtcExecPath + " setalarm -m " + date.getMinutes())
         drawSeparator()
         var rtcSetAlarm = sh.exec(rtcExecPath + " enablealarm")
@@ -346,7 +351,7 @@ function finishedReadingSensors()
     }
     else
     {
-        console.log("Reading sensor finished")
+        log("Reading sensor finished")
     }
         
 }
@@ -361,7 +366,7 @@ app.listen(8088);
 
 // Setup the ready route, and emit talk event.
 app.io.route('ready', function(req) {
-    console.log('User Connected');
+    log('User Connected');
 })
 // Send the client html.
 app.get('/', function(req, res) {
@@ -387,16 +392,16 @@ app.get('*', function(req, res){
 //Send  
 app.io.on('connection',function(socket){
     socket.on('RequestConfig',function(){
-        console.log("Requested configuration")
+        log("Requested configuration")
         databaseHelper.readConfigAndEmit(connection, socket)
         
     })
     socket.on('UpdateConfig', function(data){
-        console.log("Requested an update to configuration")
+        log("Requested an update to configuration")
         databaseHelper.setConfig(connection, data.Name, data.Value, configurationSetCallBack)
     })
     socket.on('RequestNewMeasure', function(data){
-        console.log("Requested a new measure on XX sensor")
+        log("Requested a new measure on XX sensor")
 
     })
 })
@@ -405,7 +410,7 @@ app.io.on('connection',function(socket){
 app.io.on('connection',function(socket){
     socket.on('configInterval',function(data){
        var interval = data.interval;
-       console.log("Interval = " + interval)
+       log("Interval = " + interval)
     });
     socket.on('updateTemp',function(){
         var randomnumber=(Math.random()*41.1)
@@ -445,3 +450,11 @@ function sendTempFromDB(rowCount,socket){
                 socket.emit('tempData', {'array': rows});
         });
 }
+
+function log(dataToAppend)
+{
+    dataToAppend =  "[" + new Date().toISOString() + "]: " + dataToAppend + "\r"
+    console.log(dataToAppend)
+    fs.appendFileSync(CONFIG_Log_File_Directory + 'log.txt', dataToAppend)
+}
+
