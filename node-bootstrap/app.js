@@ -165,12 +165,8 @@ function main() {
     else {
         log("Manual mode", 2)
         readAllSensorsInDataBase(getSensorReadingCallback)
-<<<<<<< HEAD
-        log("Waiting")
-=======
         log("Waiting", 2)
         
->>>>>>> 5aa46fb5f35308a79cfbbdf1a78e6b68c353b8b4
         drawSeparator()
 
     }
@@ -382,11 +378,12 @@ function createJSONfromDatabase(err, rows, fields) {
         var currentEvent = null
         var previousSensorUnitID = null
         var sensorUnitID;
-        
+        var ids = []
         for (var i = 0; i < rows.length; i++)
         {
             // Get current SensorUnitID (Physical sensor)
             sensorUnitID = rows[i].CloudiaUnitID
+            ids.push(rows[i].ID)
             log("JSON creation at : " + sensorUnitID, 3)   
             // If the last sensorunitID is not the same as the current one
             if(previousSensorUnitID !==  sensorUnitID){
@@ -418,12 +415,25 @@ function createJSONfromDatabase(err, rows, fields) {
         pubnub.publish({ 
             channel   : 'Aquarius',
             message   : message,
-            callback  : function(e) { console.log( "SUCCESS!", e ); },
-            error     : function(e) { console.log( "FAILED! RETRY PUBLISH!", e ); }
+            callback  : function(e) {
+                console.log( "SUCCESS!", e )
+                for(var s = 0; s < ids.length; s++)
+                {
+                    databaseHelper.setDataAsSent(connection, ids[s], idWasSet)
+                }
+            },
+            error     : function(e) {
+                console.log( "FAILED! RETRY PUBLISH!", e ); 
+                
+            }
         });
             
     }
     Finalise()
+}
+
+function idWasSet(err, result){
+    log("Set as sent : " + result)
 }
 
 function Finalise()

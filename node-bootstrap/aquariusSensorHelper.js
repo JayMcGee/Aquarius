@@ -126,8 +126,16 @@ module.exports = {
         'ORDER BY t_PhysicalSensor.cloudia_unit_id, t_Data.data_date, t_VirtualSensor.cloudia_id;'
         log(sql, 3)
         return connection.query(sql, callBackToApp)
-    }
+    },
     
+    setDataAsSent : function (connection, id, callback){
+        log("Selecting database", 3)   
+        connection.query('USE `station_aquarius`;')
+        
+        sql = 'UPDATE `t_Data` SET `data_is_sent` = "' + 1 + '" WHERE `idt_Data` = "' + id + '";'
+        log(sql, 3)
+        return connection.query(sql, callback)
+    }
     
 };
 
