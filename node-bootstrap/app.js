@@ -155,6 +155,7 @@ function main() {
     //If current mode is HIGH, enter auto mode. Read all sensors, set RTC to wake up and shutdown
     if (CONFIG_Operation_Mode == 1) {
         fileWatch = watchdog()
+        fs.writeSync(fileWatch, "\n")
         writeToWatchDog(fileWatch)
         log("Auto mode", 2)
         log("Reading new sensor values", 2)
@@ -287,14 +288,22 @@ function getSensorReadingCallback(err, rows, fields) {
             log("Reading : " + UnitName, 2)
             alreadyDone[alreadyDone.length] = CloudiaUnitID
 
-            var result = sh.exec(Driver + " " + Address + " R")
+            
             /////////////////////////////////////
-            log(Driver + " " + Address + " R", 2)
+            
             /////////////////////////////////////
-            var splittedStdOutput = result.stdout.split(';')
+            var tryCount = 0
+            var splittedStdOutput
+            var result
+            do{
+                result = sh.exec(Driver + " " + Address + " R")
+                log(Driver + " " + Address + " R", 2)
+                tryCount++
+                log("Try counts :" + tryCount, 2)
+            }while(result.stdout.indexOf("ERROR") > -1 || tryCount <= parseInt(CONFIG_Number_Retries));
 
-
-            log("Executed : " + splittedStdOutput, 3)
+            splittedStdOutput = result.stdout.split(';')  
+            log("Executed : " + splittedStdOutput, 2)
 
             for (i = 0; i < rows.length; ++i) {
                 writeToWatchDog(fileWatch)
@@ -404,10 +413,11 @@ function createJSONfromDatabase(err, rows, fields) {
             
             var sensorsubunitid = rows[i].CloudiaSubUnitID
             var value =rows[i].ReadValue
-            var valuetype = rows[i].UnitType
+            var measureunit = rows[i].UnitType
             var datetime = rows[i].ReadDate
+            var physicalname = rows[i].PhysicalName
             
-            var JSON_sensorData = {'id': sensorsubunitid, 'valuetytpe':"as is", 'value':value, 'datetime':datetime}
+            var JSON_sensorData = {'id': sensorsubunitid, 'physicalname': physicalname, 'measureunit' : measureunit, 'valuetytpe':"as is", 'value':value, 'datetime':datetime}
             
             log("JSON Sensor Data : " + JSON_sensorData, 3)
             
@@ -425,16 +435,24 @@ function createJSONfromDatabase(err, rows, fields) {
             message   : message,
             callback  : function(e) {
                 writeToWatchDog(fileWatch)
-                console.log( "SUCCESS!", e )
+                log( "SUCCESS!", 2 )
+                log("COunt of ids : " + ids.length, 2)
+                var idToSet = 0
                 for(var s = 0; s < ids.length; s++)
                 {
-                    databaseHelper.setDataAsSent(connection, ids[s], idWasSet)
+                    databaseHelper.setDataAsSent(connection, ids[s], function(err, result){
+                        log("Set as sent : " + result, 2)
+                        idToSet++
+                        if(idToSet >= ids.length)
+                        {
+                            Finalise()
+                        }
+                    })
                 }
-                Finalise()
             },
             error     : function(e) {
                 writeToWatchDog(fileWatch)
-                console.log( "FAILED! RETRY PUBLISH!", e ); 
+                log( "FAILED! RETRY PUBLISH!", 2 ); 
                 Finalise()
             }
         });
@@ -474,7 +492,7 @@ function Finalise()
         //Execute a shutdown
         writeToWatchDog(fileWatch)
         log("Shutting down now ", 0)
-        var shutdown = sh.exec("shutdown -h now")
+        var shutdown = sh.exec("halt")
     }
     else {
            //Prepare Data for server ( Format to Json )
@@ -495,22 +513,16 @@ function log(dataToAppend, level)
 function watchdog()
 {
     return fs.openSync('/dev/watchdog', 'w')
-    /*, function(err, fd){
-        if(err) throw err;
-        setInterval(function() {
-            if (test_val) {
-                console.log("This is the file desc : " + fd)
-                fs.writeSync(fd, "\n")
-            }
-            else log("Did not write to watchdoge", 1)       
-         }, 1000)
-    })*/
 }
 
 function writeToWatchDog(fd){
     if(fd !== null)
+    {
         fs.writeSync(fd, "\n")
+        log("write to watchdog", 1)
+    }
 }
+        
 
 
 ////////////////////////////////////////////////////////////
