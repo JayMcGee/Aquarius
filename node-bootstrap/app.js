@@ -50,7 +50,6 @@ var databaseHelper = require('./aquariusSensorHelper') //External file that help
 //Execution path for the RTC driver and Switches and Watchdog feeder
 var rtcExecPath = "python /var/lib/cloud9/Aquarius/exec/driverRTC.py"
 var modeSwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw1.py"
-var watchdogFeeder = "python /var/lib/cloud9/Aquarius/exec/feeder.py"
 
 //Still not used
 var _2SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw2.py"
@@ -58,6 +57,8 @@ var _3SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw3.py"
 var _4SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw4.py"
 
 var test_val = 1;
+
+var fileWatch = null
 
 //Config vars
 //This one is used to store the StationID used to id it in ClouDIA 
@@ -153,12 +154,13 @@ function main() {
 
     //If current mode is HIGH, enter auto mode. Read all sensors, set RTC to wake up and shutdown
     if (CONFIG_Operation_Mode == 1) {
-        watchdog()
+        fileWatch = watchdog()
+        writeToWatchDog(fileWatch)
         log("Auto mode", 2)
         log("Reading new sensor values", 2)
         drawSeparator()
         console.log()
-        
+        writeToWatchDog(fileWatch)
         //Reads all sensors in the data base
         readAllSensorsInDataBase(getSensorReadingCallback)
     }
@@ -248,6 +250,7 @@ function configurationSetCallBack(err, result) {
  */
 function t_Data_insertCallBack(err, result) {
     log("Insert result : " + result, 3)
+    writeToWatchDog(fileWatch)
     Sensors_Done++
     if (Sensors_Count <= Sensors_Done) {
         finishedReadingSensors()
@@ -266,14 +269,15 @@ function getSensorReadingCallback(err, rows, fields) {
         throw err;
         log("Could not read sensors table", 1)
     }
-    log("Reading and adding data", 2)
-
+    log("Reading and adding data"   , 2)
+    writeToWatchDog(fileWatch)
     alreadyDone = []
 
     Sensors_Count = rows.length
     Sensors_Done = 0
 
     for (index = 0; index < rows.length; ++index) {
+        writeToWatchDog(fileWatch)
         var Driver = rows[index].Driver
         var Address = rows[index].PhysicalAddress
         var UnitName = rows[index].UnitName
@@ -293,6 +297,7 @@ function getSensorReadingCallback(err, rows, fields) {
             log("Executed : " + splittedStdOutput, 3)
 
             for (i = 0; i < rows.length; ++i) {
+                writeToWatchDog(fileWatch)
                 if (rows[i].CloudiaUnitID == CloudiaUnitID) {
 
                     if (splittedStdOutput.length > rows[i].Position) {
@@ -319,10 +324,12 @@ function getSensorReadingCallback(err, rows, fields) {
  *   @brief Function that read
  */
 function readAllSensorsInDataBase(callback) {
+    writeToWatchDog(fileWatch)
     databaseHelper.getSensors(connection, callback)
 }
 
 function readDataFromSensorsNotSent(callback) {
+    writeToWatchDog(fileWatch)
     databaseHelper.getDataForSensorsNotSent(connection, callback)
 }
 
@@ -347,9 +354,8 @@ function drawSeparator() {
 }
 
 function finishedReadingSensors() {
-    
-    readDataFromSensorsNotSent(createJSONfromDatabase);
-    
+    writeToWatchDog(fileWatch)
+    readDataFromSensorsNotSent(createJSONfromDatabase)
 }
 
 function createJSONfromDatabase(err, rows, fields) {
@@ -359,6 +365,7 @@ function createJSONfromDatabase(err, rows, fields) {
     }
     else
     {
+        writeToWatchDog(fileWatch)
         //var baseEvent = { 'sensorunitid' :  'data': [] }
         //JSON Formatter
         var stationDateTime = new Date().toISOString()
@@ -381,6 +388,7 @@ function createJSONfromDatabase(err, rows, fields) {
         var ids = []
         for (var i = 0; i < rows.length; i++)
         {
+            writeToWatchDog(fileWatch)
             // Get current SensorUnitID (Physical sensor)
             sensorUnitID = rows[i].CloudiaUnitID
             ids.push(rows[i].ID)
@@ -416,6 +424,7 @@ function createJSONfromDatabase(err, rows, fields) {
             channel   : 'Aquarius',
             message   : message,
             callback  : function(e) {
+                writeToWatchDog(fileWatch)
                 console.log( "SUCCESS!", e )
                 for(var s = 0; s < ids.length; s++)
                 {
@@ -424,6 +433,7 @@ function createJSONfromDatabase(err, rows, fields) {
                 Finalise()
             },
             error     : function(e) {
+                writeToWatchDog(fileWatch)
                 console.log( "FAILED! RETRY PUBLISH!", e ); 
                 Finalise()
             }
@@ -434,13 +444,14 @@ function createJSONfromDatabase(err, rows, fields) {
 }
 
 function idWasSet(err, result){
+    
     log("Set as sent : " + result)
 }
 
 function Finalise()
  {
     if (CONFIG_Operation_Mode == 1) {
-
+        
 
         var date = new Date()
 
@@ -452,7 +463,7 @@ function Finalise()
         drawSeparator()
 
         //Setup the alarm on the RTC
-        log("Setting up rtc to wake up at : " + date.getMinutes(), 3)
+        log("Setting up rtc to wake up at : " + date.getMinutes(), 2)
         var rtcSetAlarm = sh.exec(rtcExecPath + " setalarm -m " + date.getMinutes())
         drawSeparator()
         var rtcSetAlarm = sh.exec(rtcExecPath + " enablealarm")
@@ -461,6 +472,8 @@ function Finalise()
         test_val = 0
         //Prepare Data for server ( Format to Json )
         //Execute a shutdown
+        writeToWatchDog(fileWatch)
+        log("Shutting down now ", 0)
         var shutdown = sh.exec("shutdown -h now")
     }
     else {
@@ -481,7 +494,8 @@ function log(dataToAppend, level)
 
 function watchdog()
 {
-    fs.open('/dev/watchdog', 'w', function(err, fd){
+    return fs.openSync('/dev/watchdog', 'w')
+    /*, function(err, fd){
         if(err) throw err;
         setInterval(function() {
             if (test_val) {
@@ -490,7 +504,12 @@ function watchdog()
             }
             else log("Did not write to watchdoge", 1)       
          }, 1000)
-    })
+    })*/
+}
+
+function writeToWatchDog(fd){
+    if(fd !== null)
+        fs.writeSync(fd, "\n")
 }
 
 
