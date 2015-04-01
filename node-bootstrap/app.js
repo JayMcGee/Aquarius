@@ -92,7 +92,7 @@ var connection = mysql.createConnection({
 /**
  * Creates connection to database
  */
-connection.connect(function(err) {
+connection.connect(function(err){
     /**
      *   @brief Async function called upon creation of the connection
      */
@@ -113,7 +113,7 @@ connection.connect(function(err) {
 /**
  *   Main logic function Upon arriving in this function, all configuration values have been assigned
  */
-function main() {
+function main(){
 
     CONFIG_Log_File_Directory = '/var/lib/cloud9/Aquarius/'
 
@@ -182,15 +182,15 @@ function main() {
  *  @param fields
  *  Calls main at the end to continue execution of the station
  */
-function assignConfigurationValues(err, rows, fields) {
-    if (err) {
+function assignConfigurationValues(err, rows, fields){
+    if (err){
         throw err;
         log("Could not read config table", 1)
     }
     log("Assigning config data", 2)
 
     //For each row returned, get value and key name, and use name to assign to good var
-    for (index = 0; index < rows.length; ++index) {
+    for (index = 0; index < rows.length; ++index){
         currentName = rows[index].Name
         currentValue = rows[index].Value
 
@@ -233,7 +233,6 @@ function assignConfigurationValues(err, rows, fields) {
         CONFIG_Operation_Mode = 0
         log("Operation mode is  : MANUAL", 2)
     }
-
     main()
 }
 
@@ -491,8 +490,15 @@ function Finalise()
         //Prepare Data for server ( Format to Json )
         //Execute a shutdown
         writeToWatchDog(fileWatch)
-        log("Shutting down now ", 0)
-        var shutdown = sh.exec("halt")
+        
+        setTimeout(function(){
+            setInterval(function() {
+                log("Shutting down now ", 0)
+                var shutdown = sh.exec("init 0")
+            }, 1000)
+        }, 2000)
+        
+        
     }
     else {
            //Prepare Data for server ( Format to Json )
