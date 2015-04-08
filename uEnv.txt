@@ -11,6 +11,7 @@ systemd=quiet init=/lib/systemd/systemd
 ##Disable HDMI/eMMC
 #cape_disable=capemgr.disable_partno=BB-BONELT-HDMI,BB-BONELT-HDMIN,BB-BONE-EMMC-2G
 
+cape_enable=capemgr.enable_partno=BB-UART1
 ##Disable HDMI
 cape_disable=capemgr.disable_partno=BB-BONELT-HDMI,BB-BONELT-HDMIN
 
