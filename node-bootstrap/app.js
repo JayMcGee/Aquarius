@@ -156,8 +156,12 @@ function main(){
 
     //If current mode is HIGH, enter auto mode. Read all sensors, set RTC to wake up and shutdown
     if (CONFIG_Operation_Mode == 1) {
-        //fileWatch = watchdog()
-        //fs.writeSync(fileWatch, "\n")
+        
+        setInterval( function()
+        {
+            sh.exec('python /var/lib/cloud9/Aquarius/exec/set_gpio_del.py')
+        } , 1);
+        
         writeToWatchDog(fileWatch)
         log("Auto mode", 2)
         log("Reading new sensor values", 2)
@@ -168,6 +172,12 @@ function main(){
         readAllSensorsInDataBase(getSensorReadingCallback)
     }
     else {
+        setInterval( function()
+        {
+            sh.exec('python /var/lib/cloud9/Aquarius/exec/set_gpio_del_on.py')
+        } , 1);
+        
+        
         log("Manual mode", 2)
         readAllSensorsInDataBase(getSensorReadingCallback)
         log("Waiting", 2)
@@ -239,8 +249,8 @@ function assignConfigurationValues(err, rows, fields){
         CONFIG_Operation_Mode = 0
         log("Operation mode is  : MANUAL", 2)
     }
-    setInterval( main() , (60000*5) );
-   
+    //setInterval( main() , (60000*5) );
+   main()
 }
 
 
@@ -439,8 +449,10 @@ function createJSONfromDatabase(err, rows, fields) {
         var message = JSON.stringify(JSONsession);
         console.log (message)
         databaseHelper.sendPost(message, "cloudiaproject.org", "/c/data.json", Finalise)
+        
+        
         writeToWatchDog(fileWatch)
-        log("COunt of ids : " + ids.length, 2)
+        log("Count of ids : " + ids.length, 2)
         var idToSet = 0
         for(var s = 0; s < ids.length; s++)
         {
@@ -449,7 +461,7 @@ function createJSONfromDatabase(err, rows, fields) {
                 idToSet++
                 if(idToSet >= ids.length)
                 {
-                    //Finalise()
+                    Finalise()
                 }
             })
         }
