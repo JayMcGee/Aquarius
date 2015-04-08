@@ -78,6 +78,8 @@ var CONFIG_Log_File_Directory = null;
 //
 var CONFIG_Verbose_Level = 4;
 
+var CONFIG_Sensor_unit = null;
+
 var Sensors_Count = null
 var Sensors_Done = null
 
@@ -154,8 +156,8 @@ function main(){
 
     //If current mode is HIGH, enter auto mode. Read all sensors, set RTC to wake up and shutdown
     if (CONFIG_Operation_Mode == 1) {
-        fileWatch = watchdog()
-        fs.writeSync(fileWatch, "\n")
+        //fileWatch = watchdog()
+        //fs.writeSync(fileWatch, "\n")
         writeToWatchDog(fileWatch)
         log("Auto mode", 2)
         log("Reading new sensor values", 2)
@@ -219,6 +221,10 @@ function assignConfigurationValues(err, rows, fields){
             log("Assigned debug level", 3)
             CONFIG_Verbose_Level = currentValue
         }
+        else if ( currentName == "SENSOR_UNIT"){
+            log("Assigned SensorUnit ID", 3)
+            CONFIG_Sensor_unit = currentValue
+        }
     }
 
     //Get current mode of operation
@@ -233,7 +239,8 @@ function assignConfigurationValues(err, rows, fields){
         CONFIG_Operation_Mode = 0
         log("Operation mode is  : MANUAL", 2)
     }
-    main()
+    setInterval( main() , (60000*5) );
+   
 }
 
 
@@ -376,14 +383,15 @@ function createJSONfromDatabase(err, rows, fields) {
         writeToWatchDog(fileWatch)
         //var baseEvent = { 'sensorunitid' :  'data': [] }
         //JSON Formatter
-        var stationDateTime = new Date().toISOString()
+        var t = new Date()
+        var jsonDate = t.getHours() + ":" + t.getMinutes() + ":" + t.getSeconds() + ":" + t.getDate() + ":" + (t.getMonth() + 1) + ":" + t.getFullYear()
         var stationID = CONFIG_Station_ID
         
         var JSONsession = 
         {
     	    "stationmessage": 
         	{
-            	"datetime": stationDateTime,
+            	"datetime": jsonDate,
             	"stationid": stationID,
             	"eventtype": "regularreading",
             	"event": []
@@ -391,23 +399,23 @@ function createJSONfromDatabase(err, rows, fields) {
         }
         
         var currentEvent = null
-        var previousSensorUnitID = null
-        var sensorUnitID;
+        var previousPhysicalID = null
+        var PhysicalID;
         var ids = []
         for (var i = 0; i < rows.length; i++)
         {
             writeToWatchDog(fileWatch)
             // Get current SensorUnitID (Physical sensor)
-            sensorUnitID = rows[i].CloudiaUnitID
+            PhysicalID = rows[i].PhysicalID
             ids.push(rows[i].ID)
-            log("JSON creation at : " + sensorUnitID, 3)   
+            log("JSON creation at : " + PhysicalID, 3)   
             // If the last sensorunitID is not the same as the current one
-            if(previousSensorUnitID !==  sensorUnitID){
+            if(previousPhysicalID !==  PhysicalID){
                 // If it is not the first iteration
-                if(previousSensorUnitID !== null)
+                if(previousPhysicalID !== null)
                     JSONsession.stationmessage.event.push(currentEvent)
                 //Create a new event for the physical ID
-                currentEvent = { 'sensorunitid' : sensorUnitID, 'data': [] }
+                currentEvent = { 'sensorunitid' : PhysicalID, 'data': [] }
             }
             
             var sensorsubunitid = rows[i].CloudiaSubUnitID
@@ -422,13 +430,30 @@ function createJSONfromDatabase(err, rows, fields) {
             
             currentEvent.data.push(JSON_sensorData)
             
-            previousSensorUnitID = sensorUnitID
+            previousPhysicalID = PhysicalID
         }
         
         JSONsession.stationmessage.event.push(currentEvent)
         log(JSON.stringify(JSONsession), 3)
         
         var message = JSON.stringify(JSONsession);
+        console.log (message)
+        databaseHelper.sendPost(message, "cloudiaproject.org", "/c/data.json", Finalise)
+        writeToWatchDog(fileWatch)
+        log("COunt of ids : " + ids.length, 2)
+        var idToSet = 0
+        for(var s = 0; s < ids.length; s++)
+        {
+            databaseHelper.setDataAsSent(connection, ids[s], function(err, result){
+                log("Set as sent : " + result, 2)
+                idToSet++
+                if(idToSet >= ids.length)
+                {
+                    //Finalise()
+                }
+            })
+        }
+        /*
         pubnub.publish({ 
             channel   : 'Aquarius',
             message   : message,
@@ -444,7 +469,7 @@ function createJSONfromDatabase(err, rows, fields) {
                         idToSet++
                         if(idToSet >= ids.length)
                         {
-                            Finalise()
+                            //Finalise()
                         }
                     })
                 }
@@ -452,13 +477,14 @@ function createJSONfromDatabase(err, rows, fields) {
             error     : function(e) {
                 writeToWatchDog(fileWatch)
                 log( "FAILED! RETRY PUBLISH!", 2 ); 
-                Finalise()
+                // Finalise()
             }
         });
-            
+           */ 
     }
     
 }
+
 
 function idWasSet(err, result){
     
@@ -494,7 +520,7 @@ function Finalise()
         setTimeout(function(){
             setInterval(function() {
                 log("Shutting down now ", 0)
-                var shutdown = sh.exec("init 0")
+                var shutdown = sh.exec("shutdown -h now")
             }, 1000)
         }, 2000)
         

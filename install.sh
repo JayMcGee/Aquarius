@@ -16,3 +16,10 @@ cd /etc/systemd/system/multi-user.target.wants/
 ln /lib/systemd/system/aquarius.service
 
 cd /var/lib/cloud9/Aquarius
+
+mkdir /mnt/card
+mount /dev/mmcblk0p1  /mnt/card
+cp /var/lib/cloud9/Aquarius/uEnv.txt /mnt/card/uEnv.txt
+
+echo "Thy shall reboot, for thy need to reseat"
+reboot

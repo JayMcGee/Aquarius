@@ -1,4 +1,5 @@
 var mysql = require('mysql');
+var http = require('http');
 var fs = require('fs');
 
 var CONFIG_Verbose_Level = null;
@@ -116,7 +117,7 @@ module.exports = {
         't_Data.idt_Data AS ID, ' +
         't_Data.data_date AS ReadDate, ' +
         't_VirtualSensor.cloudia_id AS CloudiaSubUnitID, ' +
-        't_PhysicalSensor.cloudia_unit_id AS CloudiaUnitID, ' +
+        't_PhysicalSensor.physical_id AS PhysicalID, ' +
         't_PhysicalSensor.physical_name AS PhysicalName, ' +
         't_VirtualSensor.virtual_measure_unit AS UnitType ' +
         'FROM t_Data, t_VirtualSensor, t_PhysicalSensor ' +
@@ -136,6 +137,40 @@ module.exports = {
         sql = 'UPDATE `t_Data` SET `data_is_sent` = "' + 1 + '" WHERE `idt_Data` = "' + id + '";'
         log(sql, 3)
         return connection.query(sql, callback)
+    },
+    
+    sendPost : function ( jsonInString , sendAddress , path , callback){
+        
+        var headers = {
+          'Content-Type': 'application/json',
+          'Content-Length': jsonInString.length
+        };
+        var options = {
+          host: sendAddress,
+          port: 80,
+          path: path,
+          method: 'POST',
+          headers: headers
+        };
+        
+        // Setup the request.  The options parameter is
+        // the object we defined above.
+        var req = http.request(options, function(res) {
+          console.log('STATUS: ' + res.statusCode);
+          console.log('HEADERS: ' + JSON.stringify(res.headers));
+          res.setEncoding('utf8');
+          res.on('data', function (chunk) {
+            console.log('BODY: ' + chunk);
+          });
+        });
+        
+        req.on('error', function(e) {
+          console.log("Error on send ")
+          callback()
+        });
+        
+        req.write(jsonInString);
+        req.end();
     }
     
 };
