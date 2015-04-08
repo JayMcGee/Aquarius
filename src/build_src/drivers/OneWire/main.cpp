@@ -3,6 +3,8 @@
  * @author Jean-Philippe Fournier
  * @date   Febuary 13 2015
  * @brief  main driver executable for the One wire maxim Ds18b20 device
+ * @modified April 10 2015
+ * @brief Added error management, to deal with 85 degrees C
  */
  
  //Temporary ID for easy recall of the value, DEV only
@@ -57,10 +59,19 @@ int main(int argc, char * argv[])
             //Temperature updated
             if(ow.getLastTemperature(&temp))
             {
-				//Create an output stream with read data
-                float datas[OW_DATA_QTY] = { temp };
-                aquarius::outputReadData(NOM_TEMPORAIRE, OW_DATA_QTY, ow.dataName, datas);
-                return 0;
+                if(temp == 85.0f)
+                {
+                    aquarius::outputError(NOM_TEMPORAIRE, OW_DEVICE_NOT_READY);
+                    return 1;
+                }
+                else
+                {
+                    //Create an output stream with read data
+                    float datas[OW_DATA_QTY] = { temp };
+                    aquarius::outputReadData(NOM_TEMPORAIRE, OW_DATA_QTY, ow.dataName, datas);
+                    return 0;
+                }
+				
             }
             else
                 aquarius::outputError(NOM_TEMPORAIRE, "OW_NO_DATA");
