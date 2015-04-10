@@ -77,6 +77,14 @@ def sendDataThroughPOST(file):
     writeAndGetResultSIM908 
     return
 ######################################################
+def powerOff():
+    
+    return
+######################################################
+def powerOn():
+    
+    return
+######################################################
 
 ser = serial.Serial( port = "/dev/ttyO1", baudrate=115200, timeout=1)
 
