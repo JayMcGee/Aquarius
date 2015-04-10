@@ -104,7 +104,19 @@ module.exports = {
         log("Selecting database", 3)
         connection.query('USE `station_aquarius`;')
 
-        sql = 'SELECT 	t_VirtualSensor.virtual_id AS VirtualID, ' + 't_Types.types_name AS TypeName, ' + 't_Types.types_driver AS Driver, ' + 't_PhysicalSensor.physical_address AS PhysicalAddress, ' + 't_PhysicalSensor.physical_name AS UnitName, ' + 't_PhysicalSensor.cloudia_unit_id AS CloudiaUnitID, ' + 't_VirtualSensor.cloudia_id AS CloudiaSensorID, ' + 't_VirtualSensor.virtual_measure_unit AS MeasureUnit, ' + 't_VirtualSensor.virtual_driver_pos AS Position ' + 'FROM `t_VirtualSensor`, `t_Types`, `t_PhysicalSensor` ' + 'WHERE t_PhysicalSensor.physical_t_type = t_Types.types_id ' + 'and t_VirtualSensor.virtual_t_physical = t_PhysicalSensor.physical_id ' + 'ORDER BY t_PhysicalSensor.cloudia_unit_id, t_VirtualSensor.cloudia_id;'
+        sql = 'SELECT t_VirtualSensor.virtual_id AS VirtualID, ' + 
+                't_Types.types_name AS TypeName, ' + 
+                't_Types.types_driver AS Driver, ' + 
+                't_PhysicalSensor.physical_address AS PhysicalAddress, ' + 
+                't_PhysicalSensor.physical_name AS UnitName, ' + 
+                't_PhysicalSensor.cloudia_unit_id AS CloudiaUnitID, ' + 
+                't_VirtualSensor.cloudia_id AS CloudiaSensorID, ' + 
+                't_VirtualSensor.virtual_measure_unit AS MeasureUnit, ' + 
+                't_VirtualSensor.virtual_driver_pos AS Position ' + 
+                'FROM `t_VirtualSensor`, `t_Types`, `t_PhysicalSensor` ' + 
+                'WHERE t_PhysicalSensor.physical_t_type = t_Types.types_id ' + 
+                'and t_VirtualSensor.virtual_t_physical = t_PhysicalSensor.physical_id ' + 
+                'ORDER BY t_PhysicalSensor.cloudia_unit_id, t_VirtualSensor.cloudia_id;'
         log(sql, 3)
         return connection.query(sql, callBackToApp)
     },

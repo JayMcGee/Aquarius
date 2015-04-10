@@ -158,11 +158,9 @@ function main(){
 
     //If current mode is HIGH, enter auto mode. Read all sensors, set RTC to wake up and shutdown
     if (CONFIG_Operation_Mode == 1) {
-        
-        setInterval( function()
-        {
-            sh.exec('python /var/lib/cloud9/Aquarius/exec/set_gpio_del.py')
-        } , 1);
+        fileWatch = watchdog()
+        fs.writeSync(fileWatch, "\n")
+        exec('python /var/lib/cloud9/Aquarius/exec/set_gpio_del.py', function(){})
         
         writeToWatchDog(fileWatch)
         log("Auto mode", 2)
@@ -174,12 +172,7 @@ function main(){
         readAllSensorsInDataBase(getSensorReadingCallback)
     }
     else {
-        setInterval( function()
-        {
-            sh.exec('python /var/lib/cloud9/Aquarius/exec/set_gpio_del_on.py')
-        } , 1);
-        
-        
+        exec('python /var/lib/cloud9/Aquarius/exec/set_gpio_del_on.py', function(){})
         log("Manual mode", 2)
         readAllSensorsInDataBase(getSensorReadingCallback)
         log("Waiting", 2)
@@ -237,7 +230,7 @@ function assignConfigurationValues(err, rows, fields){
             log("Assigned SensorUnit ID", 3)
             CONFIG_Sensor_unit = currentValue
         }
-        else if (currentName == "OW_DRIVER_WATER_COMP"){
+        else if ( currentName == "OW_DRIVER_WATER_COMP"){
             log("Assigned temperature compensation", 3)
             CONFIG_Temperature_Compensation = currentValue
         }
@@ -318,8 +311,17 @@ function getSensorReadingCallback(err, rows, fields) {
             var splittedStdOutput
             var result
             do{
-                result = sh.exec(Driver + " " + Address + " R")
-                log(Driver + " " + Address + " R", 2)
+                if (CONFIG_Temperature_Compensation !== null)
+                {
+                    result = sh.exec(Driver + " " + Address + " R:-t:" + CONFIG_Temperature_Compensation)
+                    log(Driver + " " + Address + " R:-t:" + CONFIG_Temperature_Compensation, 3)
+                }
+                else
+                {
+                    result = sh.exec(Driver + " " + Address + " R")
+                    log(Driver + " " + Address + " R", 3)
+                }
+                
                 tryCount++
                 log("Try counts :" + tryCount, 2)
             }while(result.stdout.indexOf("ERROR") > -1 || tryCount <= parseInt(CONFIG_Number_Retries));
