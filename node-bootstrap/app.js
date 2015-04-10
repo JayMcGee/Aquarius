@@ -75,9 +75,9 @@ var CONFIG_Number_Retries = null;
 var CONFIG_Operation_Mode = null;
 //Log file directory
 var CONFIG_Log_File_Directory = null;
-//
+//How much should I talk ?
 var CONFIG_Verbose_Level = 4;
-
+//Cloudia Sensor Unit 
 var CONFIG_Sensor_unit = null;
 
 var Sensors_Count = null
