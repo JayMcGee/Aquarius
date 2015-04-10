@@ -2,11 +2,13 @@
 #include <iostream>
 #include <stdlib.h>
 #include "Atlas_I2C_PH.h"
+#include "../OneWire/OneWireDevice.h"
 
 #define PH_TEMP_NAME "PH_001"
 using namespace BlackLib;
 using namespace std;
 
+float getWaterTemperature(string owname);
 
 int main(int argc, char * argv[])
 {
@@ -115,9 +117,9 @@ int main(int argc, char * argv[])
 	else if(firstCommand.compare(I2C_COMMAND_T) == 0)
 	{
 		if(commandSplitted.size() > 1)
-			return pH.command_Temperature_Compensation(commandSplitted[1]);
+			return pH.command_Temperature_Compensation(commandSplitted[1], 0);
 		else
-			return pH.command_Temperature_Compensation(I2C_COMMAND_ARG_QUEST);
+			return pH.command_Temperature_Compensation(I2C_COMMAND_ARG_QUEST, 0);
 	}	
 	//Factory reset
 	else if(firstCommand.compare(I2C_COMMAND_X) == 0)
@@ -127,7 +129,23 @@ int main(int argc, char * argv[])
 		return pH.command_Information();
     //If the command is a reading
     else if(firstCommand.compare(I2C_COMMAND_R) == 0)
-        return pH.command_Reading();
+    {
+    	if(commandSplitted[1].compare("-t") == 0 && commandSplitted.size() > 2)
+    	{
+    		float compensation = getWaterTemperature(commandSplitted[2]);
+    		if(compensation == 125){
+    			aquarius::outputError(PH_TEMP_NAME, OW_DEVICE_NOT_READY);
+    			return 1;
+    		}
+			else{
+				
+	    		pH.command_Temperature_Compensation(to_string(compensation), 1);
+			}
+	    	return pH.command_Reading();
+    	}
+    	else
+    		return pH.command_Reading();
+    }
     //Device status
 	else if(firstCommand.compare(I2C_COMMAND_STATUS) == 0)
 		return pH.command_Status();
@@ -140,6 +158,40 @@ int main(int argc, char * argv[])
     
     return 1;
 }
+
+float getWaterTemperature(string owname)
+{
+	//Create the One Wire device object
+    aquarius::OneWireDevice ow(owname);
+    
+    float temp;
+    
+    //Path validation...
+    if(ow.isValidPath())
+    {
+        //Device path is valid
+        if(ow.updateTemperature())
+        {
+            //Temperature updated
+            if(ow.getLastTemperature(&temp))
+            {
+                if(temp == 85.0f)
+                {
+                    return 125;
+                }
+                else
+                {
+                    return temp;
+                }
+				
+            }
+        }
+    }
+    return 125;
+}
+
+
+
 
 
 

@@ -72,7 +72,7 @@ namespace aquarius
 			
 			int command_Status();
 			
-			int command_Temperature_Compensation(string parameter);
+			int command_Temperature_Compensation(string parameter, int silent);
 			
 			int command_Factory_Reset();
 			

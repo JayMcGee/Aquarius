@@ -79,6 +79,8 @@ var CONFIG_Log_File_Directory = null;
 var CONFIG_Verbose_Level = 4;
 //Cloudia Sensor Unit 
 var CONFIG_Sensor_unit = null;
+//Temperature compensation device address
+var CONFIG_Temperature_Compensation = null;
 
 var Sensors_Count = null
 var Sensors_Done = null
@@ -234,6 +236,10 @@ function assignConfigurationValues(err, rows, fields){
         else if ( currentName == "SENSOR_UNIT"){
             log("Assigned SensorUnit ID", 3)
             CONFIG_Sensor_unit = currentValue
+        }
+        else if (currentName == "OW_DRIVER_WATER_COMP"){
+            log("Assigned temperature compensation", 3)
+            CONFIG_Temperature_Compensation = currentValue
         }
     }
 

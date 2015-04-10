@@ -14,6 +14,7 @@
 //External libraries
 #include "../include/blacklib/BlackLib.h"
 #include "../include/blacklib/BlackI2C.h"
+#include "drivers/OneWire/OneWireDevice.h"
 
 //
 //System wide constants
@@ -74,5 +75,4 @@ namespace aquarius
 	 * @return 
 	 */
 	int i2cCommand(BlackI2C * i2c, string commandTo, int delay, string * returnData);
-
 }

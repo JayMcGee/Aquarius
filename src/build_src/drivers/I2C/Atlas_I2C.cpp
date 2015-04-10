@@ -99,17 +99,21 @@ namespace aquarius
         return commandResult;
     }
     
-    int Atlas_I2C::command_Temperature_Compensation(string parameter)
+    int Atlas_I2C::command_Temperature_Compensation(string parameter, int silent)
     {
         string returnString;
         int commandResult = aquarius::i2cCommand(i2c_, I2C_COMMAND_T, I2C_COMMAND_T_DELAY, &returnString);
         
         if(commandResult == I2C_READ_BACK_OK)
     	{
-		    if(parameter.compare(I2C_COMMAND_ARG_QUEST) == 0)
-                aquarius::outputCommandResult(deviceName_, (string)COMPENSATION_RESPONDED + returnString);
-            else
-                aquarius::outputCommandResult(deviceName_, (string)COMPENSATION_SET_RESPONDED + parameter);
+    	    if(!silent)
+    	    {
+		        if(parameter.compare(I2C_COMMAND_ARG_QUEST) == 0)
+                    aquarius::outputCommandResult(deviceName_, (string)COMPENSATION_RESPONDED + returnString);
+                else
+                    aquarius::outputCommandResult(deviceName_, (string)COMPENSATION_SET_RESPONDED + parameter);
+    	    }
+            return 0;
     	}
     	else if(commandResult == I2C_READ_BACK_FAIL)
     		aquarius::outputError(deviceName_, I2C_READ_FAIL);
@@ -138,4 +142,6 @@ namespace aquarius
 	{
 		return "Missing arguments, could not execute \n\r [Executable] [bus:address] [command]";
 	}
+	
+	
 }
