@@ -3,18 +3,21 @@ import serial
 import sys, getopt
 
 UART.setup("UART1")
-
+###############################################
 def checkIfOK(lines):
     ok = 0
     for line in lines:
         if "OK" in line:
             ok = 1
     return ok
-
+###############################################
 def writeAndReadSIM908(dataToWrite):
     ser.write(dataToWrite + "\r")
     read = ser.readlines()
     return read
+###############################################
+def writeAndGetResultSIM908(dataToWrite):
+    return checkIfOK(writeAndReadSIM908(dataToWrite))
 ###############################################
 def startGPS():
     print "Starting GPS module"
@@ -71,7 +74,7 @@ def outputDataStringGPS(data):
     return
 ####################################################
 def sendDataThroughPOST(file):
-    
+    writeAndGetResultSIM908
     return
 ######################################################
 
@@ -92,6 +95,10 @@ if ser.isOpen() and len(sys.argv) > 1:
         stopGPS()
     elif command == "GetGPS":
         getCurrentGPSInformation()
+    elif command == "InitIPConfiguration":
+        print "TODO - InitIP"
+    elif command == "SendJSON":
+        print "TODO - JSON"
     else :
         lines = writeAndReadSIM908(command)    
         print "Serial is open! Wrote : " + command

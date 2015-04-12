@@ -24,5 +24,11 @@ mkdir /mnt/card
 mount /dev/mmcblk0p1  /mnt/card
 cp /var/lib/cloud9/Aquarius/uEnv.txt /mnt/card/uEnv.txt
 
+dtc -O dtb -o /var/lib/cloud9/Aquarius/w1-00A0.dtbo -b 0 -@ /var/lib/cloud9/Aquarius/w1.dts
+
+cp /var/lib/cloud9/Aquarius/w1-00A0.dtbo /lib/firmware
+
+echo "To do Add  echo w1 > /sys/devices/bone_capemgr.9/slots rc.local"
+
 echo "Thy shall reboot, for thy need to reseat"
 reboot
