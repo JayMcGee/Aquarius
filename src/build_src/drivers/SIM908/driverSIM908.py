@@ -1,6 +1,14 @@
 import Adafruit_BBIO.UART as UART
+import Adafruit_BBIO.GPIO as GPIO
 import serial
 import sys, getopt
+import time
+from subprocess import check_output
+from subprocess import call
+
+
+simP = "GPIO0_7"
+
 
 UART.setup("UART1")
 ###############################################
@@ -57,6 +65,21 @@ def getCurrentGPSInformation():
     else:
         print "Could not get GPS location"
     return datas
+############################################### 
+def initDevice():
+    f = open('/sys/class/gpio/export', 'a')
+    f.write("7")
+    f.close()
+    
+    f = open('/sys/class/gpio/gpio7/direction', 'a')
+    f.write("out")
+    f.close()
+    
+    f = open('/sys/class/gpio/gpio7/value', 'a')
+    f.write("0")
+    f.close()
+    
+    return 
 ##############################################
 def outputDataStringGPS(data):
   #  0,							0
@@ -72,17 +95,48 @@ def outputDataStringGPS(data):
     
     print "NAME;SIM908;DATQ;5;SATS;" + str(splitted[6]) + ";LONG;" + str(splitted[1]) + ";LAT;" + str(splitted[2]) + ";ALT;" + str(splitted[3]) + ";TIME;" + str(splitted[4])
     return
+#####################################################
+def checkGPS():
+    print "Checking GPS status"
+    datas = writeAndReadSIM908( "AT+CGPSSTATUS?" )
+    ok = checkIfOK(datas)
+    if ok == 1:
+        print "GPS module started succesfully"
+    else:
+        print "GPS module could not be started"
+        return ok
+        
+    datas = writeAndReadSIM908( "AT+CGPSRST=1" )
+    ok = checkIfOK(datas)
+    if ok == 1:
+        print "GPS resetted succesfully"
+    else :
+        print "GPS could not be resetted"
+        
+    return ok
 ####################################################
 def sendDataThroughPOST(file):
     writeAndGetResultSIM908 
     return
 ######################################################
 def powerOff():
-    
+    f = open('/sys/class/gpio/gpio7/value', 'a')
+    f.write("1")
+    f.close()
+    time.sleep(0.7)
+    f = open('/sys/class/gpio/gpio7/value', 'a')
+    f.write("0")
+    f.close()
     return
 ######################################################
 def powerOn():
-    
+    f = open('/sys/class/gpio/gpio7/value', 'a')
+    f.write("1")
+    f.close()
+    time.sleep(1.1)
+    f = open('/sys/class/gpio/gpio7/value', 'a')
+    f.write("0")
+    f.close()
     return
 ######################################################
 
@@ -101,12 +155,20 @@ if ser.isOpen() and len(sys.argv) > 1:
         startGPS()
     elif command == "StopGPS":
         stopGPS()
+    elif command == "CheckGPS":
+        checkGPS()
+    elif command == "PowerOff":
+        powerOff()
+    elif command == "PowerOn":
+        powerOn()
     elif command == "GetGPS":
         getCurrentGPSInformation()
     elif command == "InitIPConfiguration":
         print "TODO - InitIP"
     elif command == "SendJSON":
         print "TODO - JSON"
+    elif command == "initDevice":
+        initDevice()
     else :
         lines = writeAndReadSIM908(command)    
         print "Serial is open! Wrote : " + command

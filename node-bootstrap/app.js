@@ -457,6 +457,8 @@ function createJSONfromDatabase(err, rows, fields) {
         log(JSON.stringify(JSONsession), 3)
         
         var message = JSON.stringify(JSONsession);
+        
+        message = '{"stationmessage":{"datetime":"08:53:12:15:04:2015","stationid":"bra003","eventtype":"regularreading","event":[{"sensorunit":"su0008","data":[{"id":"01","datetime":"57","valuetype":"asis","value":"8.65"}]}]}}'
         console.log (message)
         databaseHelper.sendPost(message, "cloudiaproject.org", "/c/data.json", Finalise)
         

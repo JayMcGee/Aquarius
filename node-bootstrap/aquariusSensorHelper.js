@@ -155,7 +155,7 @@ module.exports = {
         
         var headers = {
           'Content-Type': 'application/json',
-          'Content-Length': jsonInString.length
+          'Content-Length': Buffer.byteLength(jsonInString)
         };
         var options = {
           host: sendAddress,

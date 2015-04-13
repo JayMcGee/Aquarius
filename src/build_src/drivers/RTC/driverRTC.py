@@ -1,5 +1,3 @@
-import sys
-
 import sys, getopt
 from Adafruit_I2C import Adafruit_I2C
 from subprocess import check_output
