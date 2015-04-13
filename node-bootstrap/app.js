@@ -218,7 +218,7 @@ function assignConfigurationValues(err, rows, fields){
             log("Assigned last known date", 3)
             CONFIG_Last_Date = currentValue
         }
-        else if (currentName == "NUMBER_RETRYS") {
+        else if (currentName == "NUMBER_RETRIES") {
             log("Assigned retry attempts", 3)
             CONFIG_Number_Retries = currentValue
         }
@@ -324,7 +324,9 @@ function getSensorReadingCallback(err, rows, fields) {
                 
                 tryCount++
                 log("Try counts :" + tryCount, 2)
-            }while(result.stdout.indexOf("ERROR") > -1 || tryCount <= parseInt(CONFIG_Number_Retries));
+                //console.log("Test result : " + (result.stdout.indexOf("ERROR") > -1))
+                //console.log("Test 2 result : " + (CONFIG_Number_Retries))
+            }while(result.stdout.indexOf("ERROR") > -1 && tryCount <= parseInt(CONFIG_Number_Retries));
 
             splittedStdOutput = result.stdout.split(';')  
             log("Executed : " + splittedStdOutput, 2)
