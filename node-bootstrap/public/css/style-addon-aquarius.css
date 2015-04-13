@@ -1,6 +1,6 @@
 .modeDisplay-Auto {
     color:red;
-	margin-top: 2px;
+	margin-top: 4px;
 	margin-right: 10px;
 	width:100%;
 	border: 0px solid #a7a9aa;
@@ -8,7 +8,7 @@
 }
 .modeDisplay-Man {
     color:#5BE643;
-	margin-top: 2px;
+	margin-top: 4px;
 	margin-right: 10px;
 	width:100%;
 	border: 0px solid #a7a9aa;
@@ -31,6 +31,15 @@
 .box-calibrate{
 	width: 100%;
 	height:200px;
+	float:left;
+	display: none;
+}
+.calibratePh{
+	width: 100%;
+	height:180px;
+	padding : 5px;
+	font-size: 20px;
+	
 	float:left;
 	display: none;
 }
