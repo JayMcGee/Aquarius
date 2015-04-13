@@ -2,7 +2,7 @@
 
 sudo apt-get update
 sudo apt-get install build-essential python-dev python-setuptools python-pip python-smbus -y
-
+sudo apt-get install mysql-server mysql-client -y
 echo "Installing npm packages ..."
 cd /var/lib/cloud9/Aquarius/node-bootstrap
 npm install 

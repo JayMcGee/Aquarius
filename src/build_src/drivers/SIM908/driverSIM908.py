@@ -74,7 +74,7 @@ def outputDataStringGPS(data):
     return
 ####################################################
 def sendDataThroughPOST(file):
-    writeAndGetResultSIM908
+    writeAndGetResultSIM908 
     return
 ######################################################
 
