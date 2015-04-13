@@ -611,13 +611,20 @@ app.get('*', function(req, res) {
 //////////////////////////////////////////////////////////////
 // Manage any Socket.io Event
 
+//On connection to the client send data required to generate interface
+app.io.on('connection', function(socket) {
+    socket.on('ready', function() {
+        log("Requested sensors", 2)
+        databaseHelper.getSensorsAndEmit(connection, socket)
+    })
+})
+
 //On connection to the client send the most recent data from the DB
 //Send  
 app.io.on('connection', function(socket) {
     socket.on('RequestConfig', function() {
         log("Requested configuration", 2)
         databaseHelper.readConfigAndEmit(connection, socket)
-
     })
     socket.on('UpdateConfig', function(data) {
         log("Requested an update to configuration", 2)
@@ -635,41 +642,19 @@ app.io.on('connection', function(socket) {
         var interval = data.interval;
         log("Interval = " + interval, 2)
     });
-    socket.on('updateTemp', function() {
-        var randomnumber = (Math.random() * 41.1)
-        socket.emit('lastTemp', {
-            'value': randomnumber
-        });
-    });
-    socket.on('updatePh', function() {
-        var randomnumber = (Math.random() * 13.99)
-        socket.emit('lastPh', {
-            'value': randomnumber
-        });
-    });
-    socket.on('updateDo', function() {
-        var randomnumber = (Math.random() * 12.99)
-        socket.emit('lastDo', {
-            'value': randomnumber
-        });
-    });
-    socket.on('updateCond', function() {
-        var randomnumber = (Math.random() * 20000)
-        socket.emit('lastCond', {
-            'value': randomnumber
-        });
-    });
-    socket.on('updateStationTemp', function() {
-        var randomnumber = (Math.random() * 41.1)
-        socket.emit('lastStationTemp', {
-            'value': randomnumber
-        });
-    });
-    socket.on('updateStationHum', function() {
-        var randomnumber = (Math.random() * 100)
-        socket.emit('lastStationHum', {
-            'value': randomnumber
-        });
+    socket.on('requestMeasure', function(ID) {
+        var sql = 'SELECT * FROM `t_PhysicalSensor`,`t_VirtualSensor`,`t_Types` WHERE physical_t_type = types_id and virtual_t_physical = physical_id and virtual_id = 3'
+        connection.query(sql, function(err, rows, fields) {
+            if (err) {
+                throw err;
+                log("Could not get sensor for update", 1)
+            }
+            var execPath = rows[0].types_driver
+            
+            socket.emit('updateSensor', {
+                'row': rows
+            })
+        })
     });
 });
 

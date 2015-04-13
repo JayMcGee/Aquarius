@@ -11,6 +11,7 @@
 */
 
 
+
 $( "#btnTemp" ).click(function() {
 	$( "#boxCalibrate" ).switchClass("red blue green orange pinkDark","yellow");
 	$( "#boxCalibrate" ).show("slow","swing");
@@ -24,11 +25,14 @@ $( "#btnTemp" ).click(function() {
 $( "#btnPh" ).click(function() {
 	$( "#boxCalibrate" ).switchClass("yellow blue green orange pinkDark","red");
 	$( "#boxCalibrate" ).show("slow","swing");
+	$( "#caliPh").show("slow","swing");
+	
 	if( $("#boxCalibrate").hasClass("red") )
-		 {
-		 	$( "#boxCalibrate" ).hide("slow","swing");
-		 	$( "#boxCalibrate" ).removeClass("red","slow","swing");
-		 }
+    {
+        $( "#boxCalibrate" ).hide("slow","swing");
+        $( "#boxCalibrate" ).removeClass("red","slow","swing");
+        $( "#caliPh").hide("slow","swing");
+    }
 });
 
 $( "#btnDo" ).click(function() {

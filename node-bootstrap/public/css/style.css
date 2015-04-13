@@ -2524,9 +2524,9 @@ footer {
 .circleStat {	
 	text-align: center;
 	position: relative;
-	padding-top:10%;
+	padding-top:15%;
 	padding-bottom:20%;
-	height: 150px;
+	height: 120px;
 }
 
 .circleStats {	
@@ -2536,7 +2536,6 @@ footer {
 
 .circleStatsItemBox {
 	position: relative;
-	background: #67C2EF;
 	width:100%;
 	height: 100%;
 	padding-top: 30px;
