@@ -248,7 +248,7 @@
 				var circleUnit = entry.MeasureUnit
 				var circleColor = Please.make_color();
 				
-				var circle = '<div class="span2" onTablet="span2" onDesktop="span2" onclick="getMeasure('+ sensorID +')"><div class="circleStatsItemBox" id="itemBox'+position+'"><div class="header">'+ circleName + '</div><div class="circleStat"><input id="'+ circleName +'" type="text" value = "99.1" data-skin="tron" data-readOnly="true" data-step="0.1" data-min="-30" data-max="100" class="whiteCircle"></div><div class="footer">' + circleUnit + '</div></div></div>'
+				var circle = '<div class="span2" onTablet="span2" onDesktop="span2" onclick="getMeasure('+ sensorID +')"><div class="circleStatsItemBox" id="itemBox'+position+'"><div class="header">'+ circleName + '</div><div class="circleStat"><input id="sensor'+ sensorID +'" type="text" value = "99.1" data-skin="tron" data-readOnly="true" data-step="0.1" data-min="-30" data-max="100" class="whiteCircle"></div><div class="footer">' + circleUnit + '</div></div></div>'
 				
 				if(position == 1)
 				{
@@ -288,18 +288,19 @@
         // Listen for the lastTemp event //Set values of tempCircle
         // first update is from Database any update after is directly from 
         // the sensor driver
-        /*
-        io.on('lastTemp',function(data){
-            var valInit = $('#tempCircle').val();
-			$({value: valInit}).animate({value: data.value}, {
+        io.on('updateSensor',function(data){
+        
+            var valInit = $('#sensor' + data.ID).val();
+			$({value: valInit}).animate({value: data.result}, {
 				duration: 500,
 				easing:'swing',
 				step: function()
 				{
-					$('#tempCircle').val(this.value).trigger('change');
+					$('#sensor' + data.ID).val(this.value).trigger('change');
 				}
 			})
         });
+        /*
         io.on('lastPh',function(data){
             var valInit = $('#phCircle').val();
 			$({value: valInit}).animate({value: data.value}, {

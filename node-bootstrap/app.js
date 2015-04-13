@@ -174,7 +174,7 @@ function main(){
     else {  //MANUAL
         exec('python /var/lib/cloud9/Aquarius/exec/set_gpio_del_on.py', function(){})
         log("Manual mode", 2)
-        //readAllSensorsInDataBase(getSensorReadingCallback)
+        readAllSensorsInDataBase(getSensorReadingCallback)
         log("Waiting", 2)
         
         drawSeparator()
@@ -457,12 +457,19 @@ function createJSONfromDatabase(err, rows, fields) {
         log(JSON.stringify(JSONsession), 3)
         
         var message = JSON.stringify(JSONsession);
-        
-        message = '{"stationmessage":{"datetime":"08:53:12:15:04:2015","stationid":"bra003","eventtype":"regularreading","event":[{"sensorunit":"su0008","data":[{"id":"01","datetime":"57","valuetype":"asis","value":"8.65"}]}]}}'
+        //message = '{"stationmessage":{"datetime":"08:53:12:15:04:2015","stationid":"bra003","eventtype":"regularreading","event":[{"sensorunit":"su0008","data":[{"id":"01","datetime":"57","valuetype":"asis","value":"8.65"}]}]}}'
         console.log (message)
-        databaseHelper.sendPost(message, "cloudiaproject.org", "/c/data.json", Finalise)
         
+        databaseHelper.sendPostFile(JSONsession, "https://dweet.io:443/dweet/for/", "Aquarius", Finalise)
         
+        /*var fs = require('fs');
+fs.writeFile("/tmp/test", "Hey there!", function(err) {
+    if(err) {
+        return console.log(err);s
+    }
+
+    console.log("The file was saved!");
+}); */
         writeToWatchDog(fileWatch)
         log("Count of ids : " + ids.length, 2)
         var idToSet = 0
@@ -659,10 +666,12 @@ app.io.on('connection', function(socket) {
             var execPath = rows[0].types_driver
             var physAddress = rows[0].physical_address
             var dataPosition = rows[0].virtual_driver_pos
+            var id = rows[0].virtual_id
             
             result = sh.exec(execPath + " " + physAddress + " R")
             
             console.log(result.stdout)
+            
             if(result.stdout.indexOf("ERROR") > -1 )
             {
                 var measuredValue = "Error"
@@ -671,12 +680,13 @@ app.io.on('connection', function(socket) {
             {
                 var splittedStdOutput = result.stdout.split(';')
                 var measuredValue = splittedStdOutput[dataPosition];
+                
             }
             
             log("Page Web requested sensor : " + sensorId + "  Returning result : " + measuredValue ,1)
-            
             socket.emit('updateSensor', {
-                'result': measuredValue
+                result: measuredValue,
+                ID: sensorId
             })
         })
     });

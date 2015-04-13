@@ -1,7 +1,9 @@
 var mysql = require('mysql');
 var http = require('http');
 var fs = require('fs');
+var requestModule = require('request')
 
+var net = require('net');
 var CONFIG_Verbose_Level = null;
 
 function log(dataToAppend, level)
@@ -188,11 +190,12 @@ module.exports = {
         
         var headers = {
           'Content-Type': 'application/json',
-          'Content-Length': Buffer.byteLength(jsonInString)
+          'Content-Length': jsonInString.length
         };
+        
         var options = {
           host: sendAddress,
-          port: 80,
+          port: 443,
           path: path,
           method: 'POST',
           headers: headers
@@ -216,7 +219,41 @@ module.exports = {
         
         req.write(jsonInString);
         req.end();
+    },
+    
+    sendPostFile : function ( file , sendAddress , path , callback){
+        /*
+        var dweetClient = require("node-dweetio");
+        var dweetio = new dweetClient();
+        
+        dweetio.dweet_for(path,file, function(err, dweet){
+            console.log(dweet.thing); // "my-thing" 
+            console.log(dweet.content); // The content of the dweet 
+            console.log(dweet.created); // The create date of the dweet 
+        });
+        */
+
+        requestModule({
+				url: "https://dweet.io:443/dweet/for/Aquarius",
+				jar: true,
+				method: "POST",
+				followAllRedirects: true,
+				timeout: 5000,
+				strictSSL: true,
+				json: file
+			}, function (err, response, body) {
+				if (!err && response.statusCode === 200) {
+                    console.log(body)
+                }
+                else {
+        
+                    console.log("error: " + err)
+                    console.log("response.statusCode: " + response.statusCode)
+                    console.log("response.statusText: " + response.statusText)
+                }
+			});
     }
+    
     
 };
 
