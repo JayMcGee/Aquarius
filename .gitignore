@@ -217,3 +217,7 @@ pip-log.txt
 
 #Object files
 *.o
+
+log.txt
+node-bootstrap/nulllog.txt
+
