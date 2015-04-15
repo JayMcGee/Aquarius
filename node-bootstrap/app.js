@@ -157,7 +157,7 @@ function main(){
     drawSeparator()
 
     //If current mode is HIGH, enter auto mode. Read all sensors, set RTC to wake up and shutdown
-    if (CONFIG_Operation_Mode == 1) {
+    if (CONFIG_Operation_Mode == 1) { //AUTO 
         fileWatch = watchdog()
         fs.writeSync(fileWatch, "\n")
         exec('python /var/lib/cloud9/Aquarius/exec/set_gpio_del.py', function(){})
@@ -171,10 +171,10 @@ function main(){
         //Reads all sensors in the data base
         readAllSensorsInDataBase(getSensorReadingCallback)
     }
-    else {
+    else {  //MANUAL
         exec('python /var/lib/cloud9/Aquarius/exec/set_gpio_del_on.py', function(){})
         log("Manual mode", 2)
-        readAllSensorsInDataBase(getSensorReadingCallback)
+        //readAllSensorsInDataBase(getSensorReadingCallback)
         log("Waiting", 2)
         
         drawSeparator()
@@ -638,21 +638,43 @@ app.io.on('connection', function(socket) {
 
 //Receive update Command
 app.io.on('connection', function(socket) {
+    
     socket.on('configInterval', function(data) {
         var interval = data.interval;
         log("Interval = " + interval, 2)
     });
+    
+    
     socket.on('requestMeasure', function(ID) {
-        var sql = 'SELECT * FROM `t_PhysicalSensor`,`t_VirtualSensor`,`t_Types` WHERE physical_t_type = types_id and virtual_t_physical = physical_id and virtual_id = 3'
+        var sensorId=ID.ID
+        
+        var sql = 'SELECT * FROM `t_PhysicalSensor`,`t_VirtualSensor`,`t_Types` WHERE physical_t_type = types_id and virtual_t_physical = physical_id and virtual_id ='+ sensorId
         connection.query(sql, function(err, rows, fields) {
             if (err) {
                 throw err;
                 log("Could not get sensor for update", 1)
             }
             var execPath = rows[0].types_driver
+            var physAddress = rows[0].physical_address
+            var dataPosition = rows[0].virtual_driver_pos
+            
+            result = sh.exec(execPath + " " + physAddress + " R")
+            
+            console.log(result.stdout)
+            if(result.stdout.indexOf("ERROR") > -1 )
+            {
+                var measuredValue = "Error"
+            }
+            else
+            {
+                var splittedStdOutput = result.stdout.split(';')
+                var measuredValue = splittedStdOutput[dataPosition];
+            }
+            
+            log("Page Web requested sensor : " + sensorId + "  Returning result : " + measuredValue ,1)
             
             socket.emit('updateSensor', {
-                'row': rows
+                'result': measuredValue
             })
         })
     });
