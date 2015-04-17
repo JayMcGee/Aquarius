@@ -124,6 +124,28 @@ module.exports = {
         return connection.query(sql, callBackToApp)
     },
     
+    getASensor: function(connection,physicalId,callBackToApp){
+        log("Selecting database", 3)
+        connection.query('USE `station_aquarius`;')
+
+        sql = 'SELECT t_VirtualSensor.virtual_id AS VirtualID, ' + 
+                't_Types.types_name AS TypeName, ' + 
+                't_Types.types_driver AS Driver, ' + 
+                't_PhysicalSensor.physical_address AS PhysicalAddress, ' + 
+                't_PhysicalSensor.physical_name AS UnitName, ' + 
+                't_PhysicalSensor.cloudia_unit_id AS CloudiaUnitID, ' + 
+                't_VirtualSensor.cloudia_id AS CloudiaSensorID, ' + 
+                't_VirtualSensor.virtual_measure_unit AS MeasureUnit, ' + 
+                't_VirtualSensor.virtual_driver_pos AS Position ' + 
+                'FROM `t_VirtualSensor`, `t_Types`, `t_PhysicalSensor` ' + 
+                'WHERE t_PhysicalSensor.physical_id = ' + physicalId + ' ' + 
+                'and t_PhysicalSensor.physical_t_type = t_Types.types_id ' +
+                'and t_VirtualSensor.virtual_t_physical = t_PhysicalSensor.physical_id ' + 
+                'ORDER BY t_PhysicalSensor.cloudia_unit_id, t_VirtualSensor.cloudia_id;'
+        log(sql, 3)
+        return connection.query(sql, callBackToApp)  
+    },
+    
     getSensorsAndEmit: function(connection,socket, callBackToApp) {
         log("Selecting database", 3)
         connection.query('USE `station_aquarius`;')
@@ -138,7 +160,8 @@ module.exports = {
                 't_VirtualSensor.virtual_measure_unit AS MeasureUnit, ' + 
                 't_VirtualSensor.virtual_driver_pos AS Position, ' + 
                 't_VirtualSensor.virtual_min AS Min, ' +
-                't_VirtualSensor.virtual_max AS Max ' +
+                't_VirtualSensor.virtual_max AS Max, ' +
+                't_VirtualSensor.virtual_color As Color ' + 
                 'FROM `t_VirtualSensor`, `t_Types`, `t_PhysicalSensor` ' + 
                 'WHERE t_PhysicalSensor.physical_t_type = t_Types.types_id ' + 
                 'and t_VirtualSensor.virtual_t_physical = t_PhysicalSensor.physical_id ' + 
@@ -215,15 +238,20 @@ module.exports = {
     			strictSSL: true,
     			json: file
     		}, function (err, response, body) {
-    			if (!err && response.statusCode === 200) {
-                    console.log(body)
-                }
-                else {
-        
+    		    if(!err)
+    		    {
+        			if (response.statusCode === 200) {
+                        console.log(body)
+                    }
+                    else {
+                        console.log("response.statusCode: " + response.statusCode)
+                        console.log("response.statusText: " + response.statusText)
+                    }
+    		    }
+    		    else {
                     log("error: " + err)
-                    console.log("response.statusCode: " + response.statusCode)
-                    console.log("response.statusText: " + response.statusText)
-                }
+    		    }
+    		    
 		});
     }
     

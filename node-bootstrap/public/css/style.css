@@ -61,9 +61,9 @@
 .progressSlim.green .ui-progressbar-value,
 .label-success,
 .badge-success {
-	background: #8FBE00 !important;
-	border-color: #8FBE00 !important;
-	color: #fff;
+	background: #28903B !important;
+	border-color: #28903B !important;
+	color: #E9E9E9;
 }
 
 .greenDark,
@@ -75,7 +75,7 @@
 .progressSlim.greenDark .ui-progressbar-value {
 	background: #1E7145 !important;
 	border-color: #1E7145 !important;
-	color: #fff;
+	color: #E9E9E9;
 }
 
 .greenLight,
@@ -87,7 +87,7 @@
 .progressSlim.greenLight .ui-progressbar-value {
 	background: #99B433 !important;
 	border-color: #99B433 !important;
-	color: #fff;
+	color: #E9E9E9;
 }
 
 .pink,
@@ -99,7 +99,7 @@
 .progressSlim.pink .ui-progressbar-value {
 	background: #9F00A7 !important;
 	border-color: #9F00A7 !important;
-	color: #fff;
+	color: #E9E9E9;
 }
 
 .pinkDark,
@@ -111,7 +111,7 @@
 .progressSlim.pinkDark .ui-progressbar-value {
 	background: #E84A5F !important;
 	border-color: #E84A5F !important;
-	color: #fff;
+	color: #E9E9E9;
 }
 
 .yellow,
@@ -123,9 +123,9 @@
 .progressSlim.yellow .ui-progressbar-value,
 .label-warning,
 .badge-warning {
-	background: #FF9900 !important;
-	border-color: #FF9900 !important;
-	color: #E9E9E9;
+	background: #F6CB04 !important;
+	border-color: #F6CB04 !important;
+	color: #fff;
 }
 
 .purple,
@@ -211,8 +211,8 @@
 .progressSlim.red .ui-progressbar-value,
 .label-important,
 .badge-important {
-	background: #B90504 !important;
-	border-color: #B90504 !important;
+	background: #ED1C24 !important;
+	border-color: #ED1C24 !important;
 	color: #E9E9E9;
 }
 

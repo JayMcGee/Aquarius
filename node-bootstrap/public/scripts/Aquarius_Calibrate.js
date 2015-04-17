@@ -11,21 +11,14 @@
 */
 
 
-
-$( "#btnTemp" ).click(function() {
-	$( "#boxCalibrate" ).switchClass("red blue green orange pinkDark","yellow");
-	$( "#boxCalibrate" ).show("slow","swing");
-	if( $("#boxCalibrate").hasClass("yellow") )
-		 {
-		 	$( "#boxCalibrate" ).hide("slow","swing");
-		 	$( "#boxCalibrate" ).removeClass("yellow","slow","swing");
-		 }
-});
-
+//////////// INTERFACE
 $( "#btnPh" ).click(function() {
-	$( "#boxCalibrate" ).switchClass("yellow blue green orange pinkDark","red");
+	$( "#boxCalibrate" ).switchClass("yellow  green","red");
 	$( "#boxCalibrate" ).show("slow","swing");
+	
 	$( "#caliPh").show("slow","swing");
+	$( "#caliDo").hide("slow","swing");
+	$( "#caliCond").hide("slow","swing");
 	
 	if( $("#boxCalibrate").hasClass("red") )
     {
@@ -36,40 +29,34 @@ $( "#btnPh" ).click(function() {
 });
 
 $( "#btnDo" ).click(function() {
-	$( "#boxCalibrate" ).switchClass("yellow red green orange pinkDark","blue");
+	$( "#boxCalibrate" ).switchClass("red green","yellow");
 	$( "#boxCalibrate" ).show("slow","swing");
+	
+	$( "#caliDo").show("slow","swing");
+	$( "#caliPh").hide("slow","swing");
+	$( "#caliCond").hide("slow","swing");
+	
 	if( $("#boxCalibrate").hasClass("blue") )
 		 {
 		 	$( "#boxCalibrate" ).hide("slow","swing");
 		 	$( "#boxCalibrate" ).removeClass("blue","slow","swing");
+		 	$( "#caliDo").hide("slow","swing");
 		 }
 });
 
 $( "#btnCond" ).click(function() {
-	$( "#boxCalibrate" ).switchClass("yellow blue red orange pinkDark","green");
+	$( "#boxCalibrate" ).switchClass("yellow red","green");
 	$( "#boxCalibrate" ).show("slow","swing");
+	
+	$( "#caliCond").show("slow","swing");
+	$( "#caliPh").hide("slow","swing");
+	$( "#caliDo").hide("slow","swing");
+	
 	if( $("#boxCalibrate").hasClass("green") )
 		 {
 		 	$( "#boxCalibrate" ).hide("slow","swing");
 		 	$( "#boxCalibrate" ).removeClass("green","slow","swing");
+		 	$( "#caliCond").hide("slow","swing");
 		 }
 });
 
-$( "#btnSTemp" ).click(function() {
-	$( "#boxCalibrate" ).switchClass("yellow blue green red pinkDark","orange");
-	$( "#boxCalibrate" ).show("slow","swing");
-	if( $("#boxCalibrate").hasClass("orange") )
-		 {
-		 	$( "#boxCalibrate" ).hide("slow","swing");
-		 	$( "#boxCalibrate" ).removeClass("orange","slow","swing");
-		 }
-});
-$( "#btnSHum" ).click(function() {
-	$( "#boxCalibrate" ).switchClass("yellow blue green orange red","pinkDark");
-	$( "#boxCalibrate" ).show("slow","swing");
-	if( $("#boxCalibrate").hasClass("pinkDark") )
-		 {
-		 	$( "#boxCalibrate" ).hide("slow","swing");
-		 	$( "#boxCalibrate" ).removeClass("pinkDark","slow","swing");
-		 }
-});

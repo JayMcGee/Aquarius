@@ -41,7 +41,6 @@ var _2SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw2.py"
 var _3SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw3.py"
 var _4SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw4.py"
 
-var test_val = 1;
 
 var fileWatch = null
 
@@ -482,15 +481,6 @@ function Finalise()
  {
     if (CONFIG_Operation_Mode == 1) {
         
-        
-        var delay=(60000 * 5);//1 seconds
-        setTimeout(function(){
-            s(getSensorReadingCallback)
-        //your code to be executed after 1 seconds
-        },delay); 
-        
-        
-        /*
         var date = new Date()
 
         //Creates a date with added minutes from the interval configuration
@@ -507,7 +497,6 @@ function Finalise()
         var rtcSetAlarm = sh.exec(rtcExecPath + " enablealarm")
         drawSeparator()
 
-        test_val = 0
         //Prepare Data for server ( Format to Json )
         //Execute a shutdown
         writeToWatchDog(fileWatch)
@@ -518,8 +507,6 @@ function Finalise()
                 var shutdown = sh.exec("shutdown -h now")
             }, 1000)
         }, 2000)
-        */
-        
     }
     else {
            //Prepare Data for server ( Format to Json )
@@ -653,6 +640,16 @@ app.io.on('connection', function(socket) {
                 ID: sensorId
             })
         })
+    });
+});
+
+//Receive Calibrate command
+app.io.on('connection', function(socket) {
+    socket.on('calibration', function(data) {
+        log("Starting Calibration",1)
+        databaseHelper.getASensor(connection,data.Id,function(err,rows,fields){
+            log(rows[0].Driver,1)
+        }) 
     });
 });
 

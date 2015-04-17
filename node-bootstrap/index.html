@@ -86,35 +86,67 @@
 					</div>
 					<div class="box-content buttons">
 						<p>
-							<button class="btn btn-calibrate yellow " id="btnTemp">Temperature</button>
 							<button class="btn btn-calibrate red" id="btnPh">pH</button>
-							<button class="btn btn-calibrate blue" id="btnDo">Dissolved Oxygen</button>
+							<button class="btn btn-calibrate yellow" id="btnDo">Dissolved Oxygen</button>
 							<button class="btn btn-calibrate green"	id="btnCond">Conductivity</button>
-							<button class="btn btn-calibrate orange"	id="btnSTemp" >Station Temperature</button>
-							<button class="btn btn-calibrate pinkDark"	id="btnSHum">Station Humidity</button>
-						<div class="box box-calibrate" id="boxCalibrate">
-							<div class="calibratePh" id="caliPh"> 
-								<div class="row-fluid">
-									<div class="span8"> First : Place the probe in a solution of pH 7 </div>
+						</p>	
+						
+						<div class="box box-calibrate ph" id="boxCalibrate">
+						
+							<div class="calibrate" id="caliPh"> 
+								<div class="row-fluid calibrate-row">
+									<div class="span8"> Place the probe in a solution of pH 7 </div>
 									<div class = "span2"> </div>
-									<div class = "span2"> <button id="midPointBtn" class="btn btn-primary"> Neutral pH </button></div>
+									<div class = "span2"> <button id="midPointBtn_ph" class="btn btn-primary"> Neutral pH </button></div>
 								</div>
 								
-								<div class="row-fluid">
-									<div class="span8"> Second : Place the probe in a solution of pH 6 or lower </div>
-									<div class = "span2">  <input id="lowPoint" class="span4" value="4">pH </div>
-									<div class = "span2">  <button id="lowPointBtn" class="btn btn-primary" disabled="disabled" > Low Point </button> </div>
+								<div class="row-fluid calibrate-row">
+									<div class="span8"> Place the probe in a solution of pH 6 or lower </div>
+									<div class = "span2">  <input id="lowPoint_ph" class="span4" value="4">pH </div>
+									<div class = "span2">  <button id="lowPointBtn_ph" class="btn btn-primary" disabled="disabled" > Low Point </button> </div>
 								</div>
 								
-								<div class="row-fluid">
-									<div class="span8"> Third : Place the probe in a solution of pH 8 or higher </div>
-									<div class = "span2">  <input id="highPoint" class="span4" value="10">pH </div>
-									<div class = "span2"> <button id= "highPointBtn" class="btn btn-primary" disabled="disabled" > High point </button> </div>
+								<div class="row-fluid calibrate-row">
+									<div class="span8"> Place the probe in a solution of pH 8 or higher </div>
+									<div class = "span2">  <input id="highPoint_ph" class="span4" value="10">pH </div>
+									<div class = "span2"> <button id= "highPointBtn_ph" class="btn btn-primary" disabled="disabled" > High point </button> </div>
+								</div>
+							</div>
+							
+							<div class="calibrate" id="caliCond"> 
+								<div class="row-fluid calibrate-row">
+									<div class="span8"> Make sure the probe is dry  </div>
+									<div class = "span2"> </div>
+									<div class = "span2"> <button id="dryPointBtn_cond" class="btn btn-primary"> Dry </button></div>
+								</div>
+								
+								<div class="row-fluid calibrate-row">
+									<div class="span8"> Place the probe in a low conductivity solution </div>
+									<div class = "span2">  <input id="lowPoint_cond" class="span4" value="">uS </div>
+									<div class = "span2">  <button id="lowPointBtn_cond" class="btn btn-primary" disabled="disabled" > Low Point </button> </div>
+								</div>
+								
+								<div class="row-fluid calibrate-row">
+									<div class="span8"> Place the probe in a high conductivity solution </div>
+									<div class = "span2">  <input id="highPoint_cond" class="span4" value="">uS </div>
+									<div class = "span2"> <button id= "highPointBtn_cond" class="btn btn-primary" disabled="disabled" > High point </button> </div>
+								</div>
+							</div>
+							
+							<div class="calibrate" id="caliDo"> 
+								<div class="row-fluid calibrate-row">
+									<div class="span8"> Place probe in ambient air </div>
+									<div class = "span2"> </div>
+									<div class = "span2"> <button id="ambientBtn_do" class="btn btn-primary"> Ambient </button></div>
+								</div>
+								
+								<div class="row-fluid calibrate-row">
+									<div class="span8"> Place the probe in a zero oxygen solution </div>
+									<div class = "span2"> </div>
+									<div class = "span2">  <button id="zeroBtn_do" class="btn btn-primary" disabled="disabled" > Zero Oxygen </button> </div>
 								</div>
 							</div>
 						</div>
-							
-						</p>
 					</div>
 			</div><!--/row-->
 
@@ -229,15 +261,52 @@
         io = io.connect();
         // Emit ready event.
         io.emit('ready');
-        var interval = 2000; //initiate interval timer
-        
 
+		/////// Ph Calibrate
+		$("#midPointBtn_ph").click(function(){
+			sendCalibrationEmit(1,"Mid")
+		})
+		$("#lowPointBtn_ph").click(function(){
+			sendCalibrationEmit(1,"Low", $("#lowPoint_ph").value )
+		})
+		$("#highPointBtn_ph").click(function(){
+			sendCalibrationEmit(1,"High",$("#highPoint_ph").value)
+		})
 		
-		$( "#midPointBtn").click(function()
+		/////// Do Calibrate
+		$("#ambientBtn_do").click(function(){
+			sendCalibrationEmit(4,"Ambient")
+		})
+		$("#zeroBtn_do").click(function(){
+			sendCalibrationEmit(4,"Zero")
+		})
+		
+		/////// Cond Calibrate
+		$("#dryPointBtn_cond").click(function(){
+			sendCalibrationEmit(5,"Dry")
+		})
+		$("#lowPointBtn_cond").click(function(){
+			sendCalibrationEmit(5,"Low", $("#lowPoint_cond").value )
+		})
+		$("#highPointBtn_cond").click(function(){
+			sendCalibrationEmit(5,"High",$("#highPoint_cond").value)
+		})
+		
+		function sendCalibrationEmit(id,point,value)
 		{
-		    io.emit('calibratePhMidpoint');
-		});
+			if( value == null){
+				io.emit('calibration',{Id:id, Point:point, Value:value})
+			}
+			else{
+				io.emit('calibration',{Id:id, Point:point})
+			}
+			
+		}
+	
 		
+        ////////////////////////////////////////////////////////////////////////
+        // ReceiveSensors contains an array representing all the 
+        // sensors and their properties
 		io.on('ReceiveSensors',function(data){
 			var position = 1;
 			
@@ -246,9 +315,11 @@
 				var sensorID = entry.VirtualID
 				var circleName = entry.UnitName
 				var circleUnit = entry.MeasureUnit
-				var circleColor = Please.make_color();
+				var circleMax = entry.Max
+				var circleMin = entry.Min
+				var circleColor = entry.Color
 				
-				var circle = '<div class="span2" onTablet="span2" onDesktop="span2" onclick="getMeasure('+ sensorID +')"><div class="circleStatsItemBox" id="itemBox'+position+'"><div class="header">'+ circleName + '</div><div class="circleStat"><input id="sensor'+ sensorID +'" type="text" value = "99.1" data-skin="tron" data-readOnly="true" data-step="0.1" data-min="-30" data-max="100" class="whiteCircle"></div><div class="footer">' + circleUnit + '</div></div></div>'
+				var circle = '<div class="span2" onTablet="span2" onDesktop="span2" onclick="getMeasure('+ sensorID +')"><div class="circleStatsItemBox" id="itemBox'+position+'"><div class="header">'+ circleName + '</div><div class="circleStat"><input id="sensor'+ sensorID +'" type="text" value = "" data-skin="tron" data-readOnly="true" data-step="0.1" data-min="'+ circleMin +'" data-max="'+ circleMax +'" class="whiteCircle"></div><div class="footer">' + circleUnit + '</div></div></div>'
 				
 				if(position == 1)
 				{
@@ -280,14 +351,15 @@
 			circle()
 		})
 		
+		
+        ////////////////////////////////////////////////////////////////////////
+        // When user click on a dataCircle it sends a request to the server
 		function getMeasure(sensorID){
 			io.emit('requestMeasure', { ID : sensorID })
 		}
-		
         ////////////////////////////////////////////////////////////////////////
-        // Listen for the lastTemp event //Set values of tempCircle
-        // first update is from Database any update after is directly from 
-        // the sensor driver
+        // This is where we process the answer from the server
+        // Update the circle value 
         io.on('updateSensor',function(data){
         
         	var measure = parseFloat(data.result);
@@ -301,90 +373,7 @@
 				}
 			})
         });
-        /*
-        io.on('lastPh',function(data){
-            var valInit = $('#phCircle').val();
-			$({value: valInit}).animate({value: data.value}, {
-				duration: 500,
-				easing:'swing',
-				step: function()
-				{
-					$('#phCircle').val(this.value).trigger('change');
-				}
-			})
-        });
-        io.on('lastDo',function(data){
-            var valInit = $('#doCircle').val();
-			$({value: valInit}).animate({value: data.value}, {
-				duration: 500,
-				easing:'swing',
-				step: function()
-				{
-					$('#doCircle').val(this.value).trigger('change');
-				}
-			})
-        });
-        io.on('lastCond',function(data){
-            var valInit = $('#condCircle').val();
-			$({value: valInit}).animate({value: data.value}, {
-				duration: 500,
-				easing:'swing',
-				step: function()
-				{
-					$('#condCircle').val(this.value).trigger('change');
-				}
-			})
-        });
-        io.on('lastStationTemp',function(data){
-            var valInit = $('#stationTempCircle').val();
-			$({value: valInit}).animate({value: data.value}, {
-				duration: 500,
-				easing:'swing',
-				step: function()
-				{
-					$('#stationTempCircle').val(this.value).trigger('change');
-				}
-			})
-        });
-        io.on('lastStationHum',function(data){
-            var valInit = $('#stationHumCircle').val();
-			$({value: valInit}).animate({value: data.value}, {
-				duration: 500,
-				easing:'swing',
-				step: function()
-				{
-					$('#stationHumCircle').val(this.value).trigger('change');
-				}
-			})
-        });
-        */
 
-        ////////////////////////////////////////////////////////////////////////
-        // Sends request for new data from sensors
-        // every half seconds
-        
-        //Save interval Settings
-        $('#InfroTextSubmit').click(function(){
-            if ($('#title').val()==="") {
-              // invalid
-              $('#title').next('.help-inline').show();
-              return false;
-            }
-            else {
-              // submit the form here
-              // $('#InfroText').submit
-              return true;
-            }
-        });
-
-        setInterval(function () {
-            io.emit('updateTemp');
-            io.emit('updatePh');
-            io.emit('updateDo');
-            io.emit('updateCond');
-            io.emit('updateStationTemp');
-            io.emit('updateStationHum');
-        }, interval);
     </script> 
     
 </body>
