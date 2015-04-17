@@ -294,7 +294,7 @@ module.exports = {
         }
     },
     
-    GPSOnBootCheckUp : function (){
+    StopSim908 : function (){
         var driver = "python /var/lib/cloud9/Aquarius/exec/driverSIM908.py ";
         var initDevice = sh.exec(driver + "initDevice");
         var tries = 0;
@@ -335,7 +335,7 @@ module.exports = {
         
     },
     
-    BootUpAndSetUpSIM908 : function(){
+    StartSIM908 : function(){
         var driver = "python /var/lib/cloud9/Aquarius/exec/driverSIM908.py ";
         var initDevice = sh.exec(driver + "initDevice");
         var tries = 0;

@@ -73,6 +73,8 @@ var CONFIG_dont_reboot = 1;
 var Sensors_Count = null
 var Sensors_Done = null
 
+
+databaseHelper.StopSIM908();
 //////////////////////////////////////////////////////////
 //Establishing connection to Station database (local DB)    
 var connection = mysql.createConnection({
@@ -109,6 +111,7 @@ function main(){
 
     CONFIG_Log_File_Directory = '/var/lib/cloud9/Aquarius/';
     
+    databaseHelper.StartSIM908();
     databaseHelper.StartGPS();
 
     updateDates();
@@ -365,8 +368,15 @@ function getSensorReadingCallback(err, rows, fields) {
             do{
                 if (CONFIG_Temperature_Compensation !== null)
                 {
-                    result = sh.exec(Driver + " " + Address + " R:-t:" + CONFIG_Temperature_Compensation)
-                    log(Driver + " " + Address + " R:-t:" + CONFIG_Temperature_Compensation, 3)
+                    var execution;
+                    if(Driver.indexOf("AtlasI2C") > -1){
+                        execution= Driver + " " + Address + " R:-t:" + CONFIG_Temperature_Compensation;
+                    }
+                    else{
+                        execution = Driver + " " + Address + " R";
+                    }
+                    result = sh.exec(execution);
+                    log(execution);
                 }
                 else
                 {
@@ -406,7 +416,7 @@ function getSensorReadingCallback(err, rows, fields) {
                 }
             }
 
-            databaseHelper.StopGPS();
+            
         }
     }
 }
@@ -448,6 +458,10 @@ function drawSeparator() {
 
 function finishedReadingSensors() {
     writeToWatchDog(fileWatch)
+    
+    databaseHelper.StopGPS();
+    databaseHelper.StopSIM908();
+    
     readDataFromSensorsNotSent(createJSONfromDatabase)
 }
 
@@ -574,10 +588,9 @@ function createJSONfromDatabase(err, rows, fields) {
                 else{
                     log("Could not create ppp connection", 2);
                     Finalise();
-            }}, 10000);
+                }
+            }, 10000);
         }
-        
-        
     }
 }
 
@@ -650,22 +663,6 @@ function writeToWatchDog(fd){
         fs.writeSync(fd, "\n")
         log("write to watchdog", 1)
     }
-}
-
-//Send from database Functions
-function sendTempFromDB(rowCount, socket) {
-
-    log("DEPRECATED", 1)
-
-    connection.query('SELECT date AS DateReading, water_temp AS TempWater FROM `sensorData` ORDER BY date DESC LIMIT 10;',
-
-    function(err, rows, fields) {
-        if (err) throw err;
-        //send temperature reading out to connected clients
-        socket.emit('tempData', {
-            'array': rows
-        });
-    });
 }
 
 /**
