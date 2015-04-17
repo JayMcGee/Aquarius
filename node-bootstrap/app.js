@@ -82,6 +82,8 @@ var CONFIG_Sensor_unit = null;
 //Temperature compensation device address
 var CONFIG_Temperature_Compensation = null;
 
+var CONFIG_dont_reboot = 1;
+
 var Sensors_Count = null
 var Sensors_Done = null
 
@@ -247,8 +249,18 @@ function assignConfigurationValues(err, rows, fields){
         CONFIG_Operation_Mode = 0
         log("Operation mode is  : MANUAL", 2)
     }
-    //setInterval( main() , (60000*5) );
-   main()
+    
+    if( CONFIG_dont_reboot && CONFIG_Operation_Mode){
+        if(CONFIG_Interval !== null)
+            setInterval( main() , (60000*CONFIG_Interval) )
+        else
+            setInterval( main() , (60000 * 5) )
+    }
+    else{
+        main()
+    }
+    
+   
 }
 
 
@@ -457,14 +469,7 @@ function createJSONfromDatabase(err, rows, fields) {
         
         databaseHelper.sendPostFile(JSONsession, "https://dweet.io:443/dweet/for/", "Aquarius", Finalise)
         databaseHelper.sendPost(message, Finalise)
-        /*var fs = require('fs');
-fs.writeFile("/tmp/test", "Hey there!", function(err) {
-    if(err) {
-        return console.log(err);s
-    }
-
-    console.log("The file was saved!");
-}); */
+        
         writeToWatchDog(fileWatch)
         log("Count of ids : " + ids.length, 2)
         var idToSet = 0
@@ -479,36 +484,7 @@ fs.writeFile("/tmp/test", "Hey there!", function(err) {
                 }
             })
         }
-        /*
-        pubnub.publish({ 
-            channel   : 'Aquarius',
-            message   : message,
-            callback  : function(e) {
-                writeToWatchDog(fileWatch)
-                log( "SUCCESS!", 2 )
-                log("COunt of ids : " + ids.length, 2)
-                var idToSet = 0
-                for(var s = 0; s < ids.length; s++)
-                {
-                    databaseHelper.setDataAsSent(connection, ids[s], function(err, result){
-                        log("Set as sent : " + result, 2)
-                        idToSet++
-                        if(idToSet >= ids.length)
-                        {
-                            //Finalise()
-                        }
-                    })
-                }
-            },
-            error     : function(e) {
-                writeToWatchDog(fileWatch)
-                log( "FAILED! RETRY PUBLISH!", 2 ); 
-                // Finalise()
-            }
-        });
-           */ 
     }
-    
 }
 
 
