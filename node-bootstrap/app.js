@@ -30,21 +30,6 @@ var schedule = require('node-schedule'); //In application schedule creator
 var fs = require('fs');
 var sh = require('execSync'); //Permits the execution of external applications synchronously
 
-var pubnub = require("pubnub")({
-    ssl           : true,  // <- enable TLS Tunneling over TCP 
-    publish_key   : "pub-c-abfe0a2b-859f-4c0a-a513-03568a39e142",
-    subscribe_key : "sub-c-9e6a1140-d4a9-11e4-8323-02ee2ddab7fe"
-});
-
-pubnub.subscribe({
-    channel  : "my_channel",
-    callback : function(message) {
-        console.log( " > ", message );
-    }
-});
- 
-
-
 var databaseHelper = require('./aquariusSensorHelper') //External file that helps the connection and querying to the database
 
 //Execution path for the RTC driver and Switches and Watchdog feeder
@@ -468,7 +453,7 @@ function createJSONfromDatabase(err, rows, fields) {
         console.log (message)
         
         databaseHelper.sendPostFile(JSONsession, "https://dweet.io:443/dweet/for/", "Aquarius", Finalise)
-        databaseHelper.sendPost(message, Finalise)
+        databaseHelper.sendPost(message, CONFIG_Cloudia_Address, Finalise)
         
         writeToWatchDog(fileWatch)
         log("Count of ids : " + ids.length, 2)
@@ -500,7 +485,7 @@ function Finalise()
         
         var delay=(60000 * 5);//1 seconds
         setTimeout(function(){
-            readAllSensorsInDataBase(getSensorReadingCallback)
+            s(getSensorReadingCallback)
         //your code to be executed after 1 seconds
         },delay); 
         
