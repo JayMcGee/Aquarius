@@ -1,0 +1,143 @@
+commit 9af2872a42831d4106106e95eed108459743d4e4
+Author: Colin Foe-Parker <colin.foeparker@logicpd.com>
+Date:   Sun Jul 8 15:42:07 2012 -0400
+
+    AM335X TPS65217 Poweroff
+    
+        Configured the AM335x to toggle the PWR_EN line on the TPS65217 to
+        turn off the power to the Beaglebone on poweroff.  The Beaglebone
+        will turn back on when the PWR_BUT signal transitions low.
+    
+    Signed-off-by: Colin Foe-Parker <colin.foeparker@logicpd.com>
+
+diff --git a/arch/arm/mach-omap2/board-am335xevm.c b/arch/arm/mach-omap2/board-am335xevm.c
+index 7fd611f..990a314 100644
+--- a/arch/arm/mach-omap2/board-am335xevm.c
++++ b/arch/arm/mach-omap2/board-am335xevm.c
+@@ -30,6 +30,7 @@
+ #include <linux/mtd/partitions.h>
+ #include <linux/platform_device.h>
+ #include <linux/clk.h>
++#include <linux/rtc.h>
+ #include <linux/err.h>
+ #include <linux/wl12xx.h>
+ #include <linux/ethtool.h>
+@@ -38,6 +39,7 @@
+ #include <linux/pwm_backlight.h>
+ #include <linux/reboot.h>
+ #include <linux/pwm/pwm.h>
++#include <linux/bcd.h>
+ #include <linux/opp.h>
+ #include <linux/w1-gpio.h>
+ #include <linux/can/platform/mcp251x.h>
+@@ -3096,6 +3098,15 @@ static void tps65217_init(int evm_id, int profile)
+ 		opp_disable(mpu_dev, 600000000);
+ 		opp_disable(mpu_dev, 720000000);
+ 	}
++
++	/* Set the PMIC to shutdown on PWR_EN toggle */
++	ret = tps65217_set_bits(tps, TPS65217_REG_STATUS, TPS65217_STATUS_OFF,
++		 TPS65217_STATUS_OFF, TPS65217_PROTECT_NONE);
++	if (ret) {
++		pr_err("failed to write tps65217 status reg\n");
++		return;
++	}
++
+ }
+ 
+ static void mmc0_no_cd_init(int evm_id, int profile)
+@@ -3692,6 +3703,85 @@ static struct platform_device am335x_rtc_device = {
+ 	.resource	= am335x_rtc_resources,
+ };
+ 
++
++#define OMAP_RTC_TIME_SEC_REG		0x00
++#define OMAP_RTC_TIME_MIN_REG		0x04
++#define OMAP_RTC_TIME_HOUR_REG		0x08
++#define OMAP_RTC_TIME_DAY_REG		0x0c
++#define OMAP_RTC_TIME_MON_REG		0x10
++#define OMAP_RTC_TIME_YEAR_REG		0x14
++
++#define OMAP_RTC_STATUS_REG		0x44
++#define OMAP_RTC_STATUS_BUSY_EN		BIT(0)
++
++#define OMAP_RTC_INTERRUPT_REG		0x48
++#define OMAP_RTC_INT_ALM2_EN		BIT(4)
++
++#define OMAP_RTC_ALARM2_SEC_REG		0x80
++#define OMAP_RTC_ALARM2_MIN_REG		0x84
++#define OMAP_RTC_ALARM2_HOUR_REG	0x88
++#define OMAP_RTC_ALARM2_DAY_REG		0x8c
++#define OMAP_RTC_ALARM2_MON_REG		0x90
++#define OMAP_RTC_ALARM2_YEAR_REG	0x94
++
++#define OMAP_RTC_PMIC_REG		0x98
++#define OMAP_RTC_PWR_EN_EN		BIT(16)
++
++void am335x_rtc_poweroff(void)
++{
++	void __iomem *base;
++	int reg_val;
++	struct rtc_time tm;
++
++	base = ioremap(AM33XX_RTC_BASE, SZ_4K);
++
++	if (WARN_ON(!base))
++		return;
++
++	/* Set the Power Enable PMIC*/
++	reg_val = readl(base +  OMAP_RTC_PMIC_REG);
++	writel(reg_val | OMAP_RTC_PWR_EN_EN, base + OMAP_RTC_PMIC_REG);
++
++	/* Rather than play the roll over game, just wait an extra second */
++	do {
++		/* Wait unit the busy bit is cleared.  Max 15 uS */
++		while(readl(base + OMAP_RTC_STATUS_REG) & OMAP_RTC_STATUS_BUSY_EN) {
++		}
++
++		/* Read the current time, convert from binary */
++		tm.tm_sec = bcd2bin(readb(base + OMAP_RTC_TIME_SEC_REG));
++		tm.tm_min = bcd2bin(readb(base + OMAP_RTC_TIME_MIN_REG));
++		tm.tm_hour = bcd2bin(readb(base + OMAP_RTC_TIME_HOUR_REG));
++		tm.tm_mday = bcd2bin(readb(base + OMAP_RTC_TIME_DAY_REG));
++		tm.tm_mon = bcd2bin(readb(base + OMAP_RTC_TIME_MON_REG));
++		tm.tm_year = bcd2bin(readb(base + OMAP_RTC_TIME_YEAR_REG));
++
++		if (59 == tm.tm_sec) {
++			mdelay(100);
++		}
++
++	} while (59 == tm.tm_sec);
++
++	tm.tm_sec++;
++
++	/* Write the Alarm 2 Register with the shutdown time */
++	writeb(bin2bcd(tm.tm_sec), base + OMAP_RTC_ALARM2_SEC_REG);
++	writeb(bin2bcd(tm.tm_min), base + OMAP_RTC_ALARM2_MIN_REG);
++	writeb(bin2bcd(tm.tm_hour), base + OMAP_RTC_ALARM2_HOUR_REG);
++	writeb(bin2bcd(tm.tm_mday), base + OMAP_RTC_ALARM2_DAY_REG);
++	writeb(bin2bcd(tm.tm_mon), base + OMAP_RTC_ALARM2_MON_REG);
++	writeb(bin2bcd(tm.tm_year), base + OMAP_RTC_ALARM2_YEAR_REG);
++
++	/* Enable the Alarm 2 Interrupt */
++	reg_val = readl(base +  OMAP_RTC_INTERRUPT_REG);
++	writel(reg_val | OMAP_RTC_INT_ALM2_EN, base + OMAP_RTC_INTERRUPT_REG);
++
++	iounmap(base);
++
++	/* Power is being pulled */
++	while(1);
++}
++
+ static int am335x_rtc_init(void)
+ {
+ 	void __iomem *base;
+@@ -3727,6 +3817,8 @@ static int am335x_rtc_init(void)
+ 
+ 	iounmap(base);
+ 
++	pm_power_off = am335x_rtc_poweroff;
++
+ 	return  platform_device_register(&am335x_rtc_device);
+ }
+ 
