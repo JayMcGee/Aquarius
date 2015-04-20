@@ -187,7 +187,7 @@ module.exports = {
         return connection.query(sql, callback)
     },
     
-    sendPost : function ( jsonInString, callback ){
+    sendPost : function ( jsonInString, address, callback ){
         
         var fs = require('fs');
         
@@ -195,102 +195,36 @@ module.exports = {
             if(err) {
                 return console.log(err);
             }
-        
-            console.log("The file was saved!");
+            log("The file was saved!", 4);
             
-            var execution = sh.exec("curl --data @/var/lib/cloud9/Aquarius/data.json http://cloudiaproject.org/data.php").stdout
+            var execution = sh.exec("curl --data @/var/lib/cloud9/Aquarius/data.json " + address).stdout
             
             console.log(execution)
             callback()
-        }); 
-        
-        
-        /*
-        requestModule.post('http://service.com/upload', jsonInString)
-        callback()*//*({
-				url: "http://cloudiaproject.org/data.php",
-				jar: true,
-				method: "POST",
-				followAllRedirects: true,
-				timeout: 5000,
-				json: jsonInString
-			}, function (err, response, body) {
-				if (!err && response.statusCode === 200) {
-                    console.log(body)
-                }
-                else {
-        
-                    console.log("error: " + err)
-                    console.log("response.statusCode: " + response.statusCode)
-                    console.log("response.statusText: " + response.statusText)
-                }
-			});*/
-        /*
-        var headers = {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Content-Length': jsonInString.length
-        };
-        
-        var options = {
-          host: 'http://cloudiaproject.org',
-          port: 80,
-          path: '/data.php',
-          method: 'POST',
-          headers: headers
-        };
-        
-        // Setup the request.  The options parameter is
-        // the object we defined above.
-        var req = http.request(options, function(res) {
-          console.log('STATUS: ' + res.statusCode);
-          console.log('HEADERS: ' + JSON.stringify(res.headers));
-          res.setEncoding('utf8');
-          res.on('data', function (chunk) {
-            console.log('BODY: ' + chunk);
-          });
         });
-        
-        req.on('error', function(e) {
-          console.log("Error on send ")
-          callback()
-        });
-        
-        req.write("data=" + jsonInString );
-        req.end();
-        */
     },
     
     sendPostFile : function ( file , sendAddress , path , callback){
-        /*
-        var dweetClient = require("node-dweetio");
-        var dweetio = new dweetClient();
-        
-        dweetio.dweet_for(path,file, function(err, dweet){
-            console.log(dweet.thing); // "my-thing" 
-            console.log(dweet.content); // The content of the dweet 
-            console.log(dweet.created); // The create date of the dweet 
-        });
-        */
 
         requestModule({
-				url: "https://dweet.io:443/dweet/for/Aquarius",
-				jar: true,
-				method: "POST",
-				followAllRedirects: true,
-				timeout: 5000,
-				strictSSL: true,
-				json: file
-			}, function (err, response, body) {
-				if (!err && response.statusCode === 200) {
+    			url: "https://dweet.io:443/dweet/for/Aquarius",
+    			jar: true,
+    			method: "POST",
+    			followAllRedirects: true,
+    			timeout: 5000,
+    			strictSSL: true,
+    			json: file
+    		}, function (err, response, body) {
+    			if (!err && response.statusCode === 200) {
                     console.log(body)
                 }
                 else {
         
-                    console.log("error: " + err)
+                    log("error: " + err)
                     console.log("response.statusCode: " + response.statusCode)
                     console.log("response.statusText: " + response.statusText)
                 }
-			});
+		});
     }
     
     
