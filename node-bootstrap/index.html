@@ -290,8 +290,9 @@
         // the sensor driver
         io.on('updateSensor',function(data){
         
+        	var measure = parseFloat(data.result);
             var valInit = $('#sensor' + data.ID).val();
-			$({value: valInit}).animate({value: data.result}, {
+			$({value: valInit}).animate({value:measure}, {
 				duration: 500,
 				easing:'swing',
 				step: function()

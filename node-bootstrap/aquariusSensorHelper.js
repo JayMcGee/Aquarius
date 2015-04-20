@@ -1,6 +1,7 @@
 var mysql = require('mysql');
 var http = require('http');
 var fs = require('fs');
+var sh = require('execSync'); //Permits the execution of external applications synchronously
 var requestModule = require('request')
 
 var net = require('net');
@@ -186,17 +187,54 @@ module.exports = {
         return connection.query(sql, callback)
     },
     
-    sendPost : function ( jsonInString , sendAddress , path , callback){
+    sendPost : function ( jsonInString, callback ){
         
+        var fs = require('fs');
+        
+        fs.writeFile("/var/lib/cloud9/Aquarius/data.json", "data=" + jsonInString, function(err) {
+            if(err) {
+                return console.log(err);
+            }
+        
+            console.log("The file was saved!");
+            
+            var execution = sh.exec("curl --data @/var/lib/cloud9/Aquarius/data.json http://cloudiaproject.org/data.php").stdout
+            
+            console.log(execution)
+            callback()
+        }); 
+        
+        
+        /*
+        requestModule.post('http://service.com/upload', jsonInString)
+        callback()*//*({
+				url: "http://cloudiaproject.org/data.php",
+				jar: true,
+				method: "POST",
+				followAllRedirects: true,
+				timeout: 5000,
+				json: jsonInString
+			}, function (err, response, body) {
+				if (!err && response.statusCode === 200) {
+                    console.log(body)
+                }
+                else {
+        
+                    console.log("error: " + err)
+                    console.log("response.statusCode: " + response.statusCode)
+                    console.log("response.statusText: " + response.statusText)
+                }
+			});*/
+        /*
         var headers = {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/x-www-form-urlencoded',
           'Content-Length': jsonInString.length
         };
         
         var options = {
-          host: sendAddress,
-          port: 443,
-          path: path,
+          host: 'http://cloudiaproject.org',
+          port: 80,
+          path: '/data.php',
           method: 'POST',
           headers: headers
         };
@@ -217,8 +255,9 @@ module.exports = {
           callback()
         });
         
-        req.write(jsonInString);
+        req.write("data=" + jsonInString );
         req.end();
+        */
     },
     
     sendPostFile : function ( file , sendAddress , path , callback){

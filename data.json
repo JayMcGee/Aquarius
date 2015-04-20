@@ -1,1 +1,1 @@
-{"stationmessage":{"datetime":"08:53:12:15:04:2015","stationid":"bra003","eventtype":"regularreading","event":[{"sensorunit":"su0008","data":[{"id":"01","datetime":"57","valuetype":"asis","value":"8.65"}]}]}}
+data={"stationmessage":{"datetime":"2015-04-17 17:43:20","stationid":"bra003","eventtype":"regularreading","event":[{"sensorunit":"su0008","data":[{"id":"11","physicalname":"Battery Sensor","measureunit":"Volts","valuetype":"asis","value":0.873333,"datetime":"2015-04-17 17:43:19"}]}]}}
