@@ -166,7 +166,6 @@ function main(){
         log("Auto mode", 2)
         log("Reading new sensor values", 2)
         drawSeparator()
-        console.log()
         writeToWatchDog(fileWatch)
         //Reads all sensors in the data base
         readAllSensorsInDataBase(getSensorReadingCallback)
@@ -174,7 +173,7 @@ function main(){
     else {  //MANUAL
         exec('python /var/lib/cloud9/Aquarius/exec/set_gpio_del_on.py', function(){})
         log("Manual mode", 2)
-        //readAllSensorsInDataBase(getSensorReadingCallback)
+        readAllSensorsInDataBase(getSensorReadingCallback)
         log("Waiting", 2)
         
         drawSeparator()
@@ -404,21 +403,20 @@ function createJSONfromDatabase(err, rows, fields) {
         //var baseEvent = { 'sensorunitid' :  'data': [] }
         //JSON Formatter
         var t = new Date()
-        var jsonDate = t.getHours() + ":" + t.getMinutes() + ":" + t.getSeconds() + ":" + t.getDate() + ":" + (t.getMonth() + 1) + ":" + t.getFullYear()
         var stationID = CONFIG_Station_ID
         
         var JSONsession = 
         {
     	    "stationmessage": 
         	{
-            	"datetime": jsonDate,
+            	"datetime": t.toISOString().slice(0, 19).replace('T', ' '),
             	"stationid": stationID,
             	"eventtype": "regularreading",
             	"event": []
         	}
         }
         
-        var currentEvent = null
+        var event = { 'sensorunit' : CONFIG_Sensor_unit, 'data': [] }
         var previousPhysicalID = null
         var PhysicalID;
         var ids = []
@@ -430,13 +428,6 @@ function createJSONfromDatabase(err, rows, fields) {
             ids.push(rows[i].ID)
             log("JSON creation at : " + PhysicalID, 3)   
             // If the last sensorunitID is not the same as the current one
-            if(previousPhysicalID !==  PhysicalID){
-                // If it is not the first iteration
-                if(previousPhysicalID !== null)
-                    JSONsession.stationmessage.event.push(currentEvent)
-                //Create a new event for the physical ID
-                currentEvent = { 'sensorunitid' : PhysicalID, 'data': [] }
-            }
             
             var sensorsubunitid = rows[i].CloudiaSubUnitID
             var value =rows[i].ReadValue
@@ -444,23 +435,36 @@ function createJSONfromDatabase(err, rows, fields) {
             var datetime = rows[i].ReadDate
             var physicalname = rows[i].PhysicalName
             
-            var JSON_sensorData = {'id': sensorsubunitid, 'physicalname': physicalname, 'measureunit' : measureunit, 'valuetytpe':"as is", 'value':value, 'datetime':datetime}
+            
+            //var JSON_sensorData = {'id': sensorsubunitid, 'physicalname': physicalname, 'measureunit' : measureunit, 'valuetytpe':"asis", 'value':value, 'datetime':datetime.toISOString().slice(0, 19).replace('T', ' ')}
+            var JSON_sensorData = {'id': sensorsubunitid, 'physicalname': physicalname, 'measureunit' : measureunit, 'valuetype':"asis", 'value': value, 'datetime':datetime.toISOString().slice(0, 19).replace('T', ' ')}
+            
             
             log("JSON Sensor Data : " + JSON_sensorData, 3)
             
-            currentEvent.data.push(JSON_sensorData)
+            event.data.push(JSON_sensorData)
             
             previousPhysicalID = PhysicalID
         }
         
-        JSONsession.stationmessage.event.push(currentEvent)
+        JSONsession.stationmessage.event.push(event)
         log(JSON.stringify(JSONsession), 3)
         
         var message = JSON.stringify(JSONsession);
+        //message = '{"stationmessage":{"datetime":"2015-04-15 11:59:23","stationid":"bra003","eventtype":"regularreading","event":[{"sensorunit":"su0008","data":[{"id":"01","datetime":"2015-04-15 11:55:15","valuetype":"asis","value":"8.65"}]}]}}'
+        //JSONsession = JSON.parse(message)
         console.log (message)
-        databaseHelper.sendPost(message, "cloudiaproject.org", "/c/data.json", Finalise)
         
-        
+        databaseHelper.sendPostFile(JSONsession, "https://dweet.io:443/dweet/for/", "Aquarius", Finalise)
+        databaseHelper.sendPost(message, Finalise)
+        /*var fs = require('fs');
+fs.writeFile("/tmp/test", "Hey there!", function(err) {
+    if(err) {
+        return console.log(err);s
+    }
+
+    console.log("The file was saved!");
+}); */
         writeToWatchDog(fileWatch)
         log("Count of ids : " + ids.length, 2)
         var idToSet = 0
@@ -517,7 +521,15 @@ function Finalise()
  {
     if (CONFIG_Operation_Mode == 1) {
         
-
+        
+        var delay=(60000 * 5);//1 seconds
+        setTimeout(function(){
+            readAllSensorsInDataBase(getSensorReadingCallback)
+        //your code to be executed after 1 seconds
+        },delay); 
+        
+        
+        /*
         var date = new Date()
 
         //Creates a date with added minutes from the interval configuration
@@ -545,7 +557,7 @@ function Finalise()
                 var shutdown = sh.exec("shutdown -h now")
             }, 1000)
         }, 2000)
-        
+        */
         
     }
     else {
@@ -657,10 +669,12 @@ app.io.on('connection', function(socket) {
             var execPath = rows[0].types_driver
             var physAddress = rows[0].physical_address
             var dataPosition = rows[0].virtual_driver_pos
+            var id = rows[0].virtual_id
             
             result = sh.exec(execPath + " " + physAddress + " R")
             
             console.log(result.stdout)
+            
             if(result.stdout.indexOf("ERROR") > -1 )
             {
                 var measuredValue = "Error"
@@ -669,12 +683,13 @@ app.io.on('connection', function(socket) {
             {
                 var splittedStdOutput = result.stdout.split(';')
                 var measuredValue = splittedStdOutput[dataPosition];
+                
             }
             
             log("Page Web requested sensor : " + sensorId + "  Returning result : " + measuredValue ,1)
-            
             socket.emit('updateSensor', {
-                'result': measuredValue
+                result: measuredValue,
+                ID: sensorId
             })
         })
     });
