@@ -36,10 +36,10 @@ $( "#btnDo" ).click(function() {
 	$( "#caliPh").hide("slow","swing");
 	$( "#caliCond").hide("slow","swing");
 	
-	if( $("#boxCalibrate").hasClass("blue") )
+	if( $("#boxCalibrate").hasClass("yellow") )
 		 {
 		 	$( "#boxCalibrate" ).hide("slow","swing");
-		 	$( "#boxCalibrate" ).removeClass("blue","slow","swing");
+		 	$( "#boxCalibrate" ).removeClass("yellow","slow","swing");
 		 	$( "#caliDo").hide("slow","swing");
 		 }
 });

@@ -1,12 +1,12 @@
 all:driverAtlasI2CDO driverAtlasI2CPH driverAtlasI2CK copylibs copyexec cleanObject
 	
-driverAtlasI2CDO: BlackI2C.o BlackCore.o Atlas_I2C_DO.o Atlas_I2C.o commun.o
+driverAtlasI2CDO: OneWireDevice.o BlackI2C.o BlackCore.o Atlas_I2C_DO.o Atlas_I2C.o commun.o
 	g++ -std=c++0x driverAtlas_I2CDO.cpp OneWireDevice.o BlackI2C.o BlackCore.o Atlas_I2C_DO.o Atlas_I2C.o commun.o -o driverAtlasI2CDO
 	
-driverAtlasI2CPH: BlackI2C.o BlackCore.o Atlas_I2C_PH.o Atlas_I2C.o commun.o
+driverAtlasI2CPH: OneWireDevice.o BlackI2C.o BlackCore.o Atlas_I2C_PH.o Atlas_I2C.o commun.o
 	g++ -std=c++0x driverAtlas_I2CPH.cpp OneWireDevice.o BlackI2C.o BlackCore.o  Atlas_I2C_PH.o Atlas_I2C.o commun.o -o driverAtlasI2CPH
 	
-driverAtlasI2CK: BlackI2C.o BlackCore.o Atlas_I2C_K.o Atlas_I2C.o commun.o
+driverAtlasI2CK: OneWireDevice.o BlackI2C.o BlackCore.o Atlas_I2C_K.o Atlas_I2C.o commun.o
 	g++ -std=c++0x driverAtlas_I2CK.cpp OneWireDevice.o BlackI2C.o BlackCore.o Atlas_I2C_K.o Atlas_I2C.o commun.o -o driverAtlasI2CK
 	
 commun.o: ../../commun.cpp

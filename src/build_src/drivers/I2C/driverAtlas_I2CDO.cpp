@@ -76,7 +76,7 @@ int main(int argc, char * argv[])
 	if (firstCommand.compare(I2C_COMMAND_CALIB) == 0)
 	{
 		//Verify that there is the minimum second argument
-		if (commandSplitted.size() > 1)
+		if (commandSplitted.size() > 1 )
 		{
 			return DO.command_Calibration(commandSplitted[1]);
 		}

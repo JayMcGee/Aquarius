@@ -16,7 +16,7 @@
 #define I2C_COMMAND_X "X"
 
 //Command delay before read data returned by I2C
-#define I2C_COMMAND_CALIB_DELAY 13
+#define I2C_COMMAND_CALIB_DELAY 18
 #define I2C_COMMAND_R_DELAY 10
 #define I2C_COMMAND_L_DELAY 3
 #define I2C_COMMAND_STATUS_DELAY 3

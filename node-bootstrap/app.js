@@ -648,10 +648,124 @@ app.io.on('connection', function(socket) {
     socket.on('calibration', function(data) {
         log("Starting Calibration",1)
         databaseHelper.getASensor(connection,data.Id,function(err,rows,fields){
-            log(rows[0].Driver,1)
+            //log(rows[0].Driver,1)
+            var driverPath = rows[0].Driver;
+            var address = rows[0].PhysicalAddress;
+            var point = data.Point;
+            
+            if(data.Value){
+                var calibValue = data.Value;
+                var execPath = driverPath +" "+  address + " Cal:" + point  + ":" + calibValue;
+                log(execPath,1);
+                
+                result = sh.exec(execPath)
+                if(result.stdout.indexOf("ERROR") > -1 ){
+                    var answer = "Error";
+                }
+                else{
+                    var splittedStdOutput = result.stdout.split(";");
+                    var answer = splittedStdOutput[1];
+                    log(result.stdout,1);
+                }
+            }
+            else
+            {
+                var execPath = driverPath +" "+ address + " Cal:" + point;
+                log(execPath,1);
+                
+                result = sh.exec(execPath)
+                if(result.stdout.indexOf("ERROR") > -1 ){
+                    var answer = "Error";
+                }
+                else{
+                    var splittedStdOutput = result.stdout.split(";");
+                    var answer = splittedStdOutput[1];
+                    log(result.stdout,1);
+                }
+            }
         }) 
     });
 });
+
+
+//Receive Calibrate command
+app.io.on('connection', function(socket) {
+    socket.on('shutdown', function() {
+        var execPath="shutdown -h now";
+        
+        result = sh.exec(execPath)
+        if(result.stdout.indexOf("ERROR") > -1 ){
+            var answer = "Error";
+            log(answer,1);
+        }
+        else{
+        }
+       
+    });
+    
+    socket.on('sysInfo', function() {
+        var execPathTemp="cat /sys/class/hwmon/hwmon0/device/temp1_input | sed 's/...$//'";
+        var execPathIpUsb = "ifconfig usb0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'";
+        var execPathIpEth = "ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'";
+        var execPathIpWlan = "ifconfig wlan0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'";
+        var execPathMem = "df | grep 'rootfs'"
+        
+        result = sh.exec(execPathTemp)
+        if(result.stdout.indexOf("ERROR") > -1 ){
+            var output = "Error";
+            log(output,1);
+        }
+        else{
+            var cpuTemp = result.stdout;
+        }
+        
+        result = sh.exec(execPathIpUsb)
+        if(result.stdout.indexOf("ERROR") > -1 ){
+            var output = "Error";
+            log(output,1);
+        }
+        else{
+            var usbIp = result.stdout;
+        }
+        
+        result = sh.exec(execPathIpEth)
+        if(result.stdout.indexOf("ERROR") > -1 ){
+            var output = "Error";
+            log(output,1);
+        }
+        else{
+            var ethIp = result.stdout;
+        }
+        
+                result = sh.exec(execPathIpWlan)
+        if(result.stdout.indexOf("ERROR") > -1 ){
+            var output = "Error";
+            log(output,1);
+        }
+        else{
+            var wlanIp = result.stdout;
+        }
+        
+        result = sh.exec(execPathMem)
+        if(result.stdout.indexOf("ERROR") > -1 ){
+            var output = "Error";
+            log(output,1);
+        }
+        else{
+            var diskUsed = result.stdout;
+        }
+        
+        socket.emit('sysInfoResult', {
+                Temp: cpuTemp,
+                UsbIp: usbIp,
+                EthIp: ethIp,
+                WlanIp: wlanIp,
+                Disk: diskUsed
+            })
+       
+    });
+});
+
 
 //Send from database Functions
 function sendTempFromDB(rowCount, socket) {

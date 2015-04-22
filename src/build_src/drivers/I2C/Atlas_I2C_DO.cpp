@@ -12,6 +12,7 @@ namespace aquarius
 			command = (string)I2C_COMMAND_CALIB;
 		else
 			command = (string)I2C_COMMAND_CALIB + I2C_DELIMITER + parameter;
+			
         int type = -1;
         
 		if (parameter.compare(I2C_CAL_CLEAR) == 0 || parameter.compare(I2C_COMMAND_ARG_QUEST) == 0)
