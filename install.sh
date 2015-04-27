@@ -1,7 +1,7 @@
 #!/bin/bash
 apt-get update; apt-get install build-essential python-dev python-setuptools python-pip python-smbus mysql-server mysql-client 
 echo "Installing npm packages ..."
-cd /var/lib/cloud9/Aquarius/node-bootstrap/ 
+cd /var/lib/cloud9/Aquarius/node-bootstrap 
 npm install 
 echo "Installing Express.io ... "
 npm install express.io 

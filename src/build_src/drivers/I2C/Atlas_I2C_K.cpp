@@ -34,6 +34,11 @@ namespace aquarius
         
         if(commandResult == I2C_READ_BACK_OK)
     	{
+    		if(parameter.compare(I2C_CAL_CLEAR) == 0){
+    			string secondCommand = (string)I2C_COMMAND_CALIB + I2C_DELIMITER + K_CAL_DRY; 
+    			int commandResult2 = aquarius::i2cCommand(i2c_,command, I2C_COMMAND_CALIB_DELAY, &returnString);
+    		}
+    		
     	    if(type)
     		    aquarius::outputCommandResult(deviceName_, (string)CALIBRATION_SUCCESSFULL_P1 + value + CALIBRATION_SUCCESSFULL_P2 + parameter);
     		else
