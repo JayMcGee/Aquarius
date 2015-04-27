@@ -159,7 +159,7 @@
 									
 									<div class="row-fluid calibrate-row">
 										<div class="span8"> Place the probe in a high conductivity solution </div>
-										<div class = "span2">  <input id="highPoint_cond" class="span4" value="14413">uS </div>
+										<div class = "span2">  <input id="highPoint_cond" class="span4" value="1278">uS </div>
 										<div class = "span2"> <button id= "highPointBtn_cond" class="btn btn-primary" disabled="disabled" > High point </button> </div>
 									</div>
 
@@ -378,9 +378,6 @@
 				if(data.status == 0)
 				{
 					setButtonStatus("lowPointBtn_cond",1);
-				}
-				if(data.status == 1)
-				{
 					setButtonStatus("highPointBtn_cond",1);
 				}
 				if(data.status == -1)

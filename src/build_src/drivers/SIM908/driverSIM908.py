@@ -31,29 +31,28 @@ def startGPS():
     print "Starting GPS module"
     datas = writeAndReadSIM908( "AT+CGPSPWR=1" )
     ok = checkIfOK(datas)
-    if ok == 1:
-        print "GPS module started succesfully"
-    else:
-        print "GPS module could not be started"
-        return ok
+    #if ok == 1:
+        #print "GPS module started succesfully"
+    #else:
+        #print "GPS module could not be started"
+    return ok
         
     datas = writeAndReadSIM908( "AT+CGPSRST=1" )
     ok = checkIfOK(datas)
-    if ok == 1:
-        print "GPS resetted succesfully"
-    else :
-        print "GPS could not be resetted"
-        
+    #if ok == 1:
+        #print "GPS resetted succesfully"
+    #else :
+        #print "GPS could not be resetted"
     return ok
 ############################################
 def stopGPS():
     print "Stopping GPS module"
     datas = writeAndReadSIM908( "AT+CGPSPWR=0" )
     ok = checkIfOK(datas)
-    if ok == 1:
-        print "GPS module stopped succesfully"
-    else :
-        print "GPS module could not be stopped"
+    #if ok == 1:
+        #print "GPS module stopped succesfully"
+    #else :
+        #print "GPS module could not be stopped"
     return ok
 ###############################################
 def getCurrentGPSInformation():
@@ -101,11 +100,12 @@ def checkGPS():
     datas = writeAndReadSIM908( "AT+CGPSSTATUS?" )
     ok = checkIfOK(datas)
     if ok == 1:
-        print "GPS module started succesfully"
+        print "GPS module is fixed"
     else:
-        print "GPS module could not be started"
+        print "GPS module is not fixed"
         return ok
-        
+
+def resetGPS():
     datas = writeAndReadSIM908( "AT+CGPSRST=1" )
     ok = checkIfOK(datas)
     if ok == 1:
@@ -162,6 +162,9 @@ if ser.isOpen() and len(sys.argv) > 1:
     elif command == "PowerOn":
         powerOn()
     elif command == "GetGPS":
+        initDevice()
+        powerOn()
+        startGPS()
         getCurrentGPSInformation()
     elif command == "InitIPConfiguration":
         print "TODO - InitIP"

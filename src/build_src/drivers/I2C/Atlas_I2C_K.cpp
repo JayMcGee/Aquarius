@@ -65,7 +65,7 @@ namespace aquarius
         
     	if(commandResult == I2C_READ_BACK_OK)
     	{
-    		//cout << "returned string : " << returnString << endl;
+    		cout << "returned string : " << returnString << endl;
     		
 			vector<string> split = aquarius::splitArguments(returnString, ',');
 			
