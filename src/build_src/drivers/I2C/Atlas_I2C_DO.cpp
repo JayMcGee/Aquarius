@@ -56,8 +56,8 @@ namespace aquarius
 			{
 				string dataName[] = { ATLAS_DO_DATA_1, ATLAS_DO_DATA_2};
     		
-				string prct = split[0].substr(1);
-				string Do = split[1];
+				string prct = split[1].substr(1);
+				string Do = split[0];
 				
 				float datas[] = { (float)atof(prct.c_str()),
 								(float)atof(Do.c_str())};
