@@ -114,8 +114,15 @@
 							</p>	
 							
 							<div class="box box-calibrate ph" id="boxCalibrate">
-							
+		
 								<div class="calibrate" id="caliPh"> 
+								
+									<div class="row-fluid calibrate-row">
+										<div class="span8"> Clear calibration </div>
+										<div class = "span2"> </div>
+										<div class = "span2"> <button id="clearBtn_ph" class="btn btn-primary"> Clear </button></div>
+									</div>
+									
 									<div class="row-fluid calibrate-row">
 										<div class="span8"> Place the probe in a solution of pH 7 </div>
 										<div class = "span2"> </div>
@@ -133,13 +140,15 @@
 										<div class = "span2">  <input id="highPoint_ph" class="span4" value="10">pH </div>
 										<div class = "span2"> <button id= "highPointBtn_ph" class="btn btn-primary" disabled="disabled" > High point </button> </div>
 									</div>
+								
 								</div>
 								
 								<div class="calibrate" id="caliCond"> 
+																	
 									<div class="row-fluid calibrate-row">
-										<div class="span8"> Make sure the probe is dry  </div>
+										<div class="span8"> Clear calibration make sure the probe is dry </div>
 										<div class = "span2"> </div>
-										<div class = "span2"> <button id="dryPointBtn_cond" class="btn btn-primary"> Dry </button></div>
+										<div class = "span2"> <button id="clearBtn_cond" class="btn btn-primary"> Clear/Dry </button></div>
 									</div>
 									
 									<div class="row-fluid calibrate-row">
@@ -153,17 +162,23 @@
 										<div class = "span2">  <input id="highPoint_cond" class="span4" value="">uS </div>
 										<div class = "span2"> <button id= "highPointBtn_cond" class="btn btn-primary" disabled="disabled" > High point </button> </div>
 									</div>
+
 								</div>
 								
 								<div class="calibrate" id="caliDo"> 
+								
+									<div class="row-fluid calibrate-row">
+										<div class="span8"> Clear calibration </div>
+										<div class = "span2"> </div>
+										<div class = "span2"> <button id="clearBtn_do" class="btn btn-primary"> Clear </button></div>
+									</div>
 									<div class="row-fluid calibrate-row">
 										<div class="span8"> Place probe in ambient air </div>
 										<div class = "span2"> </div>
 										<div class = "span2"> <button id="ambientBtn_do" class="btn btn-primary"> Ambient </button></div>
 									</div>
-									
 									<div class="row-fluid calibrate-row">
-										<div class="span8"> Place the probe in a zero oxygen solution </div>
+										<div class="span8"> Place the probe in a zero oxygen solution (optional) </div>
 										<div class = "span2"> </div>
 										<div class = "span2">  <button id="zeroBtn_do" class="btn btn-primary" disabled="disabled" > Zero Oxygen </button> </div>
 									</div>
@@ -295,41 +310,110 @@
 
 		/////// Ph Calibrate
 		$("#midPointBtn_ph").click(function(){
-			sendCalibrationEmit(1,"Mid");
+			sendCalibrationEmit(1,"mid", 7);
 		});
 		$("#lowPointBtn_ph").click(function(){
-			sendCalibrationEmit(1,"Low", $("#lowPoint_ph").value );
+			sendCalibrationEmit(1,"low", $("#lowPoint_ph").val() );
 		});
 		$("#highPointBtn_ph").click(function(){
-			sendCalibrationEmit(1,"High",$("#highPoint_ph").value);
+			sendCalibrationEmit(1,"high",$("#highPoint_ph").val());
+		});
+		$("#clearBtn_ph").click(function(){
+			sendCalibrationEmit(1,"clear");
 		});
 		
 		/////// Do Calibrate
 		$("#ambientBtn_do").click(function(){
-			sendCalibrationEmit(4,"");
+			sendCalibrationEmit(4,"Oxy");
 		})
 		$("#zeroBtn_do").click(function(){
 			sendCalibrationEmit(4,"0");
 		});
+		$("#clearBtn_do").click(function(){
+			sendCalibrationEmit(4,"clear");
+		});
+		
 		
 		/////// Cond Calibrate
 		$("#dryPointBtn_cond").click(function(){
 			sendCalibrationEmit(5,"dry");
 		});
 		$("#lowPointBtn_cond").click(function(){
-			sendCalibrationEmit(5,"Low", $("#lowPoint_cond").value );
+			sendCalibrationEmit(5,"low", $("#lowPoint_cond").val() );
 		});
 		$("#highPointBtn_cond").click(function(){
-			sendCalibrationEmit(5,"High",$("#highPoint_cond").value);
+			sendCalibrationEmit(5,"high",$("#highPoint_cond").val());
 		});
+		$("#clearBtn_cond").click(function(){
+			sendCalibrationEmit(5,"clear");
+		});
+		
+		io.on('calibrationSuccess',function(data){
+			if(data.sensorId == 1){
+				if(data.status == 1)
+				{
+					setButtonStatus("lowPointBtn_ph",1);
+				}
+				if(data.status == 2)
+				{
+					setButtonStatus("highPointBtn_ph",1);
+				}
+				if(data.status == 0)
+				{
+					setButtonStatus("lowPointBtn_ph",0);
+					setButtonStatus("highPointBtn_ph",0);
+				}
+			}
+			else if(data.sensorId == 4){
+				if(data.status == 1)
+				{
+					setButtonStatus("zeroBtn_do",1);
+				}
+				if(data.status == 0)
+				{
+					setButtonStatus("zeroBtn_do",0);
+				}
+			}
+			else if(data.sensorId == 5){
+				if(data.status == 1)
+				{
+					setButtonStatus("lowPointBtn_cond",1);
+				}
+				if(data.status == 2)
+				{
+					setButtonStatus("highPointBtn_cond",1);
+				}
+				if(data.status == 0)
+				{
+					setButtonStatus("lowPointBtn_cond",0);
+					setButtonStatus("highPointBtn_cond",0);
+				}
+			}
+		});
+		
+		function setButtonStatus(buttonId,status)
+		{
+			var buttonIdString = ("#" + buttonId);
+			
+			if(status == 1)
+			{
+				$(buttonIdString).removeAttr('disabled');
+			}
+			else if(status == 0)
+			{
+				$(buttonIdString).attr('disabled','disabled');
+					
+			}
+			
+		}
 		
 		function sendCalibrationEmit(id,point,value)
 		{
 			if( value == null){
-				io.emit('calibration',{Id:id, Point:point, Value:value});
+				io.emit('calibration',{Id:id, Point:point, Value:null});
 			}
 			else{
-				io.emit('calibration',{Id:id, Point:point, Value:null});
+				io.emit('calibration',{Id:id, Point:point, Value:value});
 			}
 			
 		}

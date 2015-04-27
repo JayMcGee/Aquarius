@@ -253,9 +253,46 @@ module.exports = {
     		    }
     		    
 		});
+    },
+    
+    calibrateAtlasSensor : function ( execPath , address , point , value ){
+        var checkFirst;
+        if(point === "mid"){
+            checkFirst = 0;
+        }
+        else if(point === "clear"){
+            checkFirst = -1;
+        }
+        else{
+            checkFirst = sh.exec(execPath + " " + address + " Cal:?").stdout.split(":")[1];
+        }
+        
+        var calibration;
+        
+        if(value == null){
+            log(execPath + " " + address + " Cal:" + point, 0);
+            calibration = sh.exec(execPath + " " + address + " Cal:" + point);
+        }
+        else{
+            log(execPath + " " + address + " Cal:" + point + ":" + value, 0);
+            calibration = sh.exec(execPath + " " + address + " Cal:" + point + ":" + value);    
+        }
+        
+        if(calibration.stdout.indexOf("ERROR") > -1 ){
+            log("Error on calibration", 2);
+            return -2;
+        }
+        
+        var checkSecond = sh.exec(execPath + " " + address + " Cal:?").stdout.split(":")[1];
+        console.log("First : " + checkFirst + " and second : "+ checkSecond);
+        
+        if(checkSecond > checkFirst){
+            return checkSecond;
+        }
+        else{
+            return -2;
+        }
     }
-    
-    
 };
 
 

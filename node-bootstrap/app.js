@@ -33,13 +33,15 @@ var sh = require('execSync'); //Permits the execution of external applications s
 var databaseHelper = require('./aquariusSensorHelper') //External file that helps the connection and querying to the database
 
 //Execution path for the RTC driver and Switches and Watchdog feeder
-var rtcExecPath = "python /var/lib/cloud9/Aquarius/exec/driverRTC.py"
-var modeSwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw1.py"
+var rtcExecPath = "python /var/lib/cloud9/Aquarius/exec/driverRTC.py";
+var modeSwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw1.py";
 
 //Still not used
-var _2SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw2.py"
-var _3SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw3.py"
-var _4SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw4.py"
+var _2SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw2.py";
+var _3SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw3.py";
+var _4SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw4.py";
+
+var pppStartup = "pon fona";
 
 
 var fileWatch = null
@@ -449,25 +451,54 @@ function createJSONfromDatabase(err, rows, fields) {
         var message = JSON.stringify(JSONsession);
         //message = '{"stationmessage":{"datetime":"2015-04-15 11:59:23","stationid":"bra003","eventtype":"regularreading","event":[{"sensorunit":"su0008","data":[{"id":"01","datetime":"2015-04-15 11:55:15","valuetype":"asis","value":"8.65"}]}]}}'
         //JSONsession = JSON.parse(message)
-        console.log (message)
+        log (message, 2);
         
-        databaseHelper.sendPostFile(JSONsession, "https://dweet.io:443/dweet/for/", "Aquarius", Finalise)
-        databaseHelper.sendPost(message, CONFIG_Cloudia_Address, Finalise)
-        
-        writeToWatchDog(fileWatch)
-        log("Count of ids : " + ids.length, 2)
-        var idToSet = 0
-        for(var s = 0; s < ids.length; s++)
-        {
-            databaseHelper.setDataAsSent(connection, ids[s], function(err, result){
-                log("Set as sent : " + result, 2)
-                idToSet++
-                if(idToSet >= ids.length)
-                {
-                    Finalise()
-                }
-            })
+        if(sh.exec("ip addr | grep eth0").stdout.indexOf("DOWN") == -1){
+            log("Ethernet is available, sending data",2);
+            
+            databaseHelper.sendPostFile(JSONsession, "https://dweet.io:443/dweet/for/", "Aquarius", Finalise)
+            databaseHelper.sendPost(message, CONFIG_Cloudia_Address, Finalise)
         }
+        else{
+            log("Trying PPP connection setup", 2);
+            exec(pppStartup, function (error, stdout, stderr) {
+                console.log('stdout: ' + stdout);
+                console.log('stderr: ' + stderr);
+                if (error !== null) {
+                  console.log('exec error: ' + error);
+                }
+            });
+        
+            setTimeout(function(){
+                var pppExec = sh.exec("ifconfig | grep ppp0");
+                
+                if(pppExec.stdout.indexOf("ppp") > -1){
+                    log("PPP connection successful", 2);
+                    
+                    databaseHelper.sendPostFile(JSONsession, "https://dweet.io:443/dweet/for/", "Aquarius", Finalise)
+                    databaseHelper.sendPost(message, CONFIG_Cloudia_Address, Finalise)
+                    
+                    writeToWatchDog(fileWatch)
+                    log("Count of ids : " + ids.length, 2)
+                    var idToSet = 0
+                    for(var s = 0; s < ids.length; s++)
+                    {
+                        databaseHelper.setDataAsSent(connection, ids[s], function(err, result){
+                            log("Set as sent : " + result, 2);
+                            idToSet++;
+                            if(idToSet >= ids.length)
+                            {
+                                Finalise();
+                            }
+                        })
+                    }
+                }
+                else{
+                    log("Could not create ppp connection", 2);
+            }}, 10000);
+        }
+        
+        
     }
 }
 
@@ -652,36 +683,22 @@ app.io.on('connection', function(socket) {
             var driverPath = rows[0].Driver;
             var address = rows[0].PhysicalAddress;
             var point = data.Point;
+            var value = data.Value;
+            var calibrationStatus;
+            console.log("Driver : " + driverPath + " addredss : " + address + " point : " + point + " value : "+ value);
+            calibrationStatus = databaseHelper.calibrateAtlasSensor(driverPath, address, point, value);
             
-            if(data.Value){
-                var calibValue = data.Value;
-                var execPath = driverPath +" "+  address + " Cal:" + point  + ":" + calibValue;
-                log(execPath,1);
+            if(calibrationStatus >= 0){
+                log("Calibration Successful",2);
                 
-                result = sh.exec(execPath)
-                if(result.stdout.indexOf("ERROR") > -1 ){
-                    var answer = "Error";
-                }
-                else{
-                    var splittedStdOutput = result.stdout.split(";");
-                    var answer = splittedStdOutput[1];
-                    log(result.stdout,1);
-                }
-            }
-            else
-            {
-                var execPath = driverPath +" "+ address + " Cal:" + point;
-                log(execPath,1);
-                
-                result = sh.exec(execPath)
-                if(result.stdout.indexOf("ERROR") > -1 ){
-                    var answer = "Error";
-                }
-                else{
-                    var splittedStdOutput = result.stdout.split(";");
-                    var answer = splittedStdOutput[1];
-                    log(result.stdout,1);
-                }
+                socket.emit('calibrationSuccess',{ sensorId : data.Id,
+                                               status : calibrationStatus
+                });
+            } 
+            else{
+                log("Calibration Failed",2);
+                               
+                socket.emit('calibrationFailure');
             }
         }) 
     });
