@@ -2,6 +2,8 @@
 
 namespace aquarius
 {
+	
+	const string Atlas_I2C_K::dataName[ATLAS_K_DATA_QTY] = { ATLAS_K_DATA_1, ATLAS_K_DATA_2, ATLAS_K_DATA_3, ATLAS_K_DATA_4 };
 	//TEST
 	int Atlas_I2C_K::command_Calibration(string parameter, string value)
 	{
@@ -76,12 +78,9 @@ namespace aquarius
 				string sal = split[2];
 				string sg = split[3];
 				
-				float datas[] = { (float)atof(ec.c_str()),
-									(float)atof(tds.c_str()),
-									(float)atof(sal.c_str()),
-									(float)atof(sg.c_str())};
+				string datas[] = { ec, tds, sal, sg};
 				
-				aquarius::outputReadData(deviceName_, ATLAS_K_DATA_QTY, dataName, datas);
+				aquarius::outputReadData(deviceName_, ATLAS_K_DATA_QTY, this->dataName, datas);
 			}
 			else
 			{

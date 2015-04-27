@@ -3,6 +3,8 @@
 namespace aquarius
 {
 	
+	const string Atlas_I2C_DO::dataName[ATLAS_DO_DATA_QTY] = { ATLAS_DO_DATA_1, ATLAS_DO_DATA_2 };
+	
     int Atlas_I2C_DO::command_Calibration(string parameter, string value)
     {
         string returnString;
@@ -49,20 +51,17 @@ namespace aquarius
         
     	if(commandResult == I2C_READ_BACK_OK)
     	{
-    		cout << "Returned string : " << returnString << endl;
     		vector<string> split = aquarius::splitArguments(returnString, ',');
 			
 			if(split.size() >= ATLAS_DO_DATA_QTY)
 			{
 				string dataName[] = { ATLAS_DO_DATA_1, ATLAS_DO_DATA_2};
     		
-				string prct = split[1].substr(1);
-				string Do = split[0];
+				string prct = split[1].erase(0, split[1].find_first_not_of(' '));
+				string Do = split[0].erase(0, split[0].find_first_not_of('?'));
+				string datas[] = { prct, Do};
 				
-				float datas[] = { (float)atof(prct.c_str()),
-								(float)atof(Do.c_str())};
-				
-				aquarius::outputReadData(deviceName_, ATLAS_DO_DATA_QTY, dataName, datas);
+				aquarius::outputReadData(deviceName_, ATLAS_DO_DATA_QTY, this->dataName, datas);
 			}
 			else
 			{

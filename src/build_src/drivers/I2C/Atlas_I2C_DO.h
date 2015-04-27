@@ -1,6 +1,7 @@
 #include "../../commun.h"
 #include <iostream>
 #include <stdlib.h>     //atof
+#include <stdio.h>     //atof
 #include "../../../include/blacklib/BlackLib.h"
 #include "../../../include/blacklib/BlackI2C.h"
 #include "Atlas_I2C.h"
@@ -34,6 +35,9 @@ namespace aquarius
 	class Atlas_I2C_DO : public Atlas_I2C
 	{
 		public:
+		
+		    static const string dataName[ATLAS_DO_DATA_QTY];
+		    
 			Atlas_I2C_DO(string deviceName, BlackI2C * i2c)  : Atlas_I2C(deviceName,i2c){};
 			
 			int command_Calibration(string parameter, string value = NO_CALIBRATION_VALUE);

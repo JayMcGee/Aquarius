@@ -3,6 +3,8 @@
 namespace aquarius
 {
 	
+	const string Atlas_I2C_PH::dataName[ATLAS_PH_DATA_QTY] = { ATLAS_PH_DATA_1 };
+	
     int Atlas_I2C_PH::command_Calibration(string parameter, string value)
     {
         string returnString;
@@ -59,9 +61,9 @@ namespace aquarius
     		
     		string tempPH = returnString.substr(1);
     		
-    		float datas[] = { (float)atof(tempPH.c_str()) };
+    		string datas[] = { tempPH };
     		
-    		aquarius::outputReadData(deviceName_, ATLAS_PH_DATA_QTY, dataName, datas);
+    		outputReadData(deviceName_, ATLAS_PH_DATA_QTY, this->dataName, datas);
     	}
     	else if(commandResult == I2C_READ_BACK_FAIL)
     	{

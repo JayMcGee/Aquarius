@@ -458,6 +458,22 @@ function createJSONfromDatabase(err, rows, fields) {
             
             databaseHelper.sendPostFile(JSONsession, "https://dweet.io:443/dweet/for/", "Aquarius", Finalise)
             databaseHelper.sendPost(message, CONFIG_Cloudia_Address, Finalise)
+            
+            writeToWatchDog(fileWatch)
+            log("Count of ids : " + ids.length, 2)
+            var idToSet = 0
+            for(var s = 0; s < ids.length; s++)
+            {
+                writeToWatchDog(fileWatch)
+                databaseHelper.setDataAsSent(connection, ids[s], function(err, result){
+                    log("Set as sent : " + result, 2);
+                    idToSet++;
+                    if(idToSet >= ids.length)
+                    {
+                        Finalise();
+                    }
+                })
+            }
         }
         else{
             log("Trying PPP connection setup", 2);
@@ -483,6 +499,7 @@ function createJSONfromDatabase(err, rows, fields) {
                     var idToSet = 0
                     for(var s = 0; s < ids.length; s++)
                     {
+                        writeToWatchDog(fileWatch)
                         databaseHelper.setDataAsSent(connection, ids[s], function(err, result){
                             log("Set as sent : " + result, 2);
                             idToSet++;
@@ -665,11 +682,11 @@ app.io.on('connection', function(socket) {
                 
             }
             
-            log("Page Web requested sensor : " + sensorId + "  Returning result : " + measuredValue ,1)
+            log("Page Web requested sensor : " + sensorId + "  Returning result : " + measuredValue ,1);
             socket.emit('updateSensor', {
                 result: measuredValue,
                 ID: sensorId
-            })
+            });
         })
     });
 });

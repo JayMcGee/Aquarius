@@ -54,7 +54,7 @@ int main(int argc, char ** argv)
     if(dht.getLatestTemperature(&temperature) && dht.getLatestHumidity(&humidity) && retour >= 0)
     {
 		//Create an output stream with both read datas
-        float datas[DHT_DATA_QTY] = { temperature, humidity };
+        string datas[DHT_DATA_QTY] = { to_string(temperature), to_string(humidity) };
         aquarius::outputReadData(NOM_TEMPORAIRE, DHT_DATA_QTY, dht.dataName, datas);
         return 0;
     }

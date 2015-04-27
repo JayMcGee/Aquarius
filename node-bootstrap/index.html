@@ -153,13 +153,13 @@
 									
 									<div class="row-fluid calibrate-row">
 										<div class="span8"> Place the probe in a low conductivity solution </div>
-										<div class = "span2">  <input id="lowPoint_cond" class="span4" value="">uS </div>
+										<div class = "span2">  <input id="lowPoint_cond" class="span4" value="903">uS </div>
 										<div class = "span2">  <button id="lowPointBtn_cond" class="btn btn-primary" disabled="disabled" > Low Point </button> </div>
 									</div>
 									
 									<div class="row-fluid calibrate-row">
 										<div class="span8"> Place the probe in a high conductivity solution </div>
-										<div class = "span2">  <input id="highPoint_cond" class="span4" value="">uS </div>
+										<div class = "span2">  <input id="highPoint_cond" class="span4" value="14413">uS </div>
 										<div class = "span2"> <button id= "highPointBtn_cond" class="btn btn-primary" disabled="disabled" > High point </button> </div>
 									</div>
 
@@ -173,7 +173,7 @@
 										<div class = "span2"> <button id="clearBtn_do" class="btn btn-primary"> Clear </button></div>
 									</div>
 									<div class="row-fluid calibrate-row">
-										<div class="span8"> Place probe in ambient air </div>
+										<div class="span8"> Dip probe in fresh water, let dry 3-5 minutes, then calibrate</div>
 										<div class = "span2"> </div>
 										<div class = "span2"> <button id="ambientBtn_do" class="btn btn-primary"> Ambient </button></div>
 									</div>
@@ -375,15 +375,15 @@
 				}
 			}
 			else if(data.sensorId == 5){
-				if(data.status == 1)
+				if(data.status == 0)
 				{
 					setButtonStatus("lowPointBtn_cond",1);
 				}
-				if(data.status == 2)
+				if(data.status == 1)
 				{
 					setButtonStatus("highPointBtn_cond",1);
 				}
-				if(data.status == 0)
+				if(data.status == -1)
 				{
 					setButtonStatus("lowPointBtn_cond",0);
 					setButtonStatus("highPointBtn_cond",0);
@@ -519,8 +519,9 @@
         // This is where we process the answer from the server
         // Update the circle value 
         io.on('updateSensor',function(data){
+        	
+        	var measure = parseFloat(data.result.replace(/[^\d.-]/g, ''));
         
-        	var measure = parseFloat(data.result);
             var valInit = $('#sensor' + data.ID).val();
 			$({value: valInit}).animate({value:measure}, {
 				duration: 500,

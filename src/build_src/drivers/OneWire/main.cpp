@@ -67,7 +67,7 @@ int main(int argc, char * argv[])
                 else
                 {
                     //Create an output stream with read data
-                    float datas[OW_DATA_QTY] = { temp };
+                    string datas[OW_DATA_QTY] = { to_string(temp) };
                     aquarius::outputReadData(NOM_TEMPORAIRE, OW_DATA_QTY, ow.dataName, datas);
                     return 0;
                 }
