@@ -49,7 +49,7 @@ namespace aquarius
         
     	if(commandResult == I2C_READ_BACK_OK)
     	{
-    		//cout << "Returned string : " << returnString << endl;
+    		cout << "Returned string : " << returnString << endl;
     		vector<string> split = aquarius::splitArguments(returnString, ',');
 			
 			if(split.size() >= ATLAS_DO_DATA_QTY)
