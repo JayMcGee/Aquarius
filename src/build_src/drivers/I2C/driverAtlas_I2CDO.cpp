@@ -80,10 +80,6 @@ int main(int argc, char * argv[])
 		{
 			return DO.command_Calibration(commandSplitted[1]);
 		}
-		else
-		{
-			return DO.command_Calibration("");
-		}
 	}
 	//Device LED control
 	else if (firstCommand.compare(I2C_COMMAND_L) == 0)

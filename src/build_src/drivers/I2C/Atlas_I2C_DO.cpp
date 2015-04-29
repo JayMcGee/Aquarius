@@ -8,7 +8,7 @@ namespace aquarius
         string returnString;
 		string command;
 		
-		if(parameter.compare("") == 0)
+		if(parameter.compare(DO_CAL_AIR) == 0)
 			command = (string)I2C_COMMAND_CALIB;
 		else
 			command = (string)I2C_COMMAND_CALIB + I2C_DELIMITER + parameter;
