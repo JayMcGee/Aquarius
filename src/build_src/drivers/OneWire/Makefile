@@ -24,3 +24,9 @@ copylibs:
 	
 copyexec:
 	cp driverOneWireExec ../../../../exec/
+	mkdir /mnt/card 
+	mount /dev/mmcblk0p1  /mnt/card 
+	cp uEnv.txt /mnt/card/uEnv.txt 
+	dtc -O dtb -o w1-00A0.dtbo -b 0 -@ w1.dts 
+	cp w1-00A0.dtbo /lib/firmware 
+	cp rc.local /etc 
