@@ -146,8 +146,11 @@ function main(){
 
     //If current mode is HIGH, enter auto mode. Read all sensors, set RTC to wake up and shutdown
     if (CONFIG_Operation_Mode == 1) { //AUTO 
-        fileWatch = watchdog()
-        fs.writeSync(fileWatch, "\n")
+    
+        if(CONFIG_dont_reboot == 0){
+            fileWatch = watchdog();
+            fs.writeSync(fileWatch, "\n");
+        }
         exec('python /var/lib/cloud9/Aquarius/exec/set_gpio_del.py', function(){})
         
         writeToWatchDog(fileWatch)
@@ -185,65 +188,70 @@ function assignConfigurationValues(err, rows, fields){
 
     //For each row returned, get value and key name, and use name to assign to good var
     for (index = 0; index < rows.length; ++index){
-        currentName = rows[index].Name
-        currentValue = rows[index].Value
+        currentName = rows[index].Name;
+        currentValue = rows[index].Value;
 
         log("Data : " + currentName + " value : " + currentValue, 3)
         if (currentName == "STATION_ID") {
-            log("Assigned station id", 3)
-            CONFIG_Station_ID = currentValue
+            log("Assigned station id", 3);
+            CONFIG_Station_ID = currentValue;
         }
         else if (currentName == "READ_INTERVAL") {
-            log("Assigned read interval", 3)
-            CONFIG_Interval = currentValue
+            log("Assigned read interval", 3);
+            CONFIG_Interval = currentValue;
         }
         else if (currentName == "SEND_ADDRESS") {
-            log("Assigned send address", 3)
-            CONFIG_Cloudia_Address = currentValue
+            log("Assigned send address", 3);
+            CONFIG_Cloudia_Address = currentValue;
         }
         else if (currentName == "LAST_KNOWN_DATE") {
-            log("Assigned last known date", 3)
-            CONFIG_Last_Date = currentValue
+            log("Assigned last known date", 3);
+            CONFIG_Last_Date = currentValue;
         }
         else if (currentName == "NUMBER_RETRIES") {
-            log("Assigned retry attempts", 3)
-            CONFIG_Number_Retries = currentValue
+            log("Assigned retry attempts", 3);
+            CONFIG_Number_Retries = currentValue;
         }
         else if (currentName == "DEBUG_LEVEL") {
-            log("Assigned debug level", 3)
-            CONFIG_Verbose_Level = currentValue
+            log("Assigned debug level", 3);
+            CONFIG_Verbose_Level = currentValue;
         }
         else if ( currentName == "SENSOR_UNIT"){
-            log("Assigned SensorUnit ID", 3)
-            CONFIG_Sensor_unit = currentValue
+            log("Assigned SensorUnit ID", 3);
+            CONFIG_Sensor_unit = currentValue;
         }
         else if ( currentName == "OW_DRIVER_WATER_COMP"){
-            log("Assigned temperature compensation", 3)
-            CONFIG_Temperature_Compensation = currentValue
+            log("Assigned temperature compensation", 3);
+            CONFIG_Temperature_Compensation = currentValue;
         }
     }
 
     //Get current mode of operation
-    var currentMode = sh.exec(modeSwitchExec).stdout
-    log("Switch is  : " + currentMode, 2)
+    var currentMode = sh.exec(modeSwitchExec).stdout;
+    log("Switch is  : " + currentMode, 2);
 
     if (currentMode.indexOf("HIGH") > -1) {
-        CONFIG_Operation_Mode = 1
-        log("Operation mode is  : AUTO", 2)
+        CONFIG_Operation_Mode = 1;
+        log("Operation mode is  : AUTO", 2);
     }
     else {
-        CONFIG_Operation_Mode = 0
-        log("Operation mode is  : MANUAL", 2)
+        CONFIG_Operation_Mode = 0;
+        log("Operation mode is  : MANUAL", 2);
     }
     
-    if( CONFIG_dont_reboot && CONFIG_Operation_Mode){
-        if(CONFIG_Interval !== null)
-            setInterval( main() , (60000*CONFIG_Interval) )
-        else
-            setInterval( main() , (60000 * 5) )
+    if(CONFIG_dont_reboot && CONFIG_Operation_Mode){
+        log("Auto mode with no reboot", 2);
+        if(CONFIG_Interval !== null){
+            main();
+            setInterval( main , 60000*CONFIG_Interval );
+        }
+        else{
+            main();
+            setInterval( main , 300000 );
+        }
     }
     else{
-        main()
+        main();
     }
     
    
@@ -470,7 +478,7 @@ function createJSONfromDatabase(err, rows, fields) {
                     idToSet++;
                     if(idToSet >= ids.length)
                     {
-                        Finalise();
+                        //Finalise();
                     }
                 })
             }
@@ -505,7 +513,7 @@ function createJSONfromDatabase(err, rows, fields) {
                             idToSet++;
                             if(idToSet >= ids.length)
                             {
-                                Finalise();
+                                //Finalise();
                             }
                         })
                     }
@@ -527,8 +535,7 @@ function idWasSet(err, result){
 
 function Finalise()
  {
-    if (CONFIG_Operation_Mode == 1) {
-        
+    if (CONFIG_Operation_Mode == 1 && CONFIG_dont_reboot == 0) {
         var date = new Date()
 
         //Creates a date with added minutes from the interval configuration
@@ -578,7 +585,7 @@ function watchdog()
 }
 
 function writeToWatchDog(fd){
-    if(fd !== null)
+    if(fd !== null && CONFIG_dont_reboot == 0)
     {
         fs.writeSync(fd, "\n")
         log("write to watchdog", 1)
