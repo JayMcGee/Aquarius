@@ -82,34 +82,13 @@
 			<!-- start: Content -->
 			<div id="content" class="span10">
 
-			<div class="row-fluid">
-					<div class="box-header">
-						<h2><i class="halflings-icon list-alt"></i><span class="break"></span>Temperature</h2>
-						<div class="box-icon">
-							<a href="#" class="btn-minimize"><i class="halflings-icon chevron-up"></i></a>
-						</div>
-					</div>
-					<div class="box-content">
-				    	<div id="tempChart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-					</div>
-			</div><!--/row-->
-			<div class="row-fluid">
-					<div class="box-header">
-						<h2><i class="halflings-icon list-alt"></i><span class="break"></span>pH</h2>
-						<div class="box-icon">
-							<a href="#" class="btn-minimize"><i class="halflings-icon chevron-up"></i></a>
-						</div>
-					</div>
-					<div class="box-content">
-				    	<div id="phChart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-					</div>
-			</div><!--/row-->
+
+
 		
 		
 
-	</div><!--/.fluid-container-->
-	
-			<!-- end: Content -->
+			</div><!--/.fluid-container-->
+				<!-- end: Content -->
 		</div><!--/#content.span10-->
 		</div><!--/fluid-row-->
 		
@@ -192,7 +171,59 @@
 		<script src="scripts/Aquarius_Calibrate.js"></script>
 		<script src="scripts/Aquarius_DataCircle.js"></script>
 		<script src="scripts/Aquarius_Chart.js"></script>
-       
+		<script>
+		
+			
+		
+		getMeasure(3);
+		getMeasure(3);
+		getMeasure(3);
+		getMeasure(3);
+		getMeasure(3);
+		getMeasure(3);
+		getMeasure(3);
+		getMeasure(3);
+		getMeasure(3);
+		getMeasure(3);
+		getMeasure(3);
+		getMeasure(3);
+		getMeasure(3);
+		
+		getMeasure(4);
+		getMeasure(4);
+		getMeasure(4);
+		getMeasure(4);
+		getMeasure(4);
+		getMeasure(4);
+		getMeasure(4);
+		getMeasure(4);
+		getMeasure(4);
+		getMeasure(4);
+		getMeasure(4);
+		getMeasure(4);
+		getMeasure(4);
+		////////////////////////////////////////////////////////////////////////
+        // When user click on a dataCircle it sends a request to the server
+		function getMeasure(sensorID){
+			io.emit('requestMeasure', { ID : sensorID });
+		}
+	
+
+        ////////////////////////////////////////////////////////////////////////
+        // This is where we process the answer from the server
+        // Update the circle value 
+        io.on('updateSensor',function(data){
+        	var chart = $('#chart' + data.ID).highcharts();
+        	var measure = parseFloat(data.result.replace(/[^\d.-]/g, ''));
+            var shift = (chart.series[0].data.length > 10);
+            var dateNow = new Date().getTime();
+			[Date.UTC(2012, 12, 10, 00, 00, 43), measure]
+			 if(!isNaN(measure) && (measure !== null) && (measure !== "")){
+			        chart.series[0].addPoint([dateNow, measure],true,shift);
+			    }
+			
+		});
+	   	</script>
 </div>
 </body>
 </html>

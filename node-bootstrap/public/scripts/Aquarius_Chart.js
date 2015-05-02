@@ -5,140 +5,74 @@
 io = io.connect();
 // Emit ready event.
 io.emit('ready');
-
-var interval = 2000; //initiate interval timer
-
-$(function(){
-    $('#tempChart').highcharts({
-        chart:{
-            type: 'line',
-            zoomType: 'xy',
-            marginRight: 10
-        },
-        title: {
-        text: 'Temperature'
-        },
-        colors: ['#FF9900'],
-        xAxis: {
-            type: 'datetime'
-        },
-        yAxis: {
-            floor: -30,
-            ceiling: 100,
-            title: {
-                text: 'Celcius'
-            }
-        },
-        plotOptions: {
-            area: {
-                marker: {
-                    enabled: true,
-                    symbol: 'circle',
-                    radius: 2.5,
-                    states: {
-                        hover: {
-                            enabled: true
-                        }
-                    }
-                }
-            }
-        },
-        tooltip: {
-            formatter: function () {
-                return '<b>' + this.series.name + '</b><br/>' +
-                    Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br/>' +
-                    Highcharts.numberFormat(this.y, 2) + " °C";
-            }
-        },
-            series:[{
-                name: "Temperature sensor",
-                data:[null]
-            }]
-        })
+io.on('ReceiveSensors',function(data){
+		data.row.forEach(function(entry){
+			var chartID = entry.VirtualID
+			var chartName = entry.UnitName
+			var chartUnit = entry.MeasureUnit
+			var chartMax = entry.Max
+			var chartMin = entry.Min
+			var chartColor = entry.Color
+			
+			var highcharts ={chart:{
+					            type: 'line',
+					            zoomType: 'xy',
+					            marginRight: 10
+						        },
+						        title: {
+						        text: 'pH'
+						        },
+						        colors: [],
+						        xAxis: {
+						            type: 'datetime'
+						        },
+						        yAxis: {
+						            floor: -30,
+						            ceiling: 100,
+						            title: {
+						                text: 'pH'
+						            }
+						        },
+						        plotOptions: {
+						            area: {
+						                marker: {
+						                    enabled: true,
+						                    symbol: 'circle',
+						                    radius: 2.5,
+						                    states: {
+						                        hover: {
+						                            enabled: true
+						                        }
+						                    }
+						                }
+						            }
+						        },
+						        tooltip: {
+						            formatter: function () {
+						                return '<b>' + this.series.name + '</b><br/>' +
+						                    Highcharts.dateFormat('%Y-%m-%d %H:%M', this.x) + '<br/>' +
+						                    Highcharts.numberFormat(this.y, 2) + " °C";
+						            }
+						        },
+						            series:[{
+						                name: "pH sensor",
+						                data:[null]
+						            }]
+					        };
+					
+		highcharts.title.text = chartName + " " + chartUnit;
+		highcharts.colors[0] = chartColor;
+		highcharts.yAxis.title.text = chartUnit;
+		
+		var htmlContainer = '<div class="row-fluid">' + '<div class="box-header">' + '<h2><i class="halflings-icon list-alt"></i><span class="break"></span>'+ chartName + '</h2>' + '<div class="box-icon">  </div> </div>' + '<div class="box-content"> <div id="' + "chart"+chartID +'" style="min-width: 310px; height: 400px; margin: 0 auto"></div> </div>' + '</div><!--/row-->';
+		$("#content").append(htmlContainer);
+		
+		
+		$(function(){
+		    $('#' + "chart"+chartID ).highcharts(highcharts);
+		});
+	});
 });
 
-$(function(){
-    $('#phChart').highcharts({
-        chart:{
-            type: 'line',
-            zoomType: 'xy',
-            marginRight: 10
-        },
-        title: {
-        text: 'pH'
-        },
-        colors: ['#FF1100'],
-        xAxis: {
-            type: 'datetime'
-        },
-        yAxis: {
-            floor: -30,
-            ceiling: 100,
-            title: {
-                text: 'pH'
-            }
-        },
-        plotOptions: {
-            area: {
-                marker: {
-                    enabled: true,
-                    symbol: 'circle',
-                    radius: 2.5,
-                    states: {
-                        hover: {
-                            enabled: true
-                        }
-                    }
-                }
-            }
-        },
-        tooltip: {
-            formatter: function () {
-                return '<b>' + this.series.name + '</b><br/>' +
-                    Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br/>' +
-                    Highcharts.numberFormat(this.y, 2) + " °C";
-            }
-        },
-            series:[{
-                name: "pH sensor",
-                data:[null]
-            }]
-        })
-});
 
-io.on('tempData',function(data){
-    var chart = $('#tempChart').highcharts();
-    var dataBuff = [];
-    
-    data.array.forEach(function(row){
-       dataBuff.push(row.TempWater)
-    });
-    chart.series[0].setData(dataBuff);
-})
-
-io.on('lastTemp',function(data){
-    var chart = $('#tempChart').highcharts();
-    var shift = (chart.series[0].data.length > 10);
-    if(!isNaN(data.value) && (data.value !== null) && (data.value !== "")){
-        chart.series[0].addPoint(data.value,true,shift);
-    }
-});
-
-io.on('phData',function(data){
-    var chart = $('#phChart').highcharts();
-    var dataBuff = [];
-    
-    data.array.forEach(function(row){
-       dataBuff.push(row.TempWater)
-    });
-    chart.series[0].setData(dataBuff);
-})
-
-io.on('lastPh',function(data){
-    var chart = $('#phChart').highcharts();
-    var shift = (chart.series[0].data.length > 10);
-    if(!isNaN(data.value) && (data.value !== null) && (data.value !== "")){
-        chart.series[0].addPoint(data.value,true,shift);
-    }
-});
 
