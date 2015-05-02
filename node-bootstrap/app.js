@@ -24,7 +24,6 @@
 
 var express = require('express.io'); //Express and Socket.io integration
 var mysql = require('mysql'); //Javascript mySql Connector
-//TODO Wait what ?
 var exec = require('child_process').exec;
 var schedule = require('node-schedule'); //In application schedule creator
 var fs = require('fs');
@@ -42,10 +41,7 @@ var _3SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw3.py";
 var _4SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw4.py";
 
 var oneWireExec = "/var/lib/cloud9/Aquarius/exec/driverOneWireExec";
-
 var pppStartup = "pon fona";
-
-
 var fileWatch = null
 
 //Config vars
@@ -137,7 +133,7 @@ function main(){
     }
     else {  //MANUAL
         log("Manual mode", 2);
-        readAllSensorsInDataBase(getSensorReadingCallback);
+        //readAllSensorsInDataBase(getSensorReadingCallback);
         log("Waiting", 2);
         
         drawSeparator();
@@ -305,7 +301,7 @@ function assignConfigurationValues(err, rows, fields){
     }
     else{
         exec('python /var/lib/cloud9/Aquarius/exec/set_gpio_del_on.py', function(){});
-        main();
+        Finalise();
     }
     
    
@@ -390,8 +386,6 @@ function getSensorReadingCallback(err, rows, fields) {
                 
                 tryCount++
                 log("Try counts :" + tryCount, 2)
-                //console.log("Test result : " + (result.stdout.indexOf("ERROR") > -1))
-                //console.log("Test 2 result : " + (CONFIG_Number_Retries))
             }while(result.stdout.indexOf("ERROR") > -1 && tryCount <= parseInt(CONFIG_Number_Retries));
 
             splittedStdOutput = result.stdout.split(';')  
@@ -410,9 +404,17 @@ function getSensorReadingCallback(err, rows, fields) {
                 if (rows[i].CloudiaUnitID == CloudiaUnitID) {
 
                     if (splittedStdOutput.length > rows[i].Position) {
-                        var value = splittedStdOutput[rows[i].Position]
-                        log("Inserting into database value : " + value + " " + rows[i].MeasureUnit, 2)
-                        databaseHelper.setData(connection, value, rows[i].VirtualID, 0, t_Data_insertCallBack)
+                        var value;
+                        if(rows[i].ValuePrecision == 0){
+                            value = splittedStdOutput[rows[i].Position];
+                        }
+                        else{
+                            value = splittedStdOutput[rows[i].Position];
+                            value = roundToX(Number(value), rows[i].ValuePrecision);
+                            
+                        }
+                        log("Inserting into database value : " + value + " " + rows[i].MeasureUnit, 2);
+                        databaseHelper.setData(connection, value, rows[i].VirtualID, 0, t_Data_insertCallBack);  
                     }
                     else {
                         log("Missing data : " + UnitName, 1)
@@ -429,6 +431,10 @@ function getSensorReadingCallback(err, rows, fields) {
     }
 }
 
+function roundToX(num, x) {
+    console.log("Number to  round : " + num + " at x : " + x)
+    return +(Math.round(num + "e+" + x)  + "e-" + x);
+}
 
 
 /**
@@ -612,10 +618,10 @@ function idWasSet(err, result){
 
 function Finalise()
  {
-    databaseHelper.StopSIM908();
+    
     updateDates();
     if (CONFIG_Operation_Mode == 1 && CONFIG_dont_reboot == 0) {
-        
+        databaseHelper.StopSIM908();
         var date = new Date()
 
         //Creates a date with added minutes from the interval configuration
@@ -640,39 +646,38 @@ function Finalise()
             setInterval(function() {
                 log("Shutting down now ", 0)
                 var shutdown = sh.exec("shutdown -h now")
-            }, 1000)
-        }, 2000)
+            }, 1000);
+        }, 2000);
     }
     else if(CONFIG_Operation_Mode == 1 && CONFIG_dont_reboot == 1){
         log("Waiting for next execution", 2);
     }
     else if(CONFIG_Operation_Mode == 0){
         //Prepare Data for server ( Format to Json )
-        log("Reading sensor finished", 2);
+        log("Starting server and GPS for manual operation", 2);
+        databaseHelper.StartSIM908();
+        databaseHelper.StartGPS();
         startServer();
     }
  }
 
 function log(dataToAppend, level)
 {
-    dataToAppend =  "[" + new Date().toISOString() + "]: " + dataToAppend + "\r"
-    //console.log(level + " <= " + CONFIG_Verbose_Level)
+    dataToAppend =  "[" + new Date().toISOString() + "]: " + dataToAppend + "\r";
     if(level <= CONFIG_Verbose_Level){
-        console.log(dataToAppend)
-        fs.appendFileSync(CONFIG_Log_File_Directory + 'log.txt', dataToAppend)    
+        console.log(dataToAppend);
+        fs.appendFileSync(CONFIG_Log_File_Directory + 'log.txt', dataToAppend);    
     }
 }
 
-function watchdog()
-{
-    return fs.openSync('/dev/watchdog', 'w')
+function watchdog(){
+    return fs.openSync('/dev/watchdog', 'w');
 }
 
 function writeToWatchDog(fd){
-    if(fd !== null && CONFIG_dont_reboot == 0)
-    {
-        fs.writeSync(fd, "\n")
-        log("write to watchdog", 1)
+    if(fd !== null && CONFIG_dont_reboot == 0){
+        fs.writeSync(fd, "\n");
+        log("write to watchdog", 1);
     }
 }
 
@@ -764,7 +769,7 @@ function startServer(){
                 
                 result = sh.exec(execPath + " " + physAddress + " R")
                 
-                console.log(result.stdout)
+                log(result.stdout, 2)
                 
                 if(result.stdout.indexOf("ERROR") > -1 )
                 {
@@ -777,7 +782,7 @@ function startServer(){
                     
                 }
                 
-                log("Page Web requested sensor : " + sensorId + "  Returning result : " + measuredValue ,1);
+                log("Page Web requested sensor : " + sensorId + "  Returning result : " + measuredValue , 2);
                 socket.emit('updateSensor', {
                     result: measuredValue,
                     ID: sensorId
