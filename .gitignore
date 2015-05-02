@@ -220,4 +220,5 @@ pip-log.txt
 
 log.txt
 node-bootstrap/nulllog.txt
-
+logsql.txt
+data.json
