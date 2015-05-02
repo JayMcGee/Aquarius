@@ -109,6 +109,8 @@ function main(){
 
     CONFIG_Log_File_Directory = '/var/lib/cloud9/Aquarius/';
     
+    databaseHelper.StartGPS();
+
     updateDates();
     
     //If current mode is HIGH, enter auto mode. Read all sensors, set RTC to wake up and shutdown
@@ -304,8 +306,6 @@ function assignConfigurationValues(err, rows, fields){
    
 }
 
-
-
 /**
  * 
  */
@@ -381,7 +381,11 @@ function getSensorReadingCallback(err, rows, fields) {
             }while(result.stdout.indexOf("ERROR") > -1 && tryCount <= parseInt(CONFIG_Number_Retries));
 
             splittedStdOutput = result.stdout.split(';')  
-            log("Executed : " + splittedStdOutput, 2)
+            log("Executed : " + splittedStdOutput, 2);
+
+            if(Driver.indexOf("AtlasI2C") > -1){
+                sh.exec(Driver + " " + Address + " Sleep");
+            }
 
             for (i = 0; i < rows.length; ++i) {
                 writeToWatchDog(fileWatch)
@@ -401,6 +405,8 @@ function getSensorReadingCallback(err, rows, fields) {
                     }
                 }
             }
+
+            databaseHelper.StopGPS();
         }
     }
 }
@@ -527,7 +533,7 @@ function createJSONfromDatabase(err, rows, fields) {
                     {
                         //Finalise();
                     }
-                })
+                });
             }
         }
         else{
@@ -560,13 +566,14 @@ function createJSONfromDatabase(err, rows, fields) {
                             idToSet++;
                             if(idToSet >= ids.length)
                             {
-                                //Finalise();
+                                Finalise();
                             }
                         })
                     }
                 }
                 else{
                     log("Could not create ppp connection", 2);
+                    Finalise();
             }}, 10000);
         }
         
