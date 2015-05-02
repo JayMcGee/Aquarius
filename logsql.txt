@@ -2423,3 +2423,5 @@
 " WHERE `config_key_name` = "LAST_KNOWN_DATE";
 >>>>>>> fb2af20193e47da4da9e0e4e6c91b9cdf5c47681
 >>>>>>> bf0b3f9beb8984272e48072628ae045e4e4d34a2
+[2015-05-02T08:08:45.320Z]: Data : SENSOR_UNIT value : su0008[2015-05-02T08:08:45.335Z]: Data : OW_DRIVER_WATER_COMP value : 28-000006052315[2015-05-02T08:08:46.004Z]: Selecting database[2015-05-02T08:08:46.020Z]: Querying[2015-05-02T08:08:46.029Z]: UPDATE `t_Config` SET `config_key_value` = "Sat May  2 08:08:46 UTC 2015
+" WHERE `config_key_name` = "LAST_KNOWN_DATE";
