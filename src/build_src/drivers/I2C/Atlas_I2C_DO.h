@@ -1,7 +1,14 @@
+/**
+ * @file   Atlas_I2C_DO.h
+ * @author Jean-Philippe Fournier
+ * @date   Febuary 18 2015
+ * @brief  Contains a child of Atlas_I2C with the DO particularities
+ */
+
 #include "../../commun.h"
 #include <iostream>
-#include <stdlib.h>     //atof
-#include <stdio.h>     //atof
+#include <stdlib.h> 
+#include <stdio.h>   
 #include "../../../include/blacklib/BlackLib.h"
 #include "../../../include/blacklib/BlackI2C.h"
 #include "Atlas_I2C.h"
@@ -12,7 +19,7 @@
 
 #define DO_CAL_AIR "Oxy"
 #define DO_CAL_0_O "0"
- 
+
 #define DO_COMMAND_P_DELAY 3
 #define DO_COMMAND_S_DELAY 3
 #define DO_COMMAND_O_DELAY 3
@@ -26,16 +33,18 @@
 #define DO_OUTPUT_SET_AT "Output string set with : "
 #define DO_OUTPUT_IS_AT "Output string is currently at : "
 
+//Number of data outputted by the device
 #define ATLAS_DO_DATA_QTY 2
 #define ATLAS_DO_DATA_1 "%"
 #define ATLAS_DO_DATA_2 "DO"
 
 namespace aquarius
 {
+	//Inherits a base Atlas_I2C device
 	class Atlas_I2C_DO : public Atlas_I2C
 	{
 		public:
-		
+			//Contains the name of all datas outputted by the device
 		    static const string dataName[ATLAS_DO_DATA_QTY];
 		    
 			Atlas_I2C_DO(string deviceName, BlackI2C * i2c)  : Atlas_I2C(deviceName,i2c){};
