@@ -41,6 +41,8 @@ var _2SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw2.py";
 var _3SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw3.py";
 var _4SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw4.py";
 
+var oneWireExec = "/var/lib/cloud9/Aquarius/exec/driverOneWireExec";
+
 var pppStartup = "pon fona";
 
 
@@ -70,11 +72,12 @@ var CONFIG_Temperature_Compensation = null;
 
 var CONFIG_dont_reboot = 1;
 
+var DataSent_Count = 0;
 var Sensors_Count = null
 var Sensors_Done = null
 
 
-databaseHelper.StopSIM908();
+
 //////////////////////////////////////////////////////////
 //Establishing connection to Station database (local DB)    
 var connection = mysql.createConnection({
@@ -124,8 +127,6 @@ function main(){
             fs.writeSync(fileWatch, "\n");
         }
         
-        exec('python /var/lib/cloud9/Aquarius/exec/set_gpio_del.py', function(){});
-        
         writeToWatchDog(fileWatch);
         log("Auto mode", 2);
         log("Reading new sensor values", 2);
@@ -135,7 +136,6 @@ function main(){
         readAllSensorsInDataBase(getSensorReadingCallback);
     }
     else {  //MANUAL
-        exec('python /var/lib/cloud9/Aquarius/exec/set_gpio_del_on.py', function(){});
         log("Manual mode", 2);
         readAllSensorsInDataBase(getSensorReadingCallback);
         log("Waiting", 2);
@@ -293,6 +293,7 @@ function assignConfigurationValues(err, rows, fields){
     
     if(CONFIG_dont_reboot && CONFIG_Operation_Mode){
         log("Auto mode with no reboot", 2);
+        exec('python /var/lib/cloud9/Aquarius/exec/set_gpio_del.py', function(){});
         if(CONFIG_Interval !== null){
             main();
             setInterval( main , 60000 * CONFIG_Interval );
@@ -303,6 +304,7 @@ function assignConfigurationValues(err, rows, fields){
         }
     }
     else{
+        exec('python /var/lib/cloud9/Aquarius/exec/set_gpio_del_on.py', function(){});
         main();
     }
     
@@ -346,6 +348,8 @@ function getSensorReadingCallback(err, rows, fields) {
 
     Sensors_Count = rows.length
     Sensors_Done = 0
+    
+    var temperatureCompensation = null;
 
     for (index = 0; index < rows.length; ++index) {
         writeToWatchDog(fileWatch)
@@ -366,17 +370,17 @@ function getSensorReadingCallback(err, rows, fields) {
             var splittedStdOutput
             var result
             do{
-                if (CONFIG_Temperature_Compensation !== null)
+                if (temperatureCompensation !== null)
                 {
                     var execution;
                     if(Driver.indexOf("AtlasI2C") > -1){
-                        execution= Driver + " " + Address + " R:-t:" + CONFIG_Temperature_Compensation;
+                        execution= Driver + " " + Address + " R:-t:" + temperatureCompensation;
                     }
                     else{
                         execution = Driver + " " + Address + " R";
                     }
                     result = sh.exec(execution);
-                    log(execution);
+                    log(execution, 3);
                 }
                 else
                 {
@@ -395,6 +399,10 @@ function getSensorReadingCallback(err, rows, fields) {
 
             if(Driver.indexOf("AtlasI2C") > -1){
                 sh.exec(Driver + " " + Address + " Sleep");
+            }
+            
+            if(Driver.indexOf("OneWire") > -1 && splittedStdOutput.length > 5){
+                temperatureCompensation = splittedStdOutput[5];
             }
 
             for (i = 0; i < rows.length; ++i) {
@@ -531,33 +539,18 @@ function createJSONfromDatabase(err, rows, fields) {
         if(sh.exec("ip addr | grep eth0").stdout.indexOf("DOWN") == -1){
             log("Ethernet is available, sending data",2);
             
-            databaseHelper.sendPostFile(JSONsession, "https://dweet.io:443/dweet/for/", "Aquarius", Finalise)
-            databaseHelper.sendPost(message, CONFIG_Cloudia_Address, Finalise)
-            
-            writeToWatchDog(fileWatch)
-            log("Count of ids : " + ids.length, 2)
-            var idToSet = 0
-            for(var s = 0; s < ids.length; s++)
-            {
-                writeToWatchDog(fileWatch)
-                databaseHelper.setDataAsSent(connection, ids[s], function(err, result){
-                    log("Set as sent : " + result, 2);
-                    idToSet++;
-                    if(idToSet >= ids.length)
-                    {
-                        //Finalise();
-                    }
-                });
-            }
+            databaseHelper.sendPostFile(JSONsession, "https://dweet.io:443/dweet/for/", "Aquarius", setIDsAsSent, ids);
+            databaseHelper.sendPost(message, CONFIG_Cloudia_Address, setIDsAsSent, ids);
         }
         else{
             log("Trying PPP connection setup", 2);
+            databaseHelper.StartSIM908();
             exec(pppStartup, function (error, stdout, stderr) {
-                console.log('stdout: ' + stdout);
-                console.log('stderr: ' + stderr);
-                if (error !== null) {
-                  console.log('exec error: ' + error);
-                }
+                //console.log('stdout: ' + stdout);
+                //console.log('stderr: ' + stderr);
+                //if (error !== null) {
+                 // console.log('exec error: ' + error);
+                //W}
             });
         
             setTimeout(function(){
@@ -566,31 +559,48 @@ function createJSONfromDatabase(err, rows, fields) {
                 if(pppExec.stdout.indexOf("ppp") > -1){
                     log("PPP connection successful", 2);
                     
-                    databaseHelper.sendPostFile(JSONsession, "https://dweet.io:443/dweet/for/", "Aquarius", Finalise)
-                    databaseHelper.sendPost(message, CONFIG_Cloudia_Address, Finalise)
-                    
-                    writeToWatchDog(fileWatch)
-                    log("Count of ids : " + ids.length, 2)
-                    var idToSet = 0
-                    for(var s = 0; s < ids.length; s++)
-                    {
-                        writeToWatchDog(fileWatch)
-                        databaseHelper.setDataAsSent(connection, ids[s], function(err, result){
-                            log("Set as sent : " + result, 2);
-                            idToSet++;
-                            if(idToSet >= ids.length)
-                            {
-                                Finalise();
-                            }
-                        })
-                    }
+                    databaseHelper.sendPostFile(JSONsession, "https://dweet.io:443/dweet/for/", "Aquarius", setIDsAsSent, ids);
+                    databaseHelper.sendPost(message, CONFIG_Cloudia_Address, setIDsAsSent, ids);
                 }
                 else{
                     log("Could not create ppp connection", 2);
                     Finalise();
                 }
-            }, 10000);
+            }, 45000);
         }
+    }
+}
+
+function setIDsAsSent(ids){
+    writeToWatchDog(fileWatch);
+    if(ids !== null){
+        log("Count of ids : " + ids.length, 2);
+        var idToSet = 0;
+        for(var s = 0; s < ids.length; s++)
+        {
+            writeToWatchDog(fileWatch)
+            databaseHelper.setDataAsSent(connection, ids[s], function(err, result){
+                log("Set as sent : " + result, 2);
+                idToSet++;
+                if(idToSet >= ids.length)
+                {
+                    countDataSent();
+                }
+            });
+        }
+    }
+    else{
+        countDataSent();
+    }
+}
+
+function countDataSent(){
+    log("Data coutn for dweet or cloudia", 1);
+    DataSent_Count = DataSent_Count + 1;
+    log("Data sent count == " + DataSent_Count, 1);
+    if(DataSent_Count > 1){
+        DataSent_Count = 0;
+        Finalise();
     }
 }
 
@@ -602,6 +612,7 @@ function idWasSet(err, result){
 
 function Finalise()
  {
+    databaseHelper.StopSIM908();
     updateDates();
     if (CONFIG_Operation_Mode == 1 && CONFIG_dont_reboot == 0) {
         

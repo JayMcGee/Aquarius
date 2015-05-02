@@ -131,17 +131,9 @@ int main(int argc, char * argv[])
     else if(firstCommand.compare(I2C_COMMAND_R) == 0)
     {
     	if(commandSplitted[1].compare("-t") == 0 && commandSplitted.size() > 2)
-    	{
-    		float compensation = getWaterTemperature(commandSplitted[2]);
-    		if(compensation == 125){
-    			aquarius::outputError(PH_TEMP_NAME, OW_DEVICE_NOT_READY);
-    			return 1;
-    		}
-			else{
-				
-	    		pH.command_Temperature_Compensation(to_string(compensation), 1);
-			}
-	    	return pH.command_Reading();
+		{
+    		pH.command_Temperature_Compensation(commandSplitted[2], 1);
+    	    return pH.command_Reading();
     	}
     	else
     		return pH.command_Reading();

@@ -132,16 +132,10 @@ int main(int argc, char * argv[])
 	//If the command is a reading
 	else if (firstCommand.compare(I2C_COMMAND_R) == 0){
 	    
-	    if(commandSplitted[1].compare("-t") == 0 && commandSplitted.size() > 2)
-    	{
-    		float compensation = getWaterTemperature(commandSplitted[2]);
-    		if(compensation == 125){
-    		    aquarius::outputError(K_TEMP_NAME, OW_DEVICE_NOT_READY);
-    			return 1;
-    		}
-    		else{
-    		    K.command_Temperature_Compensation(to_string(compensation), 1);
-    		}
+	    
+		if(commandSplitted[1].compare("-t") == 0 && commandSplitted.size() > 2)
+		{
+		    K.command_Temperature_Compensation(commandSplitted[2], 1);
     		return K.command_Reading();
     	}
 		return K.command_Reading();
