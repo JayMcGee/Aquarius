@@ -23,6 +23,7 @@
 	<link href="css/bootstrap-responsive.min.css" rel="stylesheet">
 	<link id="base-style" href="css/style.css" rel="stylesheet">
 	<link id="base-style-responsive" href="css/style-responsive.css" rel="stylesheet">
+	<link id="style-addon-aquarius" href="css/style-addon-aquarius.css" rel="stylesheet">
 	<link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800&subset=latin,cyrillic-ext,latin-ext' rel='stylesheet' type='text/css'>
 	<!-- end: CSS -->
 	
@@ -176,6 +177,9 @@
         // When user click on a dataCircle it sends a request to the server
 		function getMeasure(sensorID){
 			io.emit('requestMeasure', { ID : sensorID });
+			$("#btn"+sensorID).html('Updating <i class="fa fa-repeat"></i>');
+			$("#btn"+sensorID).attr('disabled','disabled');
+			$("#btn"+sensorID).find(".fa-repeat").addClass("gly-spin");
 		}
 	
 
@@ -183,6 +187,11 @@
         // This is where we process the answer from the server
         // Update the circle value 
         io.on('updateSensor',function(data){
+        	
+        	$("#btn"+data.ID).html('Update <i class="fa fa-repeat"></i>');    
+			$("#btn"+data.ID).removeAttr('disabled','disabled');
+			$("#btn"+data.ID).find(".fa-reapet").removeClass("gly-spin");
+			
         	var chart = $('#chart' + data.ID).highcharts();
         	var measure = parseFloat(data.result.replace(/[^\d.-]/g, ''));
         	
@@ -194,6 +203,7 @@
 			 if(!isNaN(measure) && (measure !== null) && (measure !== "")){
 			        chart.series[0].addPoint([dateNow, measure],true,shift);
 			    }
+			
 			
 		});
 	   	</script>

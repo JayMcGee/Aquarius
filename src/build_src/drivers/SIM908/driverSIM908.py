@@ -3,6 +3,7 @@ import Adafruit_BBIO.GPIO as GPIO
 import serial
 import sys, getopt
 import time
+import pyproj
 from subprocess import check_output
 from subprocess import call
 
@@ -66,6 +67,10 @@ def getCurrentGPSInformation():
     else:
         print "Could not get GPS location"
     return datas
+###############################################
+def convertGPSInformation():
+    
+    
 ############################################### 
 def initDevice():
     f = open('/sys/class/gpio/export', 'a')
