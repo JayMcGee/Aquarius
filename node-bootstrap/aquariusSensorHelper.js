@@ -294,7 +294,7 @@ module.exports = {
         }
     },
     
-    StopSim908 : function (){
+    StopSIM908 : function (){
         var driver = "python /var/lib/cloud9/Aquarius/exec/driverSIM908.py ";
         var initDevice = sh.exec(driver + "initDevice");
         var tries = 0;
