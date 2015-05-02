@@ -142,12 +142,3 @@ io.on('lastPh',function(data){
     }
 });
 
-
-setInterval(function () {
-    io.emit('updateTemp');
-    io.emit('updatePh');
-    io.emit('updateDo');
-    io.emit('updateCond');
-    io.emit('updateStationTemp');
-    io.emit('updateStationHum');
-}, interval);

@@ -1,7 +1,10 @@
 #!/bin/bash
 apt-get update; apt-get install build-essential python-dev python-setuptools python-pip python-smbus mysql-server mysql-client 
+cd /var/lib/cloud9/Aquarius/db
+mysql -u root -p -h localhost < station_aquarius_420.sql
 echo "Installing npm packages ..."
-cd /var/lib/cloud9/Aquarius/node-bootstrap 
+cd /var/lib/cloud9/Aquarius/node-bootstrap
+pwd
 npm install 
 echo "Installing Express.io ... "
 npm install express.io 
