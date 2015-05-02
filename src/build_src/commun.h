@@ -60,7 +60,7 @@ namespace aquarius
 	
     void outputError(string deviceName, string errorName);
     
-    void outputReadData(string deviceName, int dataQty, const string dataNames[], const float datas[]);
+    void outputReadData(string deviceName, int dataQty, const string dataNames[], const string datas[]);
     
     void outputCommandResult(string deviceName, string message);
     

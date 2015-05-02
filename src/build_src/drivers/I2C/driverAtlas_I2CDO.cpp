@@ -1,39 +1,54 @@
+/**
+ * @file   driverAtlas_I2CDO.cpp
+ * @author Jean-Philippe Fournier
+ * @date   Febuary 18 2015
+ * @brief  Main driver executable for the Atlas I2C DO stamp
+ */
+
 #include "../../commun.h"
 #include <iostream>
 #include <stdlib.h>
 #include "Atlas_I2C_DO.h"
 #include "../OneWire/OneWireDevice.h"
 
+//Used to output data, designates the device in question, should be replaced by an argument
 #define DO_TEMP_NAME "DO_001"
+
 using namespace BlackLib;
 using namespace std;
 
+//Function to get water temperature from onewire device and compensate on the reading
 float getWaterTemperature(string owname);
 
 int main(int argc, char * argv[])
 {
-	string returnString;
-
+	//If not enough arguments are passed to the executable, output missing argument message
 	if (argc < 3)
 	{
 		cout << aquarius::Atlas_I2C::output_missingArguments() << endl;
 		return 1;
 	}
-	string deviceLocation;
-	deviceLocation.assign(argv[1]);
 
+	//Used to store the location part of the arguments
+	string deviceLocation;
+	//Assign to the string the supposed device location argument and split to the ':' to get all arguments
+	deviceLocation.assign(argv[1]);
 	vector<string> deviceLocationSplitted{ aquarius::splitArguments(deviceLocation, ':') };
 
+	//If the device location arguments seem to be enough
 	if (deviceLocationSplitted.size() < 2)
 	{
 		cout << "Not enough I2C location information, must be [bus:address]" << endl;
 		return 1;
 	}
 
+	//Declaration of the I2C bus object
 	BlackLib::i2cName bus;
 
+	//Get the bus number from the splitted arguments
 	int bus_number = atoi(deviceLocationSplitted[0].c_str());
 
+	//Get the bus number in format usable for the device object
 	if (bus_number == 0)
 	{
 		bus = BlackLib::I2C_0;
@@ -48,24 +63,28 @@ int main(int argc, char * argv[])
 		return 1;
 	}
 
+	//Get the address of the device on the bus
 	int address = atoi(deviceLocationSplitted[1].c_str());
-
+	//Check if its valid
 	if (address > 255 && address <= 0)
 	{
 		cout << "I2C address must be smaller than 255, and higher or equal to 0" << endl;
 		return 1;
 	}
 
+	//Declare an i2c device and open the bus for communications
 	BlackI2C myI2c(bus, address);
 	myI2c.open(BlackLib::ReadWrite | BlackLib::NonBlock);
 
-
-
+	//string that will contain the command given to the I2C device
 	string command;
 	command.assign(argv[2]);
+	//Splitted to get all parts
 	vector<string> commandSplitted{ aquarius::splitArguments(command, ':') };
+	//The command itself without any parameters
 	string firstCommand = commandSplitted[0];
 
+	//Declare de the device 
 	aquarius::Atlas_I2C_DO DO(DO_TEMP_NAME, &myI2c);
 
 	int commandResult;
@@ -121,11 +140,13 @@ int main(int argc, char * argv[])
 	else if (firstCommand.compare(I2C_COMMAND_I) == 0)
 		return DO.command_Information();
 	//If the command is a reading
-	else if (firstCommand.compare(I2C_COMMAND_R) == 0){
-	
+	else if (firstCommand.compare(I2C_COMMAND_R) == 0)
+	{	
+		//If temperature compensation is asked by the reading command, execute compensation before reading
     	if(commandSplitted[1].compare("-t") == 0 && commandSplitted.size() > 2)
     	{
     		float compensation = getWaterTemperature(commandSplitted[2]);
+    		//If the one wire device did not cooperate
     		if(compensation == 125){
     		    aquarius::outputError(DO_TEMP_NAME, OW_DEVICE_NOT_READY);
     		    return 1;
@@ -135,6 +156,7 @@ int main(int argc, char * argv[])
     		}
     		return DO.command_Reading();
     	}
+    	//If not just read device
 		return DO.command_Reading();
 	}
 	//Device status

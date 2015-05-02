@@ -253,9 +253,141 @@ module.exports = {
     		    }
     		    
 		});
+    },
+    
+    calibrateAtlasSensor : function ( execPath , address , point , value ){
+        var checkFirst;
+        if(point === "mid"){
+            checkFirst = 0;
+        }
+        else if(point === "clear"){
+            checkFirst = -1;
+        }
+        else{
+            checkFirst = sh.exec(execPath + " " + address + " Cal:?").stdout.split(":")[1];
+        }
+        
+        var calibration;
+        
+        if(value == null){
+            log(execPath + " " + address + " Cal:" + point, 0);
+            calibration = sh.exec(execPath + " " + address + " Cal:" + point);
+        }
+        else{
+            log(execPath + " " + address + " Cal:" + point + ":" + value, 0);
+            calibration = sh.exec(execPath + " " + address + " Cal:" + point + ":" + value);    
+        }
+        
+        if(calibration.stdout.indexOf("ERROR") > -1 ){
+            log("Error on calibration", 2);
+            return -2;
+        }
+        
+        var checkSecond = sh.exec(execPath + " " + address + " Cal:?").stdout.split(":")[1];
+        console.log("First : " + checkFirst + " and second : "+ checkSecond);
+        
+        if(checkSecond > checkFirst){
+            return checkSecond;
+        }
+        else{
+            return -2;
+        }
+    },
+    
+    GPSOnBootCheckUp : function (){
+        var driver = "python /var/lib/cloud9/Aquarius/exec/driverSIM908.py ";
+        var initDevice = sh.exec(driver + "initDevice");
+        var tries = 0;
+        var result = 1;
+        var CheckOn = sh.exec(driver + "checkIfOn");
+        var PowerState;
+        
+        console.log("Checking current state : " +  CheckOn.stdout);
+        
+        if(CheckOn.stdout.indexOf("ON") > -1){
+            console.log("IS ON");
+            result = 1;
+        }
+        else{
+            console.log("IS OFF");
+            result = 0;
+        }
+        
+        while(result == 1 && tries < 3){
+            console.log("Still On");
+            PowerState = sh.exec(driver + "PowerOff");
+            console.log("Power Off called");
+            CheckOn = sh.exec(driver + "checkIfOn");
+            if(CheckOn.stdout.indexOf("ON") > -1){
+                console.log("IS ON");
+                result = 1;
+            }
+            else{
+                console.log("IS OFF");
+                result = 0;
+            }
+            tries++;
+            console.log(tries);
+        }
+        console.log("Finally : " + tries + " result : " + result);
+        if(tries > 2 && result == 1) return false;
+        else return true;
+        
+    },
+    
+    BootUpAndSetUpSIM908 : function(){
+        var driver = "python /var/lib/cloud9/Aquarius/exec/driverSIM908.py ";
+        var initDevice = sh.exec(driver + "initDevice");
+        var tries = 0;
+        var result = 0;
+        var CheckOn = sh.exec(driver + "checkIfOn");
+        var PowerState;
+        
+        console.log("Checking current state : " +  CheckOn.stdout);
+        
+        if(CheckOn.stdout.indexOf("ON") > -1){
+            console.log("IS ON");
+            result = 1;
+        }
+        else{
+            console.log("IS OFF");
+            result = 0;
+        }
+        
+        while(result == 0 && tries < 5){
+            console.log("Still Off");
+            PowerState = sh.exec(driver + "PowerOn");
+            console.log("Power On called");
+            CheckOn = sh.exec(driver + "checkIfOn");
+            if(CheckOn.stdout.indexOf("ON") > -1){
+                console.log("IS ON");
+                result = 1;
+            }
+            else{
+                console.log("IS OFF");
+                result = 0;
+            }
+            tries++;
+            console.log(tries);
+        }
+        console.log("Finally : " + tries + " result : " + result);
+        if(tries > 4 && result == 0) return false;
+        else return true;
+    },
+    
+    StartGPS : function(){
+        var driver = "python /var/lib/cloud9/Aquarius/exec/driverSIM908.py ";
+        
+        var result = sh.exec(driver + "StartGPS");
+    },
+    
+    GetGPS : function(){
+        var driver = "python /var/lib/cloud9/Aquarius/exec/driverSIM908.py ";
+        
+        var result = sh.exec(driver + "R");
+        
+        console.log(result.stdout);
     }
-    
-    
 };
 
 

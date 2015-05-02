@@ -34,6 +34,8 @@ namespace aquarius
 	class Atlas_I2C_K : public Atlas_I2C
 	{
 		public:
+		    static const string dataName[ATLAS_K_DATA_QTY];
+		
 			Atlas_I2C_K(string deviceName, BlackI2C * i2c) : Atlas_I2C(deviceName, i2c){};
 			
 			int command_Calibration(string parameter, string value = NO_CALIBRATION_VALUE);

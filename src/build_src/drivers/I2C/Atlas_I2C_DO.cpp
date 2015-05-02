@@ -1,13 +1,28 @@
+/**
+ * @file   Atlas_I2C_DO.cpp
+ * @author Jean-Philippe Fournier
+ * @date   Febuary 18 2015
+ * @brief  Implementation of function calls to Atlas I2C DO stamp
+ */
+
 #include "Atlas_I2C_DO.h"
 
 namespace aquarius
-{
+{	
+    //Output data names
+	const string Atlas_I2C_DO::dataName[ATLAS_DO_DATA_QTY] = { ATLAS_DO_DATA_1, ATLAS_DO_DATA_2 };
 	
+    /***
+    * Function which permits calibration of the device. Override of the function inherited from Atlas_I2C
+    * @param parameter Calibration parameter, can be Oxy, clear, 0 or ?
+    * @param value Must be null for this device. Unused
+    */
     int Atlas_I2C_DO::command_Calibration(string parameter, string value)
     {
         string returnString;
 		string command;
 		
+        //Check parameter to select which command format
 		if(parameter.compare(DO_CAL_AIR) == 0)
 			command = (string)I2C_COMMAND_CALIB;
 		else
@@ -15,21 +30,26 @@ namespace aquarius
 			
         int type = -1;
         
+        //If is not a calibration sequence but a clear or question mark
 		if (parameter.compare(I2C_CAL_CLEAR) == 0 || parameter.compare(I2C_COMMAND_ARG_QUEST) == 0)
            type = 0;
         else if(parameter.compare(DO_CAL_AIR) == 0 || parameter.compare(DO_CAL_0_O) == 0 )
             type = 1;
 
+        //Execute command on device and read answer
         int commandResult = aquarius::i2cCommand(i2c_,command, I2C_COMMAND_CALIB_DELAY, &returnString);
         
+        //If I2C response is OK
         if(commandResult == I2C_READ_BACK_OK)
     	{
+            //Ouput correctly
     	    if(type == 1)
     		    aquarius::outputCommandResult(deviceName_, (string)CALIBRATION_SUCCESSFULL_P1 + parameter);
 			else if (type == 0)
     		    aquarius::outputCommandResult(deviceName_, (string)CALIBRATION_QUERIED + splitArguments(returnString, ',')[1]);
 				
     	}
+        //Else output error message
     	else if(commandResult == I2C_READ_BACK_FAIL)
     		aquarius::outputError(deviceName_, I2C_READ_FAIL);
     	else if(commandResult == I2C_READ_BACK_PENDING)
@@ -42,6 +62,10 @@ namespace aquarius
         return commandResult;
     }
     
+    /***
+    * Function which gets the sensors readings. Outputs data through the Aquarius standard output protocol
+    * @return The I2C command code
+    */
     int Atlas_I2C_DO::command_Reading()
     {
         string returnString;
@@ -49,20 +73,19 @@ namespace aquarius
         
     	if(commandResult == I2C_READ_BACK_OK)
     	{
-    		cout << "Returned string : " << returnString << endl;
     		vector<string> split = aquarius::splitArguments(returnString, ',');
 			
 			if(split.size() >= ATLAS_DO_DATA_QTY)
 			{
 				string dataName[] = { ATLAS_DO_DATA_1, ATLAS_DO_DATA_2};
     		
-				string prct = split[1].substr(1);
-				string Do = split[0];
+                //Split data efficiently to remove garabage output
+				string prct = split[1].erase(0, split[1].find_first_not_of(' '));
+				string Do = split[0].erase(0, split[0].find_first_not_of('?'));
+				string datas[] = {prct, Do};
 				
-				float datas[] = { (float)atof(prct.c_str()),
-								(float)atof(Do.c_str())};
-				
-				aquarius::outputReadData(deviceName_, ATLAS_DO_DATA_QTY, dataName, datas);
+                //Output read data
+				aquarius::outputReadData(deviceName_, ATLAS_DO_DATA_QTY, this->dataName, datas);
 			}
 			else
 			{
@@ -89,6 +112,11 @@ namespace aquarius
 		return commandResult;
     }
 	
+    /***
+    * Function that configures the device to output certain strings
+    * @param parameter Output parameter
+    * @param enable Enable or disable the output parameter
+    */
 	int Atlas_I2C_DO::command_Output_String_Config(string parameter, string enable)
 	{
 		string returnString;

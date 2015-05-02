@@ -20,7 +20,7 @@ namespace aquarius
                 << DATA_QUANTITY << DATA_OUTPUT_DELIMITER << errorName << endl;
     }
     
-    void outputReadData(string deviceName, int dataQty, const string dataNames[], const float datas[])
+    void outputReadData(string deviceName, int dataQty, const string dataNames[], const string datas[])
     {
         cout << DEVICE_NAME_VAR << DATA_OUTPUT_DELIMITER 
                 << deviceName << DATA_OUTPUT_DELIMITER
