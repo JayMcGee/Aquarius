@@ -107,43 +107,10 @@ connection.connect(function(err){
  */
 function main(){
 
-    CONFIG_Log_File_Directory = '/var/lib/cloud9/Aquarius/'
-
-    drawSeparator()
-    //Reset RTC so it does not retrigger or stay at low logic
-    log("Resetting RTC", 3)
-    sh.exec(rtcExecPath + " disablealarm")
-    //Get date from the RTC and set it to system date
-    log("Getting date from RTC", 3)
-    sh.exec(rtcExecPath + " getdate")
-
-    //Get current system date from output of date command
-    var strCurrentSysDate = sh.exec("date").stdout
-    //And get a date object from it
-    var currentSysDate = Date.parse(strCurrentSysDate)
-    //Get a date object from last known date from configuration
-    var lastDate = Date.parse(CONFIG_Last_Date)
-
-    log("Current date : " + strCurrentSysDate, 2)
-    log("Last date : " + CONFIG_Last_Date, 2)
-
-    //If last known date is behind current system date, set last known to current and imply its correct
-    if (lastDate < currentSysDate) {
-        log("Last date is being updated to now : " + strCurrentSysDate, 2)
-        databaseHelper.setConfig(connection, 'LAST_KNOWN_DATE', strCurrentSysDate, configurationSetCallBack)
-
-    }
-    //If last known date is after current system date, set current system and rtc date to last known
-    else if (lastDate >= currentSysDate) {
-        log("Last date is in the future ? Setting date to last known, please update me", 1)
-        var execSetCurrentSysDate = sh.exec('date -s "' + CONFIG_Last_Date + '"')
-        var rtcSetDate = sh.exec(rtcExecPath + " setdate")
-    }
-
-    drawSeparator()
-    console.log()
-    drawSeparator()
-
+    CONFIG_Log_File_Directory = '/var/lib/cloud9/Aquarius/';
+    
+    updateDates();
+    
     //If current mode is HIGH, enter auto mode. Read all sensors, set RTC to wake up and shutdown
     if (CONFIG_Operation_Mode == 1) { //AUTO 
     
@@ -151,25 +118,101 @@ function main(){
             fileWatch = watchdog();
             fs.writeSync(fileWatch, "\n");
         }
-        exec('python /var/lib/cloud9/Aquarius/exec/set_gpio_del.py', function(){})
         
-        writeToWatchDog(fileWatch)
-        log("Auto mode", 2)
-        log("Reading new sensor values", 2)
-        drawSeparator()
-        writeToWatchDog(fileWatch)
+        exec('python /var/lib/cloud9/Aquarius/exec/set_gpio_del.py', function(){});
+        
+        writeToWatchDog(fileWatch);
+        log("Auto mode", 2);
+        log("Reading new sensor values", 2);
+        drawSeparator();
+        writeToWatchDog(fileWatch);
         //Reads all sensors in the data base
-        readAllSensorsInDataBase(getSensorReadingCallback)
+        readAllSensorsInDataBase(getSensorReadingCallback);
     }
     else {  //MANUAL
-        exec('python /var/lib/cloud9/Aquarius/exec/set_gpio_del_on.py', function(){})
-        log("Manual mode", 2)
-        readAllSensorsInDataBase(getSensorReadingCallback)
-        log("Waiting", 2)
+        exec('python /var/lib/cloud9/Aquarius/exec/set_gpio_del_on.py', function(){});
+        log("Manual mode", 2);
+        readAllSensorsInDataBase(getSensorReadingCallback);
+        log("Waiting", 2);
         
-        drawSeparator()
+        drawSeparator();
 
     }
+}
+
+function updateDates(){
+    
+    drawSeparator();
+    
+    if(CONFIG_dont_reboot == 0){
+        //Get current system date
+        var strCurrentSysDate = sh.exec("date").stdout;
+        var currentSysDate = Date.parse(strCurrentSysDate);
+        
+        //Get date from the RTC and set it to system date
+        log("Getting date from RTC", 3)
+        sh.exec(rtcExecPath + " getdate")
+    
+        //Get current system date from output of date command
+        var strCurrentRtcDate = sh.exec("date").stdout
+        //And get a date object from it
+        var currentRtcDate = Date.parse(strCurrentRtcDate)
+        
+        //Get a date object from last known date from configuration
+        var lastDate = Date.parse(CONFIG_Last_Date)
+    
+        log("Current Rtc date : " + strCurrentRtcDate, 2);
+        log("Current Sys date : " + strCurrentSysDate, 2);
+        log("Last known date : " + CONFIG_Last_Date, 2);
+        
+        if(currentSysDate >= lastDate && currentSysDate >= currentRtcDate){
+            //Current system date is more up to date
+            log("System date is more up to date", 2);
+            setDatesOnDevices(strCurrentSysDate);
+        }
+        if(lastDate >= currentSysDate && lastDate >= currentRtcDate){
+            //Current database date is more up to date"
+            log("Last database date is more up to date", 2);
+            setDatesOnDevices(CONFIG_Last_Date);
+        }
+        if(currentRtcDate >= currentSysDate && currentRtcDate >= lastDate){
+            //Current RTC date is more up to date
+            log("RTC date is more up to date", 2);
+            setDatesOnDevices(strCurrentRtcDate);
+        }
+    }
+    if(CONFIG_dont_reboot == 1){
+        //Get current system date
+        var strCurrentSysDate = sh.exec("date").stdout;
+        var currentSysDate = Date.parse(strCurrentSysDate);
+        
+        //Get a date object from last known date from configuration
+        var lastDate = Date.parse(CONFIG_Last_Date)
+    
+        log("Current Sys date : " + strCurrentSysDate, 2);
+        log("Last known date : " + CONFIG_Last_Date, 2);
+        
+        if(currentSysDate >= lastDate){
+            //Current system date is more up to date
+            log("System date is more up to date", 2);
+            setDatesOnDevices(strCurrentSysDate);
+        }
+        if(lastDate >= currentSysDate){
+            //Current database date is more up to date"
+            log("Last database date is more up to date", 2);
+            setDatesOnDevices(CONFIG_Last_Date);
+        }
+    }
+    drawSeparator();
+}
+
+function setDatesOnDevices(dateToUse){
+        
+    var execSetCurrentSysDate = sh.exec('date -s "' + dateToUse + '"');
+    if(CONFIG_dont_reboot == 0)
+        var rtcSetDate = sh.exec(rtcExecPath + " setdate");
+    databaseHelper.setConfig(connection, 'LAST_KNOWN_DATE', dateToUse, configurationSetCallBack);
+    
 }
 
 /**
@@ -225,6 +268,10 @@ function assignConfigurationValues(err, rows, fields){
             CONFIG_Temperature_Compensation = currentValue;
         }
     }
+    
+    //Reset RTC so it does not retrigger or stay at low logic
+    log("Resetting RTC", 3)
+    sh.exec(rtcExecPath + " disablealarm")
 
     //Get current mode of operation
     var currentMode = sh.exec(modeSwitchExec).stdout;
@@ -243,7 +290,7 @@ function assignConfigurationValues(err, rows, fields){
         log("Auto mode with no reboot", 2);
         if(CONFIG_Interval !== null){
             main();
-            setInterval( main , 60000*CONFIG_Interval );
+            setInterval( main , 60000 * CONFIG_Interval );
         }
         else{
             main();
@@ -535,7 +582,9 @@ function idWasSet(err, result){
 
 function Finalise()
  {
+    updateDates();
     if (CONFIG_Operation_Mode == 1 && CONFIG_dont_reboot == 0) {
+        
         var date = new Date()
 
         //Creates a date with added minutes from the interval configuration
@@ -563,9 +612,13 @@ function Finalise()
             }, 1000)
         }, 2000)
     }
-    else {
-           //Prepare Data for server ( Format to Json )
-        log("Reading sensor finished", 2)
+    else if(CONFIG_Operation_Mode == 1 && CONFIG_dont_reboot == 1){
+        log("Waiting for next execution", 2);
+    }
+    else if(CONFIG_Operation_Mode == 0){
+        //Prepare Data for server ( Format to Json )
+        log("Reading sensor finished", 2);
+        startServer();
     }
  }
 
@@ -591,222 +644,6 @@ function writeToWatchDog(fd){
         log("write to watchdog", 1)
     }
 }
-        
-
-
-////////////////////////////////////////////////////////////
-//Starting web-client server
-app = express();
-app.use(express.static(__dirname + '/public'));
-app.use(app.router);
-app.http().io();
-app.listen(8088);
-
-// Setup the ready route, and emit talk event.
-app.io.route('ready', function(req) {
-    log('User Connected');
-})
-// Send the client html.
-app.get('/', function(req, res) {
-    res.sendfile(__dirname + '/index.html')
-})
-app.get('/index.html', function(req, res) {
-    res.sendfile(__dirname + '/index.html')
-})
-app.get('/form.html', function(req, res) {
-    res.sendfile(__dirname + '/form.html')
-})
-app.get('/chart.html', function(req, res) {
-    res.sendfile(__dirname + '/chart.html')
-})
-//The 404 Route (ALWAYS Keep this as the last route)
-app.get('*', function(req, res) {
-    res.sendfile(__dirname + '/404.html')
-})
-//////////////////////////////////////////////////////////////
-// Manage any Socket.io Event
-
-//On connection to the client send data required to generate interface
-app.io.on('connection', function(socket) {
-    socket.on('ready', function() {
-        log("Requested sensors", 2)
-        databaseHelper.getSensorsAndEmit(connection, socket)
-    })
-})
-
-//On connection to the client send the most recent data from the DB
-//Send  
-app.io.on('connection', function(socket) {
-    socket.on('RequestConfig', function() {
-        log("Requested configuration", 2)
-        databaseHelper.readConfigAndEmit(connection, socket)
-    })
-    socket.on('UpdateConfig', function(data) {
-        log("Requested an update to configuration", 2)
-        databaseHelper.setConfig(connection, data.Name, data.Value, configurationSetCallBack)
-    })
-    socket.on('RequestNewMeasure', function(data) {
-        log("Requested a new measure on XX sensor", 2)
-
-    })
-})
-
-//Receive update Command
-app.io.on('connection', function(socket) {
-    
-    socket.on('configInterval', function(data) {
-        var interval = data.interval;
-        log("Interval = " + interval, 2)
-    });
-    
-    
-    socket.on('requestMeasure', function(ID) {
-        var sensorId=ID.ID
-        
-        var sql = 'SELECT * FROM `t_PhysicalSensor`,`t_VirtualSensor`,`t_Types` WHERE physical_t_type = types_id and virtual_t_physical = physical_id and virtual_id ='+ sensorId
-        connection.query(sql, function(err, rows, fields) {
-            if (err) {
-                throw err;
-                log("Could not get sensor for update", 1)
-            }
-            var execPath = rows[0].types_driver
-            var physAddress = rows[0].physical_address
-            var dataPosition = rows[0].virtual_driver_pos
-            var id = rows[0].virtual_id
-            
-            result = sh.exec(execPath + " " + physAddress + " R")
-            
-            console.log(result.stdout)
-            
-            if(result.stdout.indexOf("ERROR") > -1 )
-            {
-                var measuredValue = "Error"
-            }
-            else
-            {
-                var splittedStdOutput = result.stdout.split(';')
-                var measuredValue = splittedStdOutput[dataPosition];
-                
-            }
-            
-            log("Page Web requested sensor : " + sensorId + "  Returning result : " + measuredValue ,1);
-            socket.emit('updateSensor', {
-                result: measuredValue,
-                ID: sensorId
-            });
-        })
-    });
-});
-
-//Receive Calibrate command
-app.io.on('connection', function(socket) {
-    socket.on('calibration', function(data) {
-        log("Starting Calibration",1)
-        databaseHelper.getASensor(connection,data.Id,function(err,rows,fields){
-            //log(rows[0].Driver,1)
-            var driverPath = rows[0].Driver;
-            var address = rows[0].PhysicalAddress;
-            var point = data.Point;
-            var value = data.Value;
-            var calibrationStatus;
-            console.log("Driver : " + driverPath + " addredss : " + address + " point : " + point + " value : "+ value);
-            calibrationStatus = databaseHelper.calibrateAtlasSensor(driverPath, address, point, value);
-            
-            if(calibrationStatus >= 0){
-                log("Calibration Successful",2);
-                
-                socket.emit('calibrationSuccess',{ sensorId : data.Id,
-                                               status : calibrationStatus
-                });
-            } 
-            else{
-                log("Calibration Failed",2);
-                               
-                socket.emit('calibrationFailure');
-            }
-        }) 
-    });
-});
-
-
-//Receive Calibrate command
-app.io.on('connection', function(socket) {
-    socket.on('shutdown', function() {
-        var execPath="shutdown -h now";
-        
-        result = sh.exec(execPath)
-        if(result.stdout.indexOf("ERROR") > -1 ){
-            var answer = "Error";
-            log(answer,1);
-        }
-        else{
-        }
-       
-    });
-    
-    socket.on('sysInfo', function() {
-        var execPathTemp="cat /sys/class/hwmon/hwmon0/device/temp1_input | sed 's/...$//'";
-        var execPathIpUsb = "ifconfig usb0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'";
-        var execPathIpEth = "ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'";
-        var execPathIpWlan = "ifconfig wlan0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'";
-        var execPathMem = "df | grep 'rootfs'"
-        
-        result = sh.exec(execPathTemp)
-        if(result.stdout.indexOf("ERROR") > -1 ){
-            var output = "Error";
-            log(output,1);
-        }
-        else{
-            var cpuTemp = result.stdout;
-        }
-        
-        result = sh.exec(execPathIpUsb)
-        if(result.stdout.indexOf("ERROR") > -1 ){
-            var output = "Error";
-            log(output,1);
-        }
-        else{
-            var usbIp = result.stdout;
-        }
-        
-        result = sh.exec(execPathIpEth)
-        if(result.stdout.indexOf("ERROR") > -1 ){
-            var output = "Error";
-            log(output,1);
-        }
-        else{
-            var ethIp = result.stdout;
-        }
-        
-                result = sh.exec(execPathIpWlan)
-        if(result.stdout.indexOf("ERROR") > -1 ){
-            var output = "Error";
-            log(output,1);
-        }
-        else{
-            var wlanIp = result.stdout;
-        }
-        
-        result = sh.exec(execPathMem)
-        if(result.stdout.indexOf("ERROR") > -1 ){
-            var output = "Error";
-            log(output,1);
-        }
-        else{
-            var diskUsed = result.stdout;
-        }
-        
-        socket.emit('sysInfoResult', {
-                Temp: cpuTemp,
-                UsbIp: usbIp,
-                EthIp: ethIp,
-                WlanIp: wlanIp,
-                Disk: diskUsed
-            })
-       
-    });
-});
-
 
 //Send from database Functions
 function sendTempFromDB(rowCount, socket) {
@@ -820,6 +657,226 @@ function sendTempFromDB(rowCount, socket) {
         //send temperature reading out to connected clients
         socket.emit('tempData', {
             'array': rows
+        });
+    });
+}
+
+/**
+ * Function that starts the express server for the user web page
+ * 
+ */
+function startServer(){
+    log("STARTING WEB SERVER", 2);
+    ////////////////////////////////////////////////////////////
+    //Starting web-client server
+    app = express();
+    app.use(express.static(__dirname + '/public'));
+    app.use(app.router);
+    app.http().io();
+    app.listen(8088);
+    
+    // Setup the ready route, and emit talk event.
+    app.io.route('ready', function(req) {
+        log('User Connected');
+    })
+    // Send the client html.
+    app.get('/', function(req, res) {
+        res.sendfile(__dirname + '/index.html')
+    })
+    app.get('/index.html', function(req, res) {
+        res.sendfile(__dirname + '/index.html')
+    })
+    app.get('/form.html', function(req, res) {
+        res.sendfile(__dirname + '/form.html')
+    })
+    app.get('/chart.html', function(req, res) {
+        res.sendfile(__dirname + '/chart.html')
+    })
+    //The 404 Route (ALWAYS Keep this as the last route)
+    app.get('*', function(req, res) {
+        res.sendfile(__dirname + '/404.html')
+    })
+    //////////////////////////////////////////////////////////////
+    // Manage any Socket.io Event
+    
+    //On connection to the client send data required to generate interface
+    app.io.on('connection', function(socket) {
+        socket.on('ready', function() {
+            log("Requested sensors", 2)
+            databaseHelper.getSensorsAndEmit(connection, socket)
+        })
+    })
+    
+    //On connection to the client send the most recent data from the DB
+    //Send  
+    app.io.on('connection', function(socket) {
+        socket.on('RequestConfig', function() {
+            log("Requested configuration", 2)
+            databaseHelper.readConfigAndEmit(connection, socket)
+        })
+        socket.on('UpdateConfig', function(data) {
+            log("Requested an update to configuration", 2)
+            databaseHelper.setConfig(connection, data.Name, data.Value, configurationSetCallBack)
+        })
+        socket.on('RequestNewMeasure', function(data) {
+            log("Requested a new measure on XX sensor", 2)
+    
+        })
+    })
+    
+    //Receive update Command
+    app.io.on('connection', function(socket) {
+        
+        socket.on('configInterval', function(data) {
+            var interval = data.interval;
+            log("Interval = " + interval, 2)
+        });
+        
+        
+        socket.on('requestMeasure', function(ID) {
+            var sensorId=ID.ID
+            
+            var sql = 'SELECT * FROM `t_PhysicalSensor`,`t_VirtualSensor`,`t_Types` WHERE physical_t_type = types_id and virtual_t_physical = physical_id and virtual_id ='+ sensorId
+            connection.query(sql, function(err, rows, fields) {
+                if (err) {
+                    throw err;
+                    log("Could not get sensor for update", 1)
+                }
+                var execPath = rows[0].types_driver
+                var physAddress = rows[0].physical_address
+                var dataPosition = rows[0].virtual_driver_pos
+                var id = rows[0].virtual_id
+                
+                result = sh.exec(execPath + " " + physAddress + " R")
+                
+                console.log(result.stdout)
+                
+                if(result.stdout.indexOf("ERROR") > -1 )
+                {
+                    var measuredValue = "Error"
+                }
+                else
+                {
+                    var splittedStdOutput = result.stdout.split(';')
+                    var measuredValue = splittedStdOutput[dataPosition];
+                    
+                }
+                
+                log("Page Web requested sensor : " + sensorId + "  Returning result : " + measuredValue ,1);
+                socket.emit('updateSensor', {
+                    result: measuredValue,
+                    ID: sensorId
+                });
+            })
+        });
+    });
+    
+    //Receive Calibrate command
+    app.io.on('connection', function(socket) {
+        socket.on('calibration', function(data) {
+            log("Starting Calibration",1)
+            databaseHelper.getASensor(connection,data.Id,function(err,rows,fields){
+                //log(rows[0].Driver,1)
+                var driverPath = rows[0].Driver;
+                var address = rows[0].PhysicalAddress;
+                var point = data.Point;
+                var value = data.Value;
+                var calibrationStatus;
+                console.log("Driver : " + driverPath + " addredss : " + address + " point : " + point + " value : "+ value);
+                calibrationStatus = databaseHelper.calibrateAtlasSensor(driverPath, address, point, value);
+                
+                if(calibrationStatus >= 0){
+                    log("Calibration Successful",2);
+                    
+                    socket.emit('calibrationSuccess',{ sensorId : data.Id,
+                                                   status : calibrationStatus
+                    });
+                } 
+                else{
+                    log("Calibration Failed",2);
+                                   
+                    socket.emit('calibrationFailure');
+                }
+            }) 
+        });
+    });
+    
+    
+    //Receive Calibrate command
+    app.io.on('connection', function(socket) {
+        socket.on('shutdown', function() {
+            var execPath="shutdown -h now";
+            
+            result = sh.exec(execPath)
+            if(result.stdout.indexOf("ERROR") > -1 ){
+                var answer = "Error";
+                log(answer,1);
+            }
+            else{
+            }
+           
+        });
+        
+        socket.on('sysInfo', function() {
+            var execPathTemp="cat /sys/class/hwmon/hwmon0/device/temp1_input | sed 's/...$//'";
+            var execPathIpUsb = "ifconfig usb0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'";
+            var execPathIpEth = "ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'";
+            var execPathIpWlan = "ifconfig wlan0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'";
+            var execPathMem = "df | grep 'rootfs'"
+            
+            result = sh.exec(execPathTemp)
+            if(result.stdout.indexOf("ERROR") > -1 ){
+                var output = "Error";
+                log(output,1);
+            }
+            else{
+                var cpuTemp = result.stdout;
+            }
+            
+            result = sh.exec(execPathIpUsb)
+            if(result.stdout.indexOf("ERROR") > -1 ){
+                var output = "Error";
+                log(output,1);
+            }
+            else{
+                var usbIp = result.stdout;
+            }
+            
+            result = sh.exec(execPathIpEth)
+            if(result.stdout.indexOf("ERROR") > -1 ){
+                var output = "Error";
+                log(output,1);
+            }
+            else{
+                var ethIp = result.stdout;
+            }
+            
+                    result = sh.exec(execPathIpWlan)
+            if(result.stdout.indexOf("ERROR") > -1 ){
+                var output = "Error";
+                log(output,1);
+            }
+            else{
+                var wlanIp = result.stdout;
+            }
+            
+            result = sh.exec(execPathMem)
+            if(result.stdout.indexOf("ERROR") > -1 ){
+                var output = "Error";
+                log(output,1);
+            }
+            else{
+                var diskUsed = result.stdout;
+            }
+            
+            socket.emit('sysInfoResult', {
+                    Temp: cpuTemp,
+                    UsbIp: usbIp,
+                    EthIp: ethIp,
+                    WlanIp: wlanIp,
+                    Disk: diskUsed
+                })
+           
         });
     });
 }
