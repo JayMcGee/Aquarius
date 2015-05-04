@@ -318,23 +318,23 @@
     <script src="/socket.io/socket.io.js"></script>
     <script>
   
-        ////////////////////////////////////////////////////////////////////////
-        // Connect the web client to the Station Server
-        // Sends a ready event
-        io = io.connect();
-        // Emit ready event.
-        io.emit('ready');
-        var allSensors;
+	////////////////////////////////////////////////////////////////////////
+	// Connect the web client to the Station Server
+	// Sends a ready event
+	io = io.connect();
+	// Emit ready event.
+	io.emit('ready');
+	var allSensors;
 
 	/////// Manage Buttons
 	$("#shutdownBtn").click(function(){
 		io.emit("shutdown");
 	});
+	
 	$("#sysInfoBtn").click(function(){
 		io.emit("sysInfo");
 	});
 
-<<<<<<< HEAD
 	/////// Ph Calibrate
 	$("#midPointBtn_ph").click(function(){
 		sendCalibrationEmit(1,"Mid");
@@ -372,7 +372,7 @@
 		}
 		else{
 			io.emit('calibration',{Id:id, Point:point, Value:null});
-=======
+
 		/////// Ph Calibrate
 		$("#midPointBtn_ph").click(function(){
 			sendCalibrationEmit(1,"mid", 7);
@@ -453,34 +453,33 @@
 			}
 		});
 		
-		function setButtonStatus(buttonId,status)
-		{
-			var buttonIdString = ("#" + buttonId);
-			
-			if(status == 1)
+			function setButtonStatus(buttonId,status)
 			{
-				$(buttonIdString).removeAttr('disabled');
+				var buttonIdString = ("#" + buttonId);
+				
+				if(status == 1)
+				{
+					$(buttonIdString).removeAttr('disabled');
+				}
+				else if(status == 0)
+				{
+					$(buttonIdString).attr('disabled','disabled');
+						
+				}
+				
 			}
-			else if(status == 0)
+		
+			function sendCalibrationEmit(id,point,value)
 			{
-				$(buttonIdString).attr('disabled','disabled');
-					
+				if( value == null){
+					io.emit('calibration',{Id:id, Point:point, Value:null});
+				}
+				else{
+					io.emit('calibration',{Id:id, Point:point, Value:value});
+				}
 			}
-			
-		}
 		
-		function sendCalibrationEmit(id,point,value)
-		{
-			if( value == null){
-				io.emit('calibration',{Id:id, Point:point, Value:null});
-			}
-			else{
-				io.emit('calibration',{Id:id, Point:point, Value:value});
-			}
-			
->>>>>>> 1484dbf3f68aeb92e7635d072140e1c944405f1c
 		}
-		
 	}
 	
 		 ////////////////////////////////////////////////////////////////////////
@@ -611,12 +610,11 @@
         	
         	var measure = parseFloat(data.result.replace(/[^\d.-]/g, ''));
         
-<<<<<<< HEAD
         	var measure = parseFloat(data.result);
             	var valInit = $('#sensor' + data.ID).val();
-=======
+
             var valInit = $('#sensor' + data.ID).val();
->>>>>>> 1484dbf3f68aeb92e7635d072140e1c944405f1c
+
 			$({value: valInit}).animate({value:measure}, {
 				duration: 500,
 				easing:'swing',
@@ -660,6 +658,5 @@
 	createMap(-30.034647,-51.217658,"Aquarius1","Porto Alegre");
 	
 	</script>
-</div>
 </body>
 </html>
