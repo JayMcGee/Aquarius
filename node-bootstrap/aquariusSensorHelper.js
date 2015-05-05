@@ -387,6 +387,14 @@ module.exports = {
         var result = sh.exec(driver + "R");
         
         console.log(result.stdout);
+    },
+
+    StopGPS : function(){
+        var driver = "python /var/lib/cloud9/Aquarius/exec/driverSIM908.py ";
+        
+        var result = sh.exec(driver + "StopGPS");
+        
+        console.log(result.stdout);        
     }
 };
 

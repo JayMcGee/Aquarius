@@ -13,15 +13,10 @@ npm install node-schedule
 echo "Installing execSync ... " 
 npm install execSync 
 echo "Installing aquarius.service to system ..."
-cp /var/lib/cloud9/Aquarius/aquarius.service /lib/systemd/system 
+cp /var/lib/cloud9/Aquarius/install/aquarius.service /lib/systemd/system 
 cd /etc/systemd/system/multi-user.target.wants/ 
 ln /lib/systemd/system/aquarius.service 
-cd /var/lib/cloud9/Aquarius 
-mkdir /mnt/card 
-mount /dev/mmcblk0p1  /mnt/card 
-cp /var/lib/cloud9/Aquarius/install/uEnv.txt /mnt/card/uEnv.txt 
-dtc -O dtb -o /var/lib/cloud9/Aquarius/install/w1-00A0.dtbo -b 0 -@ /var/lib/cloud9/Aquarius/install/w1.dts 
-cp /var/lib/cloud9/Aquarius/install/w1-00A0.dtbo /lib/firmware 
-cp /var/lib/cloud9/Aquarius/install/rc.local /etc 
+cd /var/lib/cloud9/Aquarius/src/build_src/
+make
 echo "Thy shall reboot, for thy need to reseat" 
 reboot 
