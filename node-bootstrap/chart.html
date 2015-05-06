@@ -185,8 +185,11 @@
         io.on('updateSensor',function(data){
         	var chart = $('#chart' + data.ID).highcharts();
         	var measure = parseFloat(data.result.replace(/[^\d.-]/g, ''));
-            var shift = (chart.series[0].data.length > 10);
+        	
+            var shift = (chart.series[0].data.length > 10); //Shift the graph to display only 10 results at a time
+            
             var dateNow = new Date().getTime();
+            
 			[Date.UTC(2012, 12, 10, 00, 00, 43), measure]
 			 if(!isNaN(measure) && (measure !== null) && (measure !== "")){
 			        chart.series[0].addPoint([dateNow, measure],true,shift);
