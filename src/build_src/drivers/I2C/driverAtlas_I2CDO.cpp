@@ -145,15 +145,7 @@ int main(int argc, char * argv[])
 		//If temperature compensation is asked by the reading command, execute compensation before reading
     	if(commandSplitted[1].compare("-t") == 0 && commandSplitted.size() > 2)
     	{
-    		float compensation = getWaterTemperature(commandSplitted[2]);
-    		//If the one wire device did not cooperate
-    		if(compensation == 125){
-    		    aquarius::outputError(DO_TEMP_NAME, OW_DEVICE_NOT_READY);
-    		    return 1;
-    		}
-    		else{
-    		    DO.command_Temperature_Compensation(to_string(compensation), 1);
-    		}
+		    DO.command_Temperature_Compensation(commandSplitted[2], 1);
     		return DO.command_Reading();
     	}
     	//If not just read device

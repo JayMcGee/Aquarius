@@ -210,7 +210,7 @@ module.exports = {
         return connection.query(sql, callback)
     },
     
-    sendPost : function ( jsonInString, address, callback ){
+    sendPost : function ( jsonInString, address, callback, ids ){
         
         var fs = require('fs');
         
@@ -223,11 +223,11 @@ module.exports = {
             var execution = sh.exec("curl --data @/var/lib/cloud9/Aquarius/data.json " + address).stdout
             
             console.log(execution)
-            callback()
+            callback(ids)
         });
     },
     
-    sendPostFile : function ( file , sendAddress , path , callback){
+    sendPostFile : function ( file , sendAddress , path , callback, ids){
 
         requestModule({
     			url: "https://dweet.io:443/dweet/for/Aquarius",
@@ -242,14 +242,17 @@ module.exports = {
     		    {
         			if (response.statusCode === 200) {
                         console.log(body)
+                        callback(ids);
                     }
                     else {
                         console.log("response.statusCode: " + response.statusCode)
                         console.log("response.statusText: " + response.statusText)
+                        callback(null);
                     }
     		    }
     		    else {
                     log("error: " + err)
+                    callback(null);
     		    }
     		    
 		});
@@ -294,7 +297,7 @@ module.exports = {
         }
     },
     
-    StopSim908 : function (){
+    StopSIM908 : function (){
         var driver = "python /var/lib/cloud9/Aquarius/exec/driverSIM908.py ";
         var initDevice = sh.exec(driver + "initDevice");
         var tries = 0;
