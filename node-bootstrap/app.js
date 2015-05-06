@@ -77,7 +77,7 @@ var Sensors_Count = null
 var Sensors_Done = null
 
 
-databaseHelper.StopSIM908();
+
 //////////////////////////////////////////////////////////
 //Establishing connection to Station database (local DB)    
 var connection = mysql.createConnection({
@@ -127,8 +127,6 @@ function main(){
             fs.writeSync(fileWatch, "\n");
         }
         
-        exec('python /var/lib/cloud9/Aquarius/exec/set_gpio_del.py', function(){});
-        
         writeToWatchDog(fileWatch);
         log("Auto mode", 2);
         log("Reading new sensor values", 2);
@@ -138,7 +136,6 @@ function main(){
         readAllSensorsInDataBase(getSensorReadingCallback);
     }
     else {  //MANUAL
-        exec('python /var/lib/cloud9/Aquarius/exec/set_gpio_del_on.py', function(){});
         log("Manual mode", 2);
         readAllSensorsInDataBase(getSensorReadingCallback);
         log("Waiting", 2);
@@ -296,6 +293,7 @@ function assignConfigurationValues(err, rows, fields){
     
     if(CONFIG_dont_reboot && CONFIG_Operation_Mode){
         log("Auto mode with no reboot", 2);
+        exec('python /var/lib/cloud9/Aquarius/exec/set_gpio_del.py', function(){});
         if(CONFIG_Interval !== null){
             main();
             setInterval( main , 60000 * CONFIG_Interval );
@@ -306,6 +304,7 @@ function assignConfigurationValues(err, rows, fields){
         }
     }
     else{
+        exec('python /var/lib/cloud9/Aquarius/exec/set_gpio_del_on.py', function(){});
         main();
     }
     
@@ -545,12 +544,13 @@ function createJSONfromDatabase(err, rows, fields) {
         }
         else{
             log("Trying PPP connection setup", 2);
+            databaseHelper.StartSIM908();
             exec(pppStartup, function (error, stdout, stderr) {
-                console.log('stdout: ' + stdout);
-                console.log('stderr: ' + stderr);
-                if (error !== null) {
-                  console.log('exec error: ' + error);
-                }
+                //console.log('stdout: ' + stdout);
+                //console.log('stderr: ' + stderr);
+                //if (error !== null) {
+                 // console.log('exec error: ' + error);
+                //W}
             });
         
             setTimeout(function(){
@@ -566,7 +566,7 @@ function createJSONfromDatabase(err, rows, fields) {
                     log("Could not create ppp connection", 2);
                     Finalise();
                 }
-            }, 10000);
+            }, 45000);
         }
     }
 }
@@ -612,6 +612,7 @@ function idWasSet(err, result){
 
 function Finalise()
  {
+    databaseHelper.StopSIM908();
     updateDates();
     if (CONFIG_Operation_Mode == 1 && CONFIG_dont_reboot == 0) {
         
