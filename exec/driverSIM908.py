@@ -38,7 +38,7 @@ def startGPS():
         #print "GPS module could not be started"
     return ok
         
-    datas = writeAndReadSIM908( "AT+CGPSRST=1" )
+    datas = writeAndReadSIM908( "AT+CGPSRST=0" )
     ok = checkIfOK(datas)
     #if ok == 1:
         #print "GPS resetted succesfully"
@@ -61,6 +61,7 @@ def getCurrentGPSInformation():
     datas = writeAndReadSIM908( "AT+CGPSINF=0" )
     ok = checkIfOK(datas)
     if ok == 1:
+        print datas
         outputDataStringGPS(datas[1])
     else:
         print "Could not get GPS location"
@@ -114,19 +115,20 @@ def checkGPS():
     datas = writeAndReadSIM908( "AT+CGPSSTATUS?" )
     ok = checkIfOK(datas)
     if ok == 1:
+        print datas
         print "GPS module is fixed"
     else:
         print "GPS module is not fixed"
-        return ok
-
-def resetGPS():
-    datas = writeAndReadSIM908( "AT+CGPSRST=1" )
+    return ok
+#####################################################
+def resetGPS(x):
+    datas = writeAndReadSIM908( "AT+CGPSRST=" + str(x))
     ok = checkIfOK(datas)
     if ok == 1:
+        print datas
         print "GPS resetted succesfully"
     else :
         print "GPS could not be resetted"
-        
     return ok
 ####################################################
 def sendDataThroughPOST(file):
@@ -175,6 +177,10 @@ if ser.isOpen() and len(sys.argv) > 1:
         stopGPS()
     elif command == "CheckGPS":
         checkGPS()
+    elif command == "ResetGPS":
+        resetGPS(1)
+    elif command == "ColdResetGPS":
+        resetGPS(0)        
     elif command == "PowerOff":
         powerOff()
     elif command == "PowerOn":
