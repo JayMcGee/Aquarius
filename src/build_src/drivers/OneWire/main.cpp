@@ -74,13 +74,13 @@ int main(int argc, char * argv[])
 				
             }
             else
-                aquarius::outputError(NOM_TEMPORAIRE, "OW_NO_DATA");
+                aquarius::outputError(NOM_TEMPORAIRE, "OW_ERROR_NO_DATA");
         }
         else
-            aquarius::outputError(NOM_TEMPORAIRE, "OW_NO_RESPONSE");
+            aquarius::outputError(NOM_TEMPORAIRE, "OW_ERROR_NO_RESPONSE");
     }
     else  
-        aquarius::outputError(NOM_TEMPORAIRE, "OW_NO_DEVICE");
+        aquarius::outputError(NOM_TEMPORAIRE, "OW_ERROR_NO_DEVICE");
         
     return 1;
 }

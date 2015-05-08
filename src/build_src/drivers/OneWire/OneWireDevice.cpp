@@ -63,31 +63,44 @@ namespace aquarius
             
             string temp = "";
             
+            string isThere = "";
+            
             //Read all the lines in the file
             while(onewireFin.good())
             {
                 onewireFin >> temp;
                 
                 data += temp;
+                
+                
             }
             
             temp = data;
             
-            size_t found = temp.find_last_of('=');
+            //Look for YES which says if a device is still connected to the bus
+            size_t foundDevice = temp.find("YES");
             
-            //If the data includes a '=', substring and cast to float, divided by 1000 to get Celsius
-            if(found != string::npos)
-            {
-                data = temp.substr(found + 1);
-                
-                lastTemperature_ = stof(data) / 1000;
-                
-                return(hasUpdated_ = true);
+            if(foundDevice != string::npos){
+                size_t found = temp.find_last_of('=');
+            
+                //If the data includes a '=', substring and cast to float, divided by 1000 to get Celsius
+                if(found != string::npos)
+                {
+                    data = temp.substr(found + 1);
+                    
+                    lastTemperature_ = stof(data) / 1000;
+                    
+                    return(hasUpdated_ = true);
+                }
+                else
+                {
+                    return (hasUpdated_ = false);
+                }
             }
-            else
-            {
+            else{
                 return (hasUpdated_ = false);
             }
+            
         }
         return false;
     }

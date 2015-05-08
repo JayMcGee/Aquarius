@@ -577,6 +577,7 @@ function createJSONfromDatabase(err, rows, fields) {
     }
 }
 
+
 function setIDsAsSent(ids){
     writeToWatchDog(fileWatch);
     if(ids !== null){

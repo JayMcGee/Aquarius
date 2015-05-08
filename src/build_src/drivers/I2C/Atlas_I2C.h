@@ -1,3 +1,11 @@
+/**
+ * @file   Atlas_I2C_DO.h
+ * @author Jean-Philippe Fournier and Jean-Pascal McGee
+ * @date   Febuary 18 2015
+ * @brief  Main Atlas I2C object for control of commands
+ */
+
+
 #include "../../commun.h"
 #include <iostream>
 #include <stdlib.h>     //atof
@@ -25,12 +33,16 @@
 #define I2C_COMMAND_X_DELAY 3
 #define I2C_COMMAND_T_DELAY 3
 
+//Values to enable LEDs on the stamps
 #define ATLAS_LED_CONTROL_ON "1"
 #define ATLAS_LED_CONTROL_OFF "0"
 
+//Command to request state of parameters
 #define I2C_COMMAND_ARG_QUEST "?"
+//Orders a clear on paramteres
 #define I2C_CAL_CLEAR "clear"
 
+//Passed when no value is given for calibration
 #define NO_CALIBRATION_VALUE "NONE"
 
 //Command result strings to help decode operations
@@ -48,20 +60,40 @@
 #define LED_ON "On"
 #define LED_OFF "Off"
 
+//Stamp output data delimiter
 #define I2C_DELIMITER ","
 
+//In namespace aquarius
 namespace aquarius
 {
+	//Atlas I2C stamp base class
 	class Atlas_I2C 
 	{
 		protected:
+			//Contains de name of the I2C Atlas stamp device
 			string deviceName_;
+			//I2C port opened by the Blacklib library
 			BlackI2C * i2c_;
 		public:
+			/***
+			 * Build an Atlas I2C device 
+			 * @param deviceName Name of the created device
+			 * @param i2c I2C device to use
+			 */
 			Atlas_I2C(string deviceName, BlackI2C * i2c);
-		
+			
+			/****
+			 * Virtual function that calibrates the device. This function is device unique. 
+			 * @param parameter Contains the calibration parameter
+			 * @param value Contains the calibration value which is NO_CALIBRATION_VALUE by default
+			 * @return The I2C communication result code
+			 */
 			virtual int command_Calibration(string parameter, string value = NO_CALIBRATION_VALUE) = 0;
-
+			
+			/***
+			 * 
+			 * 
+			 */
 			int command_Information();
 			
 			int command_LEDControl(string parameter);

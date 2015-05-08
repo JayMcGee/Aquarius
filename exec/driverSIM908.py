@@ -3,6 +3,7 @@ import Adafruit_BBIO.GPIO as GPIO
 import serial
 import sys, getopt
 import time
+#import pyproj
 from subprocess import check_output
 from subprocess import call
 
@@ -66,6 +67,10 @@ def getCurrentGPSInformation():
     else:
         print "Could not get GPS location"
     return datas
+###############################################
+def convertGPSInformation():
+    
+    return
 ############################################### 
 def initDevice():
     f = open('/sys/class/gpio/export', 'a')
@@ -120,15 +125,16 @@ def checkGPS():
     else:
         print "GPS module is not fixed"
     return ok
-#####################################################
-def resetGPS(x):
-    datas = writeAndReadSIM908( "AT+CGPSRST=" + str(x))
+
+def resetGPS():
+    datas = writeAndReadSIM908( "AT+CGPSRST=0" )
     ok = checkIfOK(datas)
     if ok == 1:
         print datas
         print "GPS resetted succesfully"
     else :
         print "GPS could not be resetted"
+        
     return ok
 ####################################################
 def sendDataThroughPOST(file):
@@ -178,9 +184,7 @@ if ser.isOpen() and len(sys.argv) > 1:
     elif command == "CheckGPS":
         checkGPS()
     elif command == "ResetGPS":
-        resetGPS(1)
-    elif command == "ColdResetGPS":
-        resetGPS(0)        
+        resetGPS()
     elif command == "PowerOff":
         powerOff()
     elif command == "PowerOn":
