@@ -334,35 +334,45 @@
 	$("#sysInfoBtn").click(function(){
 		io.emit("sysInfo");
 	});
-
+	
 	/////// Ph Calibrate
 	$("#midPointBtn_ph").click(function(){
-		sendCalibrationEmit(1,"Mid");
+		sendCalibrationEmit(1,"mid", 7);
 	});
 	$("#lowPointBtn_ph").click(function(){
-		sendCalibrationEmit(1,"Low", $("#lowPoint_ph").value );
+		sendCalibrationEmit(1,"low", $("#lowPoint_ph").val() );
 	});
 	$("#highPointBtn_ph").click(function(){
-		sendCalibrationEmit(1,"High",$("#highPoint_ph").value);
+		sendCalibrationEmit(1,"high",$("#highPoint_ph").val());
+	});
+	$("#clearBtn_ph").click(function(){
+		sendCalibrationEmit(1,"clear");
 	});
 	
 	/////// Do Calibrate
 	$("#ambientBtn_do").click(function(){
-		sendCalibrationEmit(4,"");
+		sendCalibrationEmit(4,"Oxy");
 	})
 	$("#zeroBtn_do").click(function(){
 		sendCalibrationEmit(4,"0");
 	});
+	$("#clearBtn_do").click(function(){
+		sendCalibrationEmit(4,"clear");
+	});
+	
 	
 	/////// Cond Calibrate
 	$("#dryPointBtn_cond").click(function(){
 		sendCalibrationEmit(5,"dry");
 	});
 	$("#lowPointBtn_cond").click(function(){
-		sendCalibrationEmit(5,"Low", $("#lowPoint_cond").value );
+		sendCalibrationEmit(5,"low", $("#lowPoint_cond").val() );
 	});
 	$("#highPointBtn_cond").click(function(){
-		sendCalibrationEmit(5,"High",$("#highPoint_cond").value);
+		sendCalibrationEmit(5,"high",$("#highPoint_cond").val());
+	});
+	$("#clearBtn_cond").click(function(){
+		sendCalibrationEmit(5,"clear");
 	});
 
 	function sendCalibrationEmit(id,point,value)
@@ -372,155 +382,106 @@
 		}
 		else{
 			io.emit('calibration',{Id:id, Point:point, Value:null});
-
-		/////// Ph Calibrate
-		$("#midPointBtn_ph").click(function(){
-			sendCalibrationEmit(1,"mid", 7);
-		});
-		$("#lowPointBtn_ph").click(function(){
-			sendCalibrationEmit(1,"low", $("#lowPoint_ph").val() );
-		});
-		$("#highPointBtn_ph").click(function(){
-			sendCalibrationEmit(1,"high",$("#highPoint_ph").val());
-		});
-		$("#clearBtn_ph").click(function(){
-			sendCalibrationEmit(1,"clear");
-		});
-		
-		/////// Do Calibrate
-		$("#ambientBtn_do").click(function(){
-			sendCalibrationEmit(4,"Oxy");
-		})
-		$("#zeroBtn_do").click(function(){
-			sendCalibrationEmit(4,"0");
-		});
-		$("#clearBtn_do").click(function(){
-			sendCalibrationEmit(4,"clear");
-		});
-		
-		
-		/////// Cond Calibrate
-		$("#dryPointBtn_cond").click(function(){
-			sendCalibrationEmit(5,"dry");
-		});
-		$("#lowPointBtn_cond").click(function(){
-			sendCalibrationEmit(5,"low", $("#lowPoint_cond").val() );
-		});
-		$("#highPointBtn_cond").click(function(){
-			sendCalibrationEmit(5,"high",$("#highPoint_cond").val());
-		});
-		$("#clearBtn_cond").click(function(){
-			sendCalibrationEmit(5,"clear");
-		});
-		
-		io.on('calibrationSuccess',function(data){
-			if(data.sensorId == 1){
-				if(data.status == 1)
-				{
-					setButtonStatus("lowPointBtn_ph",1);
-				}
-				if(data.status == 2)
-				{
-					setButtonStatus("highPointBtn_ph",1);
-				}
-				if(data.status == 0)
-				{
-					setButtonStatus("lowPointBtn_ph",0);
-					setButtonStatus("highPointBtn_ph",0);
-				}
-			}
-			else if(data.sensorId == 4){
-				if(data.status == 1)
-				{
-					setButtonStatus("zeroBtn_do",1);
-				}
-				if(data.status == 0)
-				{
-					setButtonStatus("zeroBtn_do",0);
-				}
-			}
-			else if(data.sensorId == 5){
-				if(data.status == 0)
-				{
-					setButtonStatus("lowPointBtn_cond",1);
-					setButtonStatus("highPointBtn_cond",1);
-				}
-				if(data.status == -1)
-				{
-					setButtonStatus("lowPointBtn_cond",0);
-					setButtonStatus("highPointBtn_cond",0);
-				}
-			}
-		});
-		
-			function setButtonStatus(buttonId,status)
-			{
-				var buttonIdString = ("#" + buttonId);
-				
-				if(status == 1)
-				{
-					$(buttonIdString).removeAttr('disabled');
-				}
-				else if(status == 0)
-				{
-					$(buttonIdString).attr('disabled','disabled');
-						
-				}
-				
-			}
-		
-			function sendCalibrationEmit(id,point,value)
-			{
-				if( value == null){
-					io.emit('calibration',{Id:id, Point:point, Value:null});
-				}
-				else{
-					io.emit('calibration',{Id:id, Point:point, Value:value});
-				}
-			}
-		
 		}
 	}
+		
+	io.on('calibrationSuccess',function(data){
+		if(data.sensorId == 1){
+			if(data.status == 1)
+			{
+				setButtonStatus("lowPointBtn_ph",1);
+			}
+			if(data.status == 2)
+			{
+				setButtonStatus("highPointBtn_ph",1);
+			}
+			if(data.status == 0)
+			{
+				setButtonStatus("lowPointBtn_ph",0);
+				setButtonStatus("highPointBtn_ph",0);
+			}
+		}
+		else if(data.sensorId == 4){
+			if(data.status == 1)
+			{
+				setButtonStatus("zeroBtn_do",1);
+			}
+			if(data.status == 0)
+			{
+				setButtonStatus("zeroBtn_do",0);
+			}
+		}
+		else if(data.sensorId == 5){
+			if(data.status == 0)
+			{
+				setButtonStatus("lowPointBtn_cond",1);
+				setButtonStatus("highPointBtn_cond",1);
+			}
+			if(data.status == -1)
+			{
+				setButtonStatus("lowPointBtn_cond",0);
+				setButtonStatus("highPointBtn_cond",0);
+			}
+		}
+	});
+		
+	function setButtonStatus(buttonId,status)
+	{
+		var buttonIdString = ("#" + buttonId);
+		
+		if(status == 1)
+		{
+			$(buttonIdString).removeAttr('disabled');
+		}
+		else if(status == 0)
+		{
+			$(buttonIdString).attr('disabled','disabled');
+				
+		}
+		
+	}
+		
+
 	
-		 ////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////
         // ReceiveSensors contains an array representing all the 
         // sensors and their properties
-		io.on('sysInfoResult',function(data){
-			
-			var disk = data.Disk.split(" ");
-			
-			disk.forEach(function(element){
-				if(element.indexOf("%") > -1)
-				{
-					disk = element;
-				}
-			});
-			
-			if(data.UsbIp)
+	io.on('sysInfoResult',function(data){
+		
+		var disk = data.Disk.split(" ");
+		
+		disk.forEach(function(element){
+			if(element.indexOf("%") > -1)
 			{
-				var usb0 = "Usb0 Ip : " + data.UsbIp;
+				disk = element;
 			}
-			if(data.EthIp)
-			{
-				var eth0 = "Eth0 Ip : " + data.EthIp;
-			}
-			if(data.WlanIp)
-			{
-				var wlan0 = "Wlan0 Ip : " + data.WlanIp;
-			}
-			
-			
-			var cpuTemp = "Cpu Temperature : " + data.Temp + "°C";
-			
-			var diskUsed = "Used disk : " + disk;
-			
-			$(".cpuTemp").replaceWith(cpuTemp);
-			$(".usbIp").replaceWith(usb0);
-			$(".ethIp").replaceWith(eth0);
-			$(".wlanIp").replaceWith(wlan0);
-			$(".diskUsed").replaceWith(diskUsed);
 		});
-	
+		
+		if(data.UsbIp)
+		{
+			var usb0 = "Usb0 Ip : " + data.UsbIp;
+		}
+		if(data.EthIp)
+		{
+			var eth0 = "Eth0 Ip : " + data.EthIp;
+		}
+		if(data.WlanIp)
+		{
+			var wlan0 = "Wlan0 Ip : " + data.WlanIp;
+		}
+		
+		
+		var cpuTemp = "Cpu Temperature : " + data.Temp + "°C";
+		
+		var diskUsed = "Used disk : " + disk;
+		
+		$(".cpuTemp").replaceWith(cpuTemp);
+		$(".usbIp").replaceWith(usb0);
+		$(".ethIp").replaceWith(eth0);
+		$(".wlanIp").replaceWith(wlan0);
+		$(".diskUsed").replaceWith(diskUsed);
+	});
+
 		
 		
         ////////////////////////////////////////////////////////////////////////
