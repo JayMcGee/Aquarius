@@ -116,7 +116,7 @@ def checkPLine():
 ##############################################
 def outputDataStringGPS(data):
     splitted = data.split(",")    
-    print "NAME;SIM908;DATQ;5;SATS;" + str(splitted[6]) + ";LONG;" + ConvertLong(str(splitted[1])) + ";LAT;" + ConvertLat(str(splitted[2])) + ";ALT;" + str(splitted[3]) + ";TIME;" + str(splitted[4])
+    print "NAME;SIM908;DATQ;5;SATS;" + str(splitted[6]) + ";LONG;" + str(ConvertLong(str(splitted[1]))) + ";LAT;" + str(ConvertLat(str(splitted[2]))) + ";ALT;" + str(splitted[3]) + ";TIME;" + str(splitted[4])
     return
 ##############################################
 # Convert the Latitude from NMEA to Degrees Decimal

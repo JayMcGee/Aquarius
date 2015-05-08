@@ -3,7 +3,7 @@
 # MUST CHANGE: Change the -T parameter value **** to your network's APN value.
 # For example if your APN is 'internet' (without quotes), the line would look like:
 # connect "/usr/sbin/chat -v -f /etc/chatscripts/gprs -T internet"
-connect "/usr/sbin/chat -v -f /etc/chatscripts/gprs -T internet.com"
+connect "/usr/sbin/chat -v -f /etc/chatscripts/gprs -T internet.fido.ca"
 
 # MUST CHANGE: Uncomment the appropriate serial device for your platform below.
 # For Raspberry Pi use /dev/ttyAMA0 by uncommenting the line below:

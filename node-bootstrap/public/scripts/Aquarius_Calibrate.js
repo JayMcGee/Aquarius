@@ -80,7 +80,7 @@ $("#midPointBtn_ph").click(function(){
 	sendCalibrationEmit(1,"mid", 7);
 });
 $("#lowPointBtn_ph").click(function(){
-	sendCalibrationEmit(1,"low", $("#lowPoint_ph").val() );
+	sendCalibrationEmit(1,"low", $("#lowPoint_ph").val());
 });
 $("#highPointBtn_ph").click(function(){
 	sendCalibrationEmit(1,"high",$("#highPoint_ph").val());
@@ -123,10 +123,10 @@ $("#clearBtn_cond").click(function(){
 function sendCalibrationEmit(id,point,value)
 {
 	if( value == null){
-		io.emit('calibration',{Id:id, Point:point, Value:value});
+		io.emit('calibration',{Id:id, Point:point, Value:null});
 	}
 	else{
-		io.emit('calibration',{Id:id, Point:point, Value:null});
+		io.emit('calibration',{Id:id, Point:point, Value:value});
 	}
 }
 
