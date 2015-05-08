@@ -404,9 +404,17 @@ function getSensorReadingCallback(err, rows, fields) {
                 if (rows[i].CloudiaUnitID == CloudiaUnitID) {
 
                     if (splittedStdOutput.length > rows[i].Position) {
-                        var value = splittedStdOutput[rows[i].Position]
-                        log("Inserting into database value : " + value + " " + rows[i].MeasureUnit, 2)
-                        databaseHelper.setData(connection, roundToX(value, rows[i].Precision), rows[i].VirtualID, 0, t_Data_insertCallBack)
+                        var value;
+                        if(rows[i].ValuePrecision == 0){
+                            value = splittedStdOutput[rows[i].Position];
+                        }
+                        else{
+                            value = splittedStdOutput[rows[i].Position];
+                            value = roundToX(Number(value), rows[i].ValuePrecision);
+                            
+                        }
+                        log("Inserting into database value : " + value + " " + rows[i].MeasureUnit, 2);
+                        databaseHelper.setData(connection, value, rows[i].VirtualID, 0, t_Data_insertCallBack);  
                     }
                     else {
                         log("Missing data : " + UnitName, 1)
@@ -424,7 +432,8 @@ function getSensorReadingCallback(err, rows, fields) {
 }
 
 function roundToX(num, x) {
-  return +(Math.round(num + "e+" + places)  + "e-" + places);
+    console.log("Number to  round : " + num + " at x : " + x)
+    return +(Math.round(num + "e+" + x)  + "e-" + x);
 }
 
 

@@ -116,7 +116,7 @@ module.exports = {
                 't_VirtualSensor.cloudia_id AS CloudiaSensorID, ' + 
                 't_VirtualSensor.virtual_measure_unit AS MeasureUnit, ' + 
                 't_VirtualSensor.virtual_driver_pos AS Position, ' + 
-                't_VirtualSensor.virtual_precision AS Precision ' + 
+                't_VirtualSensor.virtual_precision AS ValuePrecision ' + 
                 'FROM `t_VirtualSensor`, `t_Types`, `t_PhysicalSensor` ' + 
                 'WHERE t_PhysicalSensor.physical_t_type = t_Types.types_id ' + 
                 'and t_VirtualSensor.virtual_t_physical = t_PhysicalSensor.physical_id ' + 
@@ -138,7 +138,7 @@ module.exports = {
                 't_VirtualSensor.cloudia_id AS CloudiaSensorID, ' + 
                 't_VirtualSensor.virtual_measure_unit AS MeasureUnit, ' + 
                 't_VirtualSensor.virtual_driver_pos AS Position, ' + 
-                't_VirtualSensor.virtual_precision AS Precision ' +
+                't_VirtualSensor.virtual_precision AS ValuePrecision ' +
                 'FROM `t_VirtualSensor`, `t_Types`, `t_PhysicalSensor` ' + 
                 'WHERE t_PhysicalSensor.physical_id = ' + physicalId + ' ' + 
                 'and t_PhysicalSensor.physical_t_type = t_Types.types_id ' +
@@ -161,7 +161,7 @@ module.exports = {
                 't_VirtualSensor.cloudia_id AS CloudiaSensorID, ' + 
                 't_VirtualSensor.virtual_measure_unit AS MeasureUnit, ' + 
                 't_VirtualSensor.virtual_driver_pos AS Position, ' + 
-                't_VirtualSensor.virtual_precision AS Precision, ' +
+                't_VirtualSensor.virtual_precision AS ValuePrecision, ' +
                 't_VirtualSensor.virtual_min AS Min, ' +
                 't_VirtualSensor.virtual_max AS Max, ' +
                 't_VirtualSensor.virtual_color As Color ' + 
