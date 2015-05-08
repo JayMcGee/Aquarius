@@ -1,7 +1,7 @@
 #!/bin/bash
-apt-get update; apt-get install build-essential python-dev python-setuptools python-pip python-smbus mysql-server mysql-client 
+apt-get update; apt-get install build-essential python-dev python-setuptools python-pip python-smbus mysql-server mysql-client phpmyadmin
 cd /var/lib/cloud9/Aquarius/db
-mysql -u root -p -h localhost < station_aquarius_420.sql
+mysql -u root -p -h localhost < station_aquarius_6_mai_gps_fixed_for_real.sql
 echo "Installing npm packages ..."
 cd /var/lib/cloud9/Aquarius/node-bootstrap
 pwd
