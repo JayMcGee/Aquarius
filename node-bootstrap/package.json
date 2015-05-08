@@ -10,7 +10,6 @@
     "method-override": "*",
     "morgan": "*",
     "mysql": "*",
-    "node-schedule": "^0.2.6",
     "serve-favicon": "*",
     "socket.io": "*"
   },
