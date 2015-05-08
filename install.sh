@@ -18,6 +18,8 @@ cp /var/lib/cloud9/Aquarius/install/aquarius.service /lib/systemd/system
 cd /etc/systemd/system/multi-user.target.wants/ 
 ln /lib/systemd/system/aquarius.service 
 cd /var/lib/cloud9/Aquarius/src/build_src/
+mkdir -p /var/lib/cloud9/Aquarius/exec
+mkdir -p /var/lib/cloud9/Aquarius/src/build_src/libs
 make
 cd /var/lib/cloud9/Aquarius/exec/
 ./driverAtlasI2CDO 1:97 O:%:1

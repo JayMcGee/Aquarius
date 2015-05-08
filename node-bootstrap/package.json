@@ -11,7 +11,7 @@
     "morgan": "*",
     "mysql": "*",
     "serve-favicon": "*",
-    "socket.io": "*",
+    "socket.io": "*"
   },
   "engines": {
     "node": "0.10.30",
