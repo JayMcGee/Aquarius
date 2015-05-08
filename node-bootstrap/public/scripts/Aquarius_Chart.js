@@ -68,7 +68,7 @@ io.on('ReceiveSensors',function(data){
 		highcharts.colors[0] = chartColor;
 		highcharts.yAxis.title.text = chartUnit;
 		
-		var htmlContainer = '<div class="row-fluid">' + '<div class="box-header">' + '<h2><i class="halflings-icon list-alt"></i><span class="break"></span>'+ chartName + '</h2>' + '<div class="box-icon"><a id="' + "btn"+chartID +'" class="btn-setting btn-aquarius" onclick="getMeasure('+ chartID +')"> Update <i class="halflings-icon repeat"></i></a></div> </div>' + '<div class="box-content"> <div id="' + "chart"+chartID +'" style="min-width: 310px; height: 400px; margin: 0 auto"></div> </div>' + '</div><!--/row-->';
+		var htmlContainer = '<div class="row-fluid">' + '<div class="box-header">' + '<h2><i class="halflings-icon list-alt"></i><span class="break"></span>'+ chartName + '</h2>' + '<div class="box-icon"><button id="' + "btn"+chartID +'" class="btn btn-small btn-primary btn-aquarius" onclick="getMeasure('+ chartID +')"> Update <i class="fa fa-repeat"></i></button></div> </div>' + '<div class="box-content"> <div id="' + "chart"+chartID +'" style="min-width: 310px; height: 400px; margin: 0 auto"></div> </div>' + '</div><!--/row-->';
 		$("#content").append(htmlContainer);
 		
 		
