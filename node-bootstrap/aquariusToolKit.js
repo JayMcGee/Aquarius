@@ -199,7 +199,8 @@ module.exports = {
                 't_VirtualSensor.virtual_precision AS ValuePrecision ' + 
                 'FROM `t_VirtualSensor`, `t_Types`, `t_PhysicalSensor` ' + 
                 'WHERE t_PhysicalSensor.physical_t_type = t_Types.types_id ' + 
-                'and t_VirtualSensor.virtual_t_physical = t_PhysicalSensor.physical_id ' + 
+                'and t_VirtualSensor.virtual_t_physical = t_PhysicalSensor.physical_id ' +
+                'and t_VirtualSensor.virtual_on = 1 ' +
                 'ORDER BY t_VirtualSensor.cloudia_id;'
         log(sql, 3)
         return connection.query(sql, callBackToApp)
@@ -263,7 +264,8 @@ module.exports = {
                 't_VirtualSensor.virtual_color As Color ' + 
                 'FROM `t_VirtualSensor`, `t_Types`, `t_PhysicalSensor` ' + 
                 'WHERE t_PhysicalSensor.physical_t_type = t_Types.types_id ' + 
-                'and t_VirtualSensor.virtual_t_physical = t_PhysicalSensor.physical_id ' + 
+                'and t_VirtualSensor.virtual_t_physical = t_PhysicalSensor.physical_id ' +
+                'and t_VirtualSensor.virtual_on = 1 ' + 
                 'ORDER BY t_VirtualSensor.cloudia_id;'
         log(sql, 3)
         var query = connection.query(sql, function(err, rows, fields) {

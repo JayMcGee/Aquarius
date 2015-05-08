@@ -30,7 +30,6 @@
 var express = require('express.io'); //Express and Socket.io integration
 var mysql = require('mysql'); //Javascript mySql Connector
 var exec = require('child_process').exec;
-var schedule = require('node-schedule'); //In application schedule creator
 var fs = require('fs');         //File system manipluation for the watchdog
 var sh = require('execSync'); //Permits the execution of external applications synchronously
 
