@@ -572,7 +572,7 @@ function createJSONfromDatabase(err, rows, fields) {
                     log("Could not create ppp connection", 2);
                     Finalise();
                 }
-            }, 45000);
+            }, 10000);
         }
     }
 }
