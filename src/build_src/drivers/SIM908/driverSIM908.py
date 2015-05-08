@@ -72,7 +72,8 @@ def getCurrentGPSInformation():
     print "Querying GPS module"
     datas = writeAndReadSIM908( "AT+CGPSINF=0" )
     ok = checkIfOK(datas)
-    if ok == 1:
+    gpsOk = checkIfFix(datas)
+    if ok == 1 and gpsOk == 1:
         print datas
         outputDataStringGPS(datas[1])
     else:
@@ -186,6 +187,18 @@ def checkIfOn():
     datas = writeAndReadSIM908( "AT" )
     ok = checkIfOK(datas)
     return ok
+
+######################################################
+# Checks if the device has a fix on its position
+# If it doesn't, return 0 or 1 if a fix was made
+######################################################
+def checkIfFix(datas):
+    splitted = data.split(",")
+    if splitted[5] !== "0"
+        ok = 1
+    else
+        ok = 0
+    return ok 
 ######################################################
 # Main program
 # Manages the arguments passed to the script
