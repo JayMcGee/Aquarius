@@ -29,7 +29,7 @@
 	<!-- end: CSS -->	
 		
 	<!-- start: Favicon -->
-	<link rel="shortcut icon" href="images/favicon.png">
+	<link rel="shortcut icon" href="img/favicon.png">
 	<!-- end: Favicon -->
 </head>
 
@@ -83,7 +83,7 @@
 							<p>
 								<button class="btn green"id="exportBtn">Export Database</button>
 								<button class="btn yellow btn-setting" id="sysInfoBtn">System Information</button>
-								<button class="btn btn-primary"id="modetBtn">Switch to Auto mode</button>
+								<button class="btn btn-primary" data-toggle="modal" data-target="#switchMode" id="modetBtn">Switch to Auto mode</button>
 								<button class="btn red" id="shutdownBtn">ShutDown</button>
 							</p>
 						</div>
@@ -210,6 +210,7 @@
 		</div><!--/#content.span10-->
 	</div><!--/fluid-row-->
 	
+	<!-- System Information Modal -->
 	<div class="modal hide fade" id="myModal">
 		<div class="modal-header">
 			<button type="button" class="close" data-dismiss="modal">×</button>
@@ -237,6 +238,28 @@
 			<a href="#" class="btn" data-dismiss="modal">Close</a>
 		</div>
 	</div>
+	<!-- Switch Mode Modal -->
+	<div class="modal hide fade" id="switchMode">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal">×</button>
+			<h3>Switch to Auto Mode</h3>
+		</div>
+		<div class="modal-body">
+			<div class="row-fluid ">
+				<div class="span10"> Flip switch 1 to Auto mode </div>
+				<div class="span2"> <i class="fa fa-toggle-off"></i></div>
+			</div>
+			<div class="row-fluid ">
+				<div class="span10"> Now restart the service </div>
+				<div class="span2"><button class="btn btn-primary" id="restartBtn">Restart</button></i></div>
+			</div>
+		</div>
+		<div class="modal-footer">
+			<a href="#" class="btn" data-dismiss="modal">Close</a>
+		</div>
+	</div>
+	
+	
 		
 	<div class="clearfix"></div>
 	
@@ -334,6 +357,12 @@
 	
 	$("#sysInfoBtn").click(function(){
 		io.emit("sysInfo");
+	});
+	$("#modetBtn").click(function(){
+		getSwitchStatus();
+	});
+	$("#restartBtn").click(function(){
+		io.emit("restartService");
 	});
 	
 	/////// Ph Calibrate
@@ -558,11 +587,29 @@
 		*/
 	})
 	
+	function getSwitchStatus(){
+		io.emit('getSwitchStatus');
+	}
+	
+	io.on('switchStatus',function(data){
+		
+		if(data.mode.indexOf("HIGH") > -1){
+			$("#switchMode").find(".fa").switchClass( "fa-toggle-off", "fa-toggle-on", 500, "easeInOutQuad" );
+			$("#restartBtn").removeAttr('disabled','disabled');
+		}
+		else{
+			$("#restartBtn").attr('disabled','disabled');
+			$("#switchMode").find(".fa").switchClass( "fa-toggle-on", "fa-toggle-off", 500, "easeInOutQuad" );
+			setTimeout(function(){
+				getSwitchStatus();
+				}, 1000);
+		}
+	});
 
         ////////////////////////////////////////////////////////////////////////
         // When user click on a dataCircle it sends a request to the server
 	function getMeasure(sensorID){
-		io.emit('requestMeasure', { ID : sensorID })
+		io.emit('requestMeasure', { ID : sensorID });
 		$("#itemBox"+sensorID).find(".footer").html("Updating");
 	}
 	
