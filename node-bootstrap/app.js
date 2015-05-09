@@ -844,6 +844,16 @@ function startServer(){
            
         });
         
+        socket.on('getSwitchStatus',function(){
+            var currentMode = sh.exec(modeSwitchExec).stdout; //High auto; Low manual
+            socket.emit('switchStatus',{mode:currentMode})
+        });
+        
+        socket.on('restartService',function()
+        {
+           var service = sh.exec("systemctl restart aquarius.service").stdout; 
+        });
+        
         socket.on('sysInfo', function() {
             var execPathTemp="cat /sys/class/hwmon/hwmon0/device/temp1_input | sed 's/...$//'";
             var execPathIpUsb = "ifconfig usb0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'";
