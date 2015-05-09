@@ -349,11 +349,11 @@ function getSensorReadingCallback(err, rows, fields) {
         var Driver = rows[index].Driver
         var Address = rows[index].PhysicalAddress
         var UnitName = rows[index].UnitName
-        var CloudiaUnitID = rows[index].CloudiaUnitID
+        var PhysicalID = rows[index].PhysicalID
 
-        if (alreadyDone.indexOf(CloudiaUnitID) == -1) {
+        if (alreadyDone.indexOf(PhysicalID) == -1) {
             log("Reading : " + UnitName, 2)
-            alreadyDone[alreadyDone.length] = CloudiaUnitID
+            alreadyDone[alreadyDone.length] = PhysicalID
 
             
             if(Driver.indexOf("SIM908") > -1){
@@ -407,7 +407,7 @@ function getSensorReadingCallback(err, rows, fields) {
 
             for (i = 0; i < rows.length; ++i) {
                 writeToWatchDog(fileWatch)
-                if (rows[i].CloudiaUnitID == CloudiaUnitID) {
+                if (rows[i].PhysicalID == PhysicalID) {
 
                     if (splittedStdOutput.length > rows[i].Position) {
                         var value;

@@ -112,7 +112,7 @@ module.exports = {
                 't_Types.types_driver AS Driver, ' + 
                 't_PhysicalSensor.physical_address AS PhysicalAddress, ' + 
                 't_PhysicalSensor.physical_name AS UnitName, ' + 
-                't_PhysicalSensor.cloudia_unit_id AS CloudiaUnitID, ' + 
+                't_PhysicalSensor.physical_id AS PhysicalID, ' +
                 't_VirtualSensor.cloudia_id AS CloudiaSensorID, ' + 
                 't_VirtualSensor.virtual_measure_unit AS MeasureUnit, ' + 
                 't_VirtualSensor.virtual_driver_pos AS Position, ' + 
@@ -134,7 +134,6 @@ module.exports = {
                 't_Types.types_driver AS Driver, ' + 
                 't_PhysicalSensor.physical_address AS PhysicalAddress, ' + 
                 't_PhysicalSensor.physical_name AS UnitName, ' + 
-                't_PhysicalSensor.cloudia_unit_id AS CloudiaUnitID, ' + 
                 't_VirtualSensor.cloudia_id AS CloudiaSensorID, ' + 
                 't_VirtualSensor.virtual_measure_unit AS MeasureUnit, ' + 
                 't_VirtualSensor.virtual_driver_pos AS Position, ' + 
@@ -157,7 +156,6 @@ module.exports = {
                 't_Types.types_driver AS Driver, ' + 
                 't_PhysicalSensor.physical_address AS PhysicalAddress, ' + 
                 't_PhysicalSensor.physical_name AS UnitName, ' + 
-                't_PhysicalSensor.cloudia_unit_id AS CloudiaUnitID, ' + 
                 't_VirtualSensor.cloudia_id AS CloudiaSensorID, ' + 
                 't_VirtualSensor.virtual_measure_unit AS MeasureUnit, ' + 
                 't_VirtualSensor.virtual_driver_pos AS Position, ' + 
