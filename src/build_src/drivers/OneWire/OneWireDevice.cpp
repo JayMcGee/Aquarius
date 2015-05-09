@@ -1,3 +1,11 @@
+/**
+ * @file   OneWireDevice.cpp
+ * @author Jean-Philippe Fournier
+ * @date   October 19 2014
+ * @brief  Defintion of a device tree operated temperature one wire sensor
+ */
+
+
 #include "OneWireDevice.h"
 namespace aquarius
 {

@@ -4,36 +4,42 @@
 #include "Atlas_I2C_PH.h"
 #include "../OneWire/OneWireDevice.h"
 
+
+//Used to output data, designates the device in question, should be replaced by an argument
 #define PH_TEMP_NAME "PH_001"
+
 using namespace BlackLib;
 using namespace std;
-
-float getWaterTemperature(string owname);
 
 int main(int argc, char * argv[])
 {
     string returnString;
     
+    //If not enough arguments are passed to the executable, output missing argument message
     if(argc < 3)
     {
         cout << aquarius::Atlas_I2C::output_missingArguments() << endl;
         return 1;
     }
+
+    //Used to store the location part of the arguments
     string deviceLocation;
-    deviceLocation.assign(argv[1]);
-    
+    //Assign to the string the supposed device location argument and split to the ':' to get all arguments
+    deviceLocation.assign(argv[1]);    
     vector<string> deviceLocationSplitted{aquarius::splitArguments(deviceLocation, ':')};
-    
+
+    //If the device location arguments seem to be enough    
     if(deviceLocationSplitted.size() < 2)
     {
         cout << "Not enough I2C location information, must be [bus:address]" << endl;  
         return 1;
     }
     
+    //Declaration of the I2C bus object
     BlackLib::i2cName bus;
     
     int bus_number = atoi(deviceLocationSplitted[0].c_str());
-    
+    //Get the bus number in format usable for the device object
     if(bus_number == 0)
     {
         bus = BlackLib::I2C_0;
@@ -48,22 +54,28 @@ int main(int argc, char * argv[])
         return 1;
     }
     
+    //Get the address of the device on the bus
     int address = atoi(deviceLocationSplitted[1].c_str());
-    
+    //Check if its valid
     if(address > 255 && address <= 0)
     {
         cout << "I2C address must be smaller than 255, and higher or equal to 0" << endl;  
         return 1;
     }
     
+    //Declare an i2c device and open the bus for communications
     BlackI2C myI2c(bus, address);
     myI2c.open( BlackLib::ReadWrite | BlackLib::NonBlock);
 	
+    //string that will contain the command given to the I2C device
     string command;
-    command.assign(argv[2]);    
+    command.assign(argv[2]); 
+    //Splitted to get all parts   
     vector<string> commandSplitted{aquarius::splitArguments(command, ':')};
+    //The command itself without any parameters
 	string firstCommand = commandSplitted[0];
 	
+    //Declare de the device 
 	aquarius::Atlas_I2C_PH pH(PH_TEMP_NAME, &myI2c);
 	
 	int commandResult;	
@@ -150,40 +162,3 @@ int main(int argc, char * argv[])
     
     return 1;
 }
-
-float getWaterTemperature(string owname)
-{
-	//Create the One Wire device object
-    aquarius::OneWireDevice ow(owname);
-    
-    float temp;
-    
-    //Path validation...
-    if(ow.isValidPath())
-    {
-        //Device path is valid
-        if(ow.updateTemperature())
-        {
-            //Temperature updated
-            if(ow.getLastTemperature(&temp))
-            {
-                if(temp == 85.0f)
-                {
-                    return 125;
-                }
-                else
-                {
-                    return temp;
-                }
-				
-            }
-        }
-    }
-    return 125;
-}
-
-
-
-
-
-

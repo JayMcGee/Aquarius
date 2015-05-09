@@ -1,6 +1,6 @@
 /**
  * @file   Atlas_I2C_DO.cpp
- * @author Jean-Philippe Fournier
+ * @author Jean-Philippe Fournier and Jean-Pascal McGee
  * @date   Febuary 18 2015
  * @brief  Implementation of function calls to Atlas I2C DO stamp
  */
@@ -12,11 +12,14 @@ namespace aquarius
     //Output data names
 	const string Atlas_I2C_DO::dataName[ATLAS_DO_DATA_QTY] = { ATLAS_DO_DATA_1, ATLAS_DO_DATA_2 };
 	
-    /***
-    * Function which permits calibration of the device. Override of the function inherited from Atlas_I2C
-    * @param parameter Calibration parameter, can be Oxy, clear, 0 or ?
-    * @param value Must be null for this device. Unused
-    */
+    /**
+     * @brief Calibrates the device
+     * 
+     * @param parameter calibration parameter (query, level)
+     * @param value value for calibration, NO_CALIBRATION_VALUE is default
+     * 
+     * @return I2C commande result code
+     */
     int Atlas_I2C_DO::command_Calibration(string parameter, string value)
     {
         string returnString;
@@ -62,10 +65,11 @@ namespace aquarius
         return commandResult;
     }
     
-    /***
-    * Function which gets the sensors readings. Outputs data through the Aquarius standard output protocol
-    * @return The I2C command code
-    */
+    /**
+     * @brief Outputs a reading
+     * @details Using the common aquarius output system, read and output the sensor
+     * @return I2C commande result code
+     */
     int Atlas_I2C_DO::command_Reading()
     {
         string returnString;
@@ -112,11 +116,15 @@ namespace aquarius
 		return commandResult;
     }
 	
-    /***
-    * Function that configures the device to output certain strings
-    * @param parameter Output parameter
-    * @param enable Enable or disable the output parameter
-    */
+    /**
+     * @brief Changes the output string from the device
+     * @details Use with caution, can alter the reading functions accuracy
+     * 
+     * @param parameter Command parameter
+     * @param enable Enable/Disable the output
+     * 
+     * @return I2C commande result code
+     */
 	int Atlas_I2C_DO::command_Output_String_Config(string parameter, string enable)
 	{
 		string returnString;
@@ -158,7 +166,14 @@ namespace aquarius
     	}
 		return commandResult;
 	}
-			
+	
+     /**
+     * @brief Pressure compensation command
+     * @details Set the pressure compensation on the device
+     * 
+     * @param parameter The pressure parameter or query parameter
+     * @return I2C commande result code
+     */		
 	int Atlas_I2C_DO::command_Pressure(string parameter)
 	{
 		string returnString;

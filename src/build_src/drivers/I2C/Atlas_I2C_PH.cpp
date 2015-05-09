@@ -1,3 +1,11 @@
+/**
+ * @file   Atlas_I2C_K.cpp
+ * @author Jean-Philippe Fournier and Jean-Pascal McGee
+ * @date   Febuary 18 2015
+ * @brief  Implementation of function calls to Atlas I2C K stamp
+ */
+
+
 #include "Atlas_I2C_PH.h"
 
 namespace aquarius
@@ -5,6 +13,15 @@ namespace aquarius
 	
 	const string Atlas_I2C_PH::dataName[ATLAS_PH_DATA_QTY] = { ATLAS_PH_DATA_1 };
 	
+    /**
+     * @brief Device calibration
+     * @details Calibrates the device using the stamp commands
+     * 
+     * @param parameter calibration parameter
+     * @param value calibration value if any
+     * 
+     * @return I2C command result code
+     */
     int Atlas_I2C_PH::command_Calibration(string parameter, string value)
     {
         string returnString;
@@ -50,6 +67,11 @@ namespace aquarius
         return commandResult;
     }
     
+    /**
+     * @brief Reads the sensor value
+     * @details Outputs a reading using the common aquarius output system
+     * @return I2C command result code
+     */
     int Atlas_I2C_PH::command_Reading()
     {
         string returnString;
