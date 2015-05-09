@@ -315,21 +315,21 @@ module.exports = {
         var CheckOn = sh.exec(driver + "checkIfOn");
         var PowerState;
         
-        console.log("Checking current state : " +  CheckOn.stdout);
+        //console.log("Checking current state : " +  CheckOn.stdout);
         
         if(CheckOn.stdout.indexOf("ON") > -1){
-            console.log("IS ON");
+            //console.log("IS ON");
             result = 1;
         }
         else{
-            console.log("IS OFF");
+            //console.log("IS OFF");
             result = 0;
         }
         
         while(result == 1 && tries < 3){
-            console.log("Still On");
+            //console.log("Still On");
             PowerState = sh.exec(driver + "PowerOff");
-            console.log("Power Off called");
+            //console.log("Power Off called");
             CheckOn = sh.exec(driver + "checkIfOn");
             if(CheckOn.stdout.indexOf("ON") > -1){
                 console.log("IS ON");
@@ -340,9 +340,9 @@ module.exports = {
                 result = 0;
             }
             tries++;
-            console.log(tries);
+            //console.log(tries);
         }
-        console.log("Finally : " + tries + " result : " + result);
+        //console.log("Finally : " + tries + " result : " + result);
         if(tries > 2 && result == 1) return false;
         else return true;
         
@@ -356,21 +356,21 @@ module.exports = {
         var CheckOn = sh.exec(driver + "checkIfOn");
         var PowerState;
         
-        console.log("Checking current state : " +  CheckOn.stdout);
+        //console.log("Checking current state : " +  CheckOn.stdout);
         
         if(CheckOn.stdout.indexOf("ON") > -1){
-            console.log("IS ON");
+            //console.log("IS ON");
             result = 1;
         }
         else{
-            console.log("IS OFF");
+            //console.log("IS OFF");
             result = 0;
         }
         
         while(result == 0 && tries < 5){
-            console.log("Still Off");
+            //console.log("Still Off");
             PowerState = sh.exec(driver + "PowerOn");
-            console.log("Power On called");
+            //console.log("Power On called");
             CheckOn = sh.exec(driver + "checkIfOn");
             if(CheckOn.stdout.indexOf("ON") > -1){
                 console.log("IS ON");
@@ -381,9 +381,9 @@ module.exports = {
                 result = 0;
             }
             tries++;
-            console.log(tries);
+            //console.log(tries);
         }
-        console.log("Finally : " + tries + " result : " + result);
+        //console.log("Finally : " + tries + " result : " + result);
         if(tries > 4 && result == 0) return false;
         else return true;
     },
@@ -392,6 +392,8 @@ module.exports = {
         var driver = "python /var/lib/cloud9/Aquarius/exec/driverSIM908.py ";
         
         var result = sh.exec(driver + "StartGPS");
+        
+        var result2 = sh.exec(driver + "ResetGPS");
     },
     
     GetGPS : function(){

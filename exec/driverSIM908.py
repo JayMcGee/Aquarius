@@ -3,7 +3,7 @@ import Adafruit_BBIO.GPIO as GPIO
 import serial
 import sys, getopt
 import time
-import pyproj
+#import pyproj
 from subprocess import check_output
 from subprocess import call
 
@@ -58,19 +58,24 @@ def stopGPS():
     return ok
 ###############################################
 def getCurrentGPSInformation():
-    print "Querying GPS module"
-    datas = writeAndReadSIM908( "AT+CGPSINF=0" )
-    ok = checkIfOK(datas)
-    if ok == 1:
-        print datas
-        outputDataStringGPS(datas[1])
-    else:
-        print "Could not get GPS location"
-    return datas
+    #resetGPS()
+    i = 0
+    while(i < 10):
+        #print "Querying GPS module"
+        datas = writeAndReadSIM908( "AT+CGPSINF=0" )
+        ok = checkIfOK(datas)
+        if ok == 1:
+            #print datas
+            if outputDataStringGPS(datas[1]) == 1:
+                return datas
+        time.sleep(5.0)
+        i = i + 1
+    print "ERROR : Could not get GPS location"
+    return 0
 ###############################################
 def convertGPSInformation():
     
-    
+    return
 ############################################### 
 def initDevice():
     f = open('/sys/class/gpio/export', 'a')
@@ -111,9 +116,10 @@ def outputDataStringGPS(data):
 #0.000000,					7
 #0.000000		8
     splitted = data.split(",")
-    
+    if splitted[6] == "0" or splitted[5] == "0":
+        return 0
     print "NAME;SIM908;DATQ;5;SATS;" + str(splitted[6]) + ";LONG;" + str(splitted[1]) + ";LAT;" + str(splitted[2]) + ";ALT;" + str(splitted[3]) + ";TIME;" + str(splitted[4])
-    return
+    return 1
 #####################################################
 def checkGPS():
     print "Checking GPS status"
@@ -129,11 +135,11 @@ def checkGPS():
 def resetGPS():
     datas = writeAndReadSIM908( "AT+CGPSRST=0" )
     ok = checkIfOK(datas)
-    if ok == 1:
-        print datas
-        print "GPS resetted succesfully"
-    else :
-        print "GPS could not be resetted"
+    #if ok == 1:
+        #print datas
+        #print "GPS resetted succesfully"
+    #else :
+        #print "GPS could not be resetted"
         
     return ok
 ####################################################

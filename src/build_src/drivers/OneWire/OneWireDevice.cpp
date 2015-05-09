@@ -77,6 +77,7 @@ namespace aquarius
             
             temp = data;
             
+            //Look for YES which says if a device is still connected to the bus
             size_t foundDevice = temp.find("YES");
             
             if(foundDevice != string::npos){

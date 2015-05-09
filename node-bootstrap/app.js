@@ -109,9 +109,6 @@ connection.connect(function(err){
 function main(){
 
     CONFIG_Log_File_Directory = '/var/lib/cloud9/Aquarius/';
-    
-    databaseHelper.StartSIM908();
-    databaseHelper.StartGPS();
 
     updateDates();
     
@@ -359,6 +356,10 @@ function getSensorReadingCallback(err, rows, fields) {
             alreadyDone[alreadyDone.length] = CloudiaUnitID
 
             
+            if(Driver.indexOf("SIM908") > -1){
+                databaseHelper.StartSIM908();
+                databaseHelper.StartGPS();
+            }
             /////////////////////////////////////
             
             /////////////////////////////////////
@@ -397,6 +398,11 @@ function getSensorReadingCallback(err, rows, fields) {
             
             if(Driver.indexOf("OneWire") > -1 && splittedStdOutput.length > 5){
                 temperatureCompensation = splittedStdOutput[5];
+            }
+            
+            if(Driver.indexOf("SIM908") > -1){
+                databaseHelper.StopGPS();
+                databaseHelper.StopSIM908();
             }
 
             for (i = 0; i < rows.length; ++i) {
@@ -473,8 +479,7 @@ function drawSeparator() {
 function finishedReadingSensors() {
     writeToWatchDog(fileWatch)
     
-    databaseHelper.StopGPS();
-    databaseHelper.StopSIM908();
+    
     
     readDataFromSensorsNotSent(createJSONfromDatabase)
 }
@@ -570,6 +575,7 @@ function createJSONfromDatabase(err, rows, fields) {
                 }
                 else{
                     log("Could not create ppp connection", 2);
+                    databaseHelper.StopSIM908();
                     Finalise();
                 }
             }, 10000);
