@@ -35,6 +35,8 @@ var databaseHelper = require('./aquariusSensorHelper') //External file that help
 var rtcExecPath = "python /var/lib/cloud9/Aquarius/exec/driverRTC.py";
 var modeSwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw1.py";
 
+var flashLED = 'python /var/lib/cloud9/Aquarius/exec/flash_led.py';
+var keepLED = 'python /var/lib/cloud9/Aquarius/exec/open_led.py'
 //Still not used
 var _2SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw2.py";
 var _3SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw3.py";
@@ -286,7 +288,7 @@ function assignConfigurationValues(err, rows, fields){
     
     if(CONFIG_dont_reboot && CONFIG_Operation_Mode){
         log("Auto mode with no reboot", 2);
-        exec('python /var/lib/cloud9/Aquarius/exec/set_gpio_del.py', function(){});
+        exec(flashLED, function(){});
         if(CONFIG_Interval !== null){
             main();
             setInterval( main , 60000 * CONFIG_Interval );
@@ -297,7 +299,7 @@ function assignConfigurationValues(err, rows, fields){
         }
     }
     else{
-        exec('python /var/lib/cloud9/Aquarius/exec/set_gpio_del_on.py', function(){});
+        exec(keepLED, function(){});
         Finalise();
     }
     
