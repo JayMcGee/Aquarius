@@ -337,6 +337,99 @@
 	$("#restartBtn").click(function(){
 		io.emit("restartService");
 	});
+<<<<<<< HEAD
+=======
+	
+	/////// Ph Calibrate
+	$("#midPointBtn_ph").click(function(){
+		sendCalibrationEmit(1,"mid", "7");
+	});
+	$("#lowPointBtn_ph").click(function(){
+		sendCalibrationEmit(1,"low", $("#lowPoint_ph").val() );
+	});
+	$("#highPointBtn_ph").click(function(){
+		sendCalibrationEmit(1,"high",$("#highPoint_ph").val());
+	});
+	$("#clearBtn_ph").click(function(){
+		sendCalibrationEmit(1,"clear");
+	});
+	
+	/////// Do Calibrate
+	$("#ambientBtn_do").click(function(){
+		sendCalibrationEmit(4,"Oxy");
+	})
+	$("#zeroBtn_do").click(function(){
+		sendCalibrationEmit(4,"0");
+	});
+	$("#clearBtn_do").click(function(){
+		sendCalibrationEmit(4,"clear");
+	});
+	
+	
+	/////// Cond Calibrate
+	$("#dryPointBtn_cond").click(function(){
+		sendCalibrationEmit(5,"dry");
+	});
+	$("#lowPointBtn_cond").click(function(){
+		sendCalibrationEmit(5,"low", $("#lowPoint_cond").val() );
+	});
+	$("#highPointBtn_cond").click(function(){
+		sendCalibrationEmit(5,"high",$("#highPoint_cond").val());
+	});
+	$("#clearBtn_cond").click(function(){
+		sendCalibrationEmit(5,"clear");
+	});
+
+	function sendCalibrationEmit(id,point,value)
+	{
+		if( value !== null){
+			io.emit('calibration',{Id:id, Point:point, Value:value});
+		}
+		else{
+			io.emit('calibration',{Id:id, Point:point, Value:null});
+		}
+	}
+		
+	io.on('calibrationSuccess',function(data){
+		if(data.sensorId == 1){
+			if(data.status == 1)
+			{
+				setButtonStatus("lowPointBtn_ph",1);
+			}
+			if(data.status == 2)
+			{
+				setButtonStatus("highPointBtn_ph",1);
+			}
+			if(data.status == 0)
+			{
+				setButtonStatus("lowPointBtn_ph",0);
+				setButtonStatus("highPointBtn_ph",0);
+			}
+		}
+		else if(data.sensorId == 4){
+			if(data.status == 1)
+			{
+				setButtonStatus("zeroBtn_do",1);
+			}
+			if(data.status == 0)
+			{
+				setButtonStatus("zeroBtn_do",0);
+			}
+		}
+		else if(data.sensorId == 5){
+			if(data.status == 0)
+			{
+				setButtonStatus("lowPointBtn_cond",1);
+				setButtonStatus("highPointBtn_cond",1);
+			}
+			if(data.status == -1)
+			{
+				setButtonStatus("lowPointBtn_cond",0);
+				setButtonStatus("highPointBtn_cond",0);
+			}
+		}
+	});
+>>>>>>> cd8056af4261a35af9c899f406c5ec46d05aabd4
 		
 	function setButtonStatus(buttonId,status)
 	{

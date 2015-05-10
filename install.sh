@@ -19,5 +19,7 @@ cd /etc/systemd/system/multi-user.target.wants/
 ln /lib/systemd/system/aquarius.service 
 cd /var/lib/cloud9/Aquarius/src/build_src/
 make
+cd /var/lib/cloud9/Aquarius/exec/
+./driverAtlasI2CDO 1:97 O:%:1
 echo "Thy shall reboot, for thy need to reseat" 
 reboot 

@@ -43,9 +43,6 @@ namespace aquarius
             command = (string)I2C_COMMAND_CALIB + I2C_DELIMITER + parameter + I2C_DELIMITER + value;
             type = 1;
         }
-        
-        
-        cout << "Command " << command << endl;
         int commandResult = aquarius::i2cCommand(i2c_,command, I2C_COMMAND_CALIB_DELAY, &returnString);
         
         if(commandResult == I2C_READ_BACK_OK)
