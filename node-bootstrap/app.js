@@ -16,6 +16,7 @@
  * @version 1.0 : Première version with limited functionnality
  * @version 2.0 : March 18, 2015 Added looping and restarting functionnality
  * Environnement: Linux Debian
+ * @version 3.0 : May 12, 2015 First completely functional milestone
  *
  * Hardware:
  *      Board Aquarius
@@ -26,24 +27,28 @@ var express = require('express.io'); //Express and Socket.io integration
 var mysql = require('mysql'); //Javascript mySql Connector
 var exec = require('child_process').exec;
 var schedule = require('node-schedule'); //In application schedule creator
-var fs = require('fs');
+var fs = require('fs');         //File system manipluation for the watchdog
 var sh = require('execSync'); //Permits the execution of external applications synchronously
 
-var databaseHelper = require('./aquariusSensorHelper') //External file that helps the connection and querying to the database
+var aquairusTools = require('./aquairusToolKit') //External file that helps the connection and querying to the database
 
 //Execution path for the RTC driver and Switches and Watchdog feeder
 var rtcExecPath = "python /var/lib/cloud9/Aquarius/exec/driverRTC.py";
 var modeSwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw1.py";
 
+//Path to execute LED flashing or keep open
 var flashLED = 'python /var/lib/cloud9/Aquarius/exec/flash_led.py';
 var keepLED = 'python /var/lib/cloud9/Aquarius/exec/open_led.py'
+
 //Still not used
 var _2SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw2.py";
 var _3SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw3.py";
 var _4SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw4.py";
 
-var oneWireExec = "/var/lib/cloud9/Aquarius/exec/driverOneWireExec";
+//PPP startup command to create a PPP connection through SIM908
 var pppStartup = "pon fona";
+
+//Var to keep up with the watchdog file
 var fileWatch = null
 
 //Config vars
@@ -70,23 +75,32 @@ var CONFIG_Temperature_Compensation = null;
 
 var CONFIG_dont_reboot = 1;
 
+//Vars used to count data sent to ClouDIA
 var DataSent_Count = 0;
+//Number of sensors
 var Sensors_Count = null
+//Number of sensors that have been read
 var Sensors_Done = null
 
-
-
-//////////////////////////////////////////////////////////
-//Establishing connection to Station database (local DB)    
+/**
+* @brief Establishing connection object to Station database (local DB)   
+*        with parameters
+*/
 var connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password: 'snoopy'
 });
 
-/**
- * Creates connection to database
- */
+
+ /**
+  * @brief Create a connection to the database
+  * @details Creates a connection to the database. In the callback function
+  *          error checking is done and a call to read configuration values is done
+  * 
+  * @param  callback function that occurs after the creation of the connection
+  * @return null
+  */
 connection.connect(function(err){
     /**
      *   @brief Async function called upon creation of the connection
@@ -100,46 +114,39 @@ connection.connect(function(err){
     log('Connected as id ' + connection.threadId, 2);
     drawSeparator()
 
-    //Calls configuration read from databasehelper, callsback to assignConfigurationValues
-    databaseHelper.init(connection)
-    databaseHelper.readConfig(connection, assignConfigurationValues);
+    //Calls configuration read from aquairusTools, callsback to assignConfigurationValues
+    aquairusTools.init(connection)
+    aquairusTools.readConfig(connection, assignConfigurationValues);
 });
 
-/**
- *   Main logic function Upon arriving in this function, all configuration values have been assigned
- */
-function main(){
-
-    CONFIG_Log_File_Directory = '/var/lib/cloud9/Aquarius/';
-
-    updateDates();
+ /**
+  * @brief Selects the main logic of the service
+  * @details Main logic function Upon arriving in this function, all configuration values have been assigned
+  * @details Will select the sequence of operation with CONFIG data
+  * @return null
+  */
+function autoMode(){      
     
-    //If current mode is HIGH, enter auto mode. Read all sensors, set RTC to wake up and shutdown
-    if (CONFIG_Operation_Mode == 1) { //AUTO 
+    //If current mode is to shutdown at the end of sensor reading
+    if(CONFIG_dont_reboot == 0){
+        fileWatch = watchdog();
+        fs.writeSync(fileWatch, "\n");
+    }
     
-        if(CONFIG_dont_reboot == 0){
-            fileWatch = watchdog();
-            fs.writeSync(fileWatch, "\n");
-        }
-        
-        writeToWatchDog(fileWatch);
-        log("Auto mode", 2);
-        log("Reading new sensor values", 2);
-        drawSeparator();
-        writeToWatchDog(fileWatch);
-        //Reads all sensors in the data base
-        readAllSensorsInDataBase(getSensorReadingCallback);
-    }
-    else {  //MANUAL
-        log("Manual mode", 2);
-        //readAllSensorsInDataBase(getSensorReadingCallback);
-        log("Waiting", 2);
-        
-        drawSeparator();
-
-    }
+    writeToWatchDog(fileWatch);
+    log("Auto mode", 2);
+    log("Reading new sensor values", 2);
+    drawSeparator();
+    writeToWatchDog(fileWatch);
+    //Reads all sensors in the data base
+    readAllSensorsInDataBase(getSensorReadingCallback);
 }
 
+/**
+ * @brief Updates dates on all devices in the system
+ * @details Using the current operation mode, the system update the RTC, system date and database last known date
+ * @return null
+ */
 function updateDates(){
     
     drawSeparator();
@@ -206,12 +213,19 @@ function updateDates(){
     drawSeparator();
 }
 
+/**
+ * @brief Updates device time
+ * @details Executes scripts to update device times
+ * 
+ * @param  Date to set on devices
+ * @return null
+ */
 function setDatesOnDevices(dateToUse){
         
     var execSetCurrentSysDate = sh.exec('date -s "' + dateToUse + '"');
     if(CONFIG_dont_reboot == 0)
         var rtcSetDate = sh.exec(rtcExecPath + " setdate");
-    databaseHelper.setConfig(connection, 'LAST_KNOWN_DATE', dateToUse, configurationSetCallBack);
+    aquairusTools.setConfig(connection, 'LAST_KNOWN_DATE', dateToUse, configurationSetCallBack);
     
 }
 
@@ -219,8 +233,8 @@ function setDatesOnDevices(dateToUse){
  *  @brief Callback from selecting all config values in the database
  *  @param err Errors relative to fetching the data
  *  @param rows All rows returned from the database
- *  @param fields
- *  Calls main at the end to continue execution of the station
+ *  @param fields All fileds returned from the query
+ *  Calls autoMode at the end to continue execution of the station
  */
 function assignConfigurationValues(err, rows, fields){
     if (err){
@@ -228,6 +242,8 @@ function assignConfigurationValues(err, rows, fields){
         log("Could not read config table", 1)
     }
     log("Assigning config data", 2)
+
+    CONFIG_Log_File_Directory = '/var/lib/cloud9/Aquarius/';
 
     //For each row returned, get value and key name, and use name to assign to good var
     for (index = 0; index < rows.length; ++index){
@@ -277,6 +293,7 @@ function assignConfigurationValues(err, rows, fields){
     var currentMode = sh.exec(modeSwitchExec).stdout;
     log("Switch is  : " + currentMode, 2);
 
+    //Set current operation mode with switch state
     if (currentMode.indexOf("HIGH") > -1) {
         CONFIG_Operation_Mode = 1;
         log("Operation mode is  : AUTO", 2);
@@ -286,35 +303,53 @@ function assignConfigurationValues(err, rows, fields){
         log("Operation mode is  : MANUAL", 2);
     }
     
+    updateDates();
+
+    //Select what 
     if(CONFIG_dont_reboot && CONFIG_Operation_Mode){
         log("Auto mode with no reboot", 2);
         exec(flashLED, function(){});
         if(CONFIG_Interval !== null){
-            main();
-            setInterval( main , 60000 * CONFIG_Interval );
+            autoMode();
+            setInterval( autoMode , 60000 * CONFIG_Interval );
         }
         else{
-            main();
-            setInterval( main , 300000 );
+            autoMode();
+            setInterval( autoMode , 300000 );
         }
     }
     else{
         exec(keepLED, function(){});
-        Finalise();
+        completeOperations();
     }
     
    
 }
 
 /**
+ * @brief Callback for configuration setting
+ * @details Prints a configuration setting result to the log file
  * 
+ * @param err Error code
+ * @param result Result of configuration
+ * 
+ * @return Null
  */
 function configurationSetCallBack(err, result) {
     log("Configuration result : " + result, 2)
 }
 
 /**
- *
+ * @brief Callback for data insertion
+ * @details Prints a data insertion result to the log file then increments
+ *          the number of sensor data inserted in the database
+ *          and if the number matches or is higher than the number
+ *          of sensors to do, calls finished reading sensors
+ * 
+ * @param err Error code
+ * @param result Result of insertion
+ * 
+ * @return Null
  */
 function t_Data_insertCallBack(err, result) {
     log("Insert result : " + result, 3)
@@ -359,8 +394,8 @@ function getSensorReadingCallback(err, rows, fields) {
 
             
             if(Driver.indexOf("SIM908") > -1){
-                databaseHelper.StartSIM908();
-                databaseHelper.StartGPS();
+                aquairusTools.StartSIM908();
+                aquairusTools.StartGPS();
             }
             /////////////////////////////////////
             
@@ -403,8 +438,8 @@ function getSensorReadingCallback(err, rows, fields) {
             }
             
             if(Driver.indexOf("SIM908") > -1){
-                databaseHelper.StopGPS();
-                databaseHelper.StopSIM908();
+                aquairusTools.StopGPS();
+                aquairusTools.StopSIM908();
             }
 
             for (i = 0; i < rows.length; ++i) {
@@ -422,7 +457,7 @@ function getSensorReadingCallback(err, rows, fields) {
                             
                         }
                         log("Inserting into database value : " + value + " " + rows[i].MeasureUnit, 2);
-                        databaseHelper.setData(connection, value, rows[i].VirtualID, 0, t_Data_insertCallBack);  
+                        aquairusTools.setData(connection, value, rows[i].VirtualID, 0, t_Data_insertCallBack);  
                     }
                     else {
                         log("Missing data : " + UnitName, 1)
@@ -439,6 +474,14 @@ function getSensorReadingCallback(err, rows, fields) {
     }
 }
 
+/**
+ * @brief Round a number to x precision
+ * @details Rounds a number to a precision of X decimals
+ * 
+ * @param num Number to round   
+ * @param x Precision to round the number   
+ * @return the number rounded
+ */
 function roundToX(num, x) {
     console.log("Number to  round : " + num + " at x : " + x)
     return +(Math.round(num + "e+" + x)  + "e-" + x);
@@ -446,20 +489,35 @@ function roundToX(num, x) {
 
 
 /**
- *   @brief Function that read
+ *   @brief Function that will call get sensors with the callback
+ *   given in parameter
+ *   @param callback Function to callback after getting all sensors
  */
 function readAllSensorsInDataBase(callback) {
     writeToWatchDog(fileWatch)
-    databaseHelper.getSensors(connection, callback)
-}
-
-function readDataFromSensorsNotSent(callback) {
-    writeToWatchDog(fileWatch)
-    databaseHelper.getDataForSensorsNotSent(connection, callback)
+    aquairusTools.getSensors(connection, callback)
 }
 
 /**
- *
+ * @brief Function that gets all sensor data not sent
+ * @details Calls a query to get all sensor data not sent to the servers
+ * 
+ * @param  callback Callback function once finished
+ * @return null
+ */
+function readDataFromSensorsNotSent(callback) {
+    writeToWatchDog(fileWatch)
+    aquairusTools.getDataForSensorsNotSent(connection, callback)
+}
+
+/**
+ * @brief [brief description]
+ * @details [long description]
+ * 
+ * @param err [description]
+ * @param rows [description]
+ * @param fields [description]
+ * @return [description]
  */
 function sendConfigToWeb(err, rows, fields) {
     if (err) {
@@ -472,12 +530,20 @@ function sendConfigToWeb(err, rows, fields) {
 }
 
 /**
- *
+ * @brief [brief description]
+ * @details [long description]
+ * @return [description]
  */
 function drawSeparator() {
     console.log("///////////////////////////////////////////")
 }
 
+
+/**
+ * @brief [brief description]
+ * @details [long description]
+ * @return [description]
+ */
 function finishedReadingSensors() {
     writeToWatchDog(fileWatch)
     
@@ -486,6 +552,15 @@ function finishedReadingSensors() {
     readDataFromSensorsNotSent(createJSONfromDatabase)
 }
 
+/**
+ * @brief [brief description]
+ * @details [long description]
+ * 
+ * @param r [description]
+ * @param s [description]
+ * @param s [description]
+ * @return [description]
+ */
 function createJSONfromDatabase(err, rows, fields) {
     if (err) {
         throw err;
@@ -552,12 +627,12 @@ function createJSONfromDatabase(err, rows, fields) {
         if(sh.exec("ip addr | grep eth0").stdout.indexOf("DOWN") == -1){
             log("Ethernet is available, sending data",2);
             
-            databaseHelper.sendPostFile(JSONsession, "https://dweet.io:443/dweet/for/", "Aquarius", setIDsAsSent, ids);
-            databaseHelper.sendPost(message, CONFIG_Cloudia_Address, setIDsAsSent, ids);
+            aquairusTools.sendPostFile(JSONsession, "https://dweet.io:443/dweet/for/", "Aquarius", setIDsAsSent, ids);
+            aquairusTools.sendPost(message, CONFIG_Cloudia_Address, setIDsAsSent, ids);
         }
         else{
             log("Trying PPP connection setup", 2);
-            databaseHelper.StartSIM908();
+            aquairusTools.StartSIM908();
             exec(pppStartup, function (error, stdout, stderr) {
                 //console.log('stdout: ' + stdout);
                 //console.log('stderr: ' + stderr);
@@ -572,20 +647,26 @@ function createJSONfromDatabase(err, rows, fields) {
                 if(pppExec.stdout.indexOf("ppp") > -1){
                     log("PPP connection successful", 2);
                     
-                    databaseHelper.sendPostFile(JSONsession, "https://dweet.io:443/dweet/for/", "Aquarius", setIDsAsSent, ids);
-                    databaseHelper.sendPost(message, CONFIG_Cloudia_Address, setIDsAsSent, ids);
+                    aquairusTools.sendPostFile(JSONsession, "https://dweet.io:443/dweet/for/", "Aquarius", setIDsAsSent, ids);
+                    aquairusTools.sendPost(message, CONFIG_Cloudia_Address, setIDsAsSent, ids);
                 }
                 else{
                     log("Could not create ppp connection", 2);
-                    databaseHelper.StopSIM908();
-                    Finalise();
+                    aquairusTools.StopSIM908();
+                    completeOperations();
                 }
             }, 10000);
         }
     }
 }
 
-
+/**
+ * @brief [brief description]
+ * @details [long description]
+ * 
+ * @param  [description]
+ * @return [description]
+ */
 function setIDsAsSent(ids){
     writeToWatchDog(fileWatch);
     if(ids !== null){
@@ -594,7 +675,7 @@ function setIDsAsSent(ids){
         for(var s = 0; s < ids.length; s++)
         {
             writeToWatchDog(fileWatch)
-            databaseHelper.setDataAsSent(connection, ids[s], function(err, result){
+            aquairusTools.setDataAsSent(connection, ids[s], function(err, result){
                 log("Set as sent : " + result, 2);
                 idToSet++;
                 if(idToSet >= ids.length)
@@ -609,28 +690,48 @@ function setIDsAsSent(ids){
     }
 }
 
+/**
+ * @brief [brief description]
+ * @details [long description]
+ * @return [description]
+ */
 function countDataSent(){
     log("Data coutn for dweet or cloudia", 1);
     DataSent_Count = DataSent_Count + 1;
     log("Data sent count == " + DataSent_Count, 1);
     if(DataSent_Count > 1){
         DataSent_Count = 0;
-        Finalise();
+        completeOperations();
     }
 }
 
-
+/**
+ * @brief [brief description]
+ * @details [long description]
+ * 
+ * @param r [description]
+ * @param t [description]
+ * 
+ * @return [description]
+ */
 function idWasSet(err, result){
     
     log("Set as sent : " + result)
 }
 
-function Finalise()
+/**
+ * @brief [brief description]
+ * @details [long description]
+ * 
+ * @param s [description]
+ * @return [description]
+ */
+function completeOperations()
  {
     
     updateDates();
     if (CONFIG_Operation_Mode == 1 && CONFIG_dont_reboot == 0) {
-        databaseHelper.StopSIM908();
+        aquairusTools.StopSIM908();
         var date = new Date()
 
         //Creates a date with added minutes from the interval configuration
@@ -662,14 +763,25 @@ function Finalise()
         log("Waiting for next execution", 2);
     }
     else if(CONFIG_Operation_Mode == 0){
+        log("Manual mode", 2);            
+        drawSeparator();
         //Prepare Data for server ( Format to Json )
         log("Starting server and GPS for manual operation", 2);
-        databaseHelper.StartSIM908();
-        databaseHelper.StartGPS();
+        aquairusTools.StartSIM908();
+        aquairusTools.StartGPS();
         startServer();
     }
  }
 
+/**
+ * @brief [brief description]
+ * @details [long description]
+ * 
+ * @param d [description]
+ * @param l [description]
+ * 
+ * @return [description]
+ */
 function log(dataToAppend, level)
 {
     dataToAppend =  "[" + new Date().toISOString() + "]: " + dataToAppend + "\r";
@@ -679,10 +791,22 @@ function log(dataToAppend, level)
     }
 }
 
+/**
+ * @brief [brief description]
+ * @details [long description]
+ * @return [description]
+ */
 function watchdog(){
     return fs.openSync('/dev/watchdog', 'w');
 }
 
+/**
+ * @brief [brief description]
+ * @details [long description]
+ * 
+ * @param  [description]
+ * @return [description]
+ */
 function writeToWatchDog(fd){
     if(fd !== null && CONFIG_dont_reboot == 0){
         fs.writeSync(fd, "\n");
@@ -691,8 +815,9 @@ function writeToWatchDog(fd){
 }
 
 /**
- * Function that starts the express server for the user web page
- * 
+ * @brief Function that starts the express server for the user web page
+ * @details [long description]
+ * @return [description]
  */
 function startServer(){
     log("STARTING WEB SERVER", 2);
@@ -732,7 +857,7 @@ function startServer(){
     app.io.on('connection', function(socket) {
         socket.on('ready', function() {
             log("Requested sensors", 2)
-            databaseHelper.getSensorsAndEmit(connection, socket)
+            aquairusTools.getSensorsAndEmit(connection, socket)
         })
     })
     
@@ -741,11 +866,11 @@ function startServer(){
     app.io.on('connection', function(socket) {
         socket.on('RequestConfig', function() {
             log("Requested configuration", 2)
-            databaseHelper.readConfigAndEmit(connection, socket)
+            aquairusTools.readConfigAndEmit(connection, socket)
         })
         socket.on('UpdateConfig', function(data) {
             log("Requested an update to configuration", 2)
-            databaseHelper.setConfig(connection, data.Name, data.Value, configurationSetCallBack)
+            aquairusTools.setConfig(connection, data.Name, data.Value, configurationSetCallBack)
         })
         socket.on('RequestNewMeasure', function(data) {
             log("Requested a new measure on XX sensor", 2)
@@ -804,7 +929,7 @@ function startServer(){
     app.io.on('connection', function(socket) {
         socket.on('calibration', function(data) {
             log("Starting Calibration",1)
-            databaseHelper.getASensor(connection,data.Id,function(err,rows,fields){
+            aquairusTools.getASensor(connection,data.Id,function(err,rows,fields){
                 //log(rows[0].Driver,1)
                 var driverPath = rows[0].Driver;
                 var address = rows[0].PhysicalAddress;
@@ -812,7 +937,7 @@ function startServer(){
                 var value = data.Value;
                 var calibrationStatus;
                 console.log("Driver : " + driverPath + " addredss : " + address + " point : " + point + " value : "+ value);
-                calibrationStatus = databaseHelper.calibrateAtlasSensor(driverPath, address, point, value);
+                calibrationStatus = aquairusTools.calibrateAtlasSensor(driverPath, address, point, value);
                 
                 if(calibrationStatus >= 0){
                     log("Calibration Successful",2);
