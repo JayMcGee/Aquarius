@@ -1,5 +1,5 @@
 /**
- * @file   Atlas_I2C_DO.h
+ * @file   Atlas_I2C.h
  * @author Jean-Philippe Fournier and Jean-Pascal McGee
  * @date   Febuary 18 2015
  * @brief  Main Atlas I2C object for control of commands
@@ -91,21 +91,48 @@ namespace aquarius
 			virtual int command_Calibration(string parameter, string value = NO_CALIBRATION_VALUE) = 0;
 			
 			/***
-			 * 
-			 * 
+			 * Executes the command to get information from the device
+			 * @return The I2C communication result code
 			 */
 			int command_Information();
 			
+			/***
+			* Call the LED control function of the device. 
+			* @param Paramter to be used to activate/deactivate the LED
+			* @return The I2C communication result code
+			*/
 			int command_LEDControl(string parameter);
 			
+			/***
+			* Virtual function to read sensor and return an output. This function is device unique.
+			* @return The I2C communication result code
+			*/
 			virtual int command_Reading() = 0;
 			
+			/***
+			* Function that puts the device to sleep
+			* @return The I2C communication result code
+			*/
 			int command_Sleep();
 			
+			/***
+			* Function that returns the current status of the device
+			* @return The I2C communication result code
+			*/
 			int command_Status();
 			
+			/***
+			* Function that set the temperature compensation value in the device
+			* @param parameter Temperature to assign as compensation
+			* @param silent Enable silent mode, which doesn't ouput result in stdout
+			* @return The I2C communication result code
+			*/
 			int command_Temperature_Compensation(string parameter, int silent);
 			
+			/***
+			* Function that resets the device to factory defaults
+			* @return The I2C communication result code
+			*/
 			int command_Factory_Reset();
 			
 			/**

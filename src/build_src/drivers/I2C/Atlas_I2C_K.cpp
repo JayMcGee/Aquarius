@@ -1,10 +1,26 @@
+/**
+ * @file   Atlas_I2C_K.cpp
+ * @author Jean-Philippe Fournier and Jean-Pascal McGee
+ * @date   Febuary 18 2015
+ * @brief  Implementation of function calls to Atlas I2C K stamp
+ */
+
 #include "Atlas_I2C_K.h"
 
 namespace aquarius
 {
 	
 	const string Atlas_I2C_K::dataName[ATLAS_K_DATA_QTY] = { ATLAS_K_DATA_1, ATLAS_K_DATA_2, ATLAS_K_DATA_3, ATLAS_K_DATA_4 };
-	//TEST
+
+	/**
+	 * @brief Device calibration
+	 * @details Calibrates the device using the stamp commands
+	 * 
+	 * @param parameter calibration parameter
+	 * @param value calibration value if any
+	 * 
+	 * @return I2C command result code
+	 */
 	int Atlas_I2C_K::command_Calibration(string parameter, string value)
 	{
 		string returnString;
@@ -56,8 +72,13 @@ namespace aquarius
     	    aquarius::outputError(deviceName_, I2C_COMMS_ERROR);
     	    
         return commandResult;
-    }
-	//TEST
+    }	
+
+	/**
+	 * @brief Reads the sensor value
+	 * @details Outputs a reading using the common aquarius output system
+	 * @return I2C command result code
+	*/
 	int Atlas_I2C_K::command_Reading()
     {
         string returnString;
@@ -106,7 +127,15 @@ namespace aquarius
     	}
 		return commandResult;
     }
-	//TEST
+	
+
+	/**
+	 * @brief Update K constant
+	 * @details Set or get the K constant (fresh water, mid, or salt water)
+	 * 
+	 * @param parameter Parameter or query
+	 * @return I2C command result code
+	 */
 	int Atlas_I2C_K::command_K_Constant(string parameter)
 	{
 		string returnString;
@@ -132,7 +161,16 @@ namespace aquarius
 		return commandResult;
 
 	}
-	//TEST
+
+	/**
+	 * @brief Update output string parameters
+	 * @details Set or get the activated output parameters
+	 * 
+	 * @param parameter The parameter to query or set
+	 * @param enable Enable/disable parameter
+	 * 
+	 * @return I2C command result code
+	 */
 	int Atlas_I2C_K::command_Output_String_Config(string parameter, string enable)
 	{
 		string returnString;

@@ -1,6 +1,6 @@
 /**
  * @file   driverAtlas_I2CDO.cpp
- * @author Jean-Philippe Fournier
+ * @author Jean-Philippe Fournier and Jean-Pascal McGee
  * @date   Febuary 18 2015
  * @brief  Main driver executable for the Atlas I2C DO stamp
  */
@@ -16,9 +16,6 @@
 
 using namespace BlackLib;
 using namespace std;
-
-//Function to get water temperature from onewire device and compensate on the reading
-float getWaterTemperature(string owname);
 
 int main(int argc, char * argv[])
 {
@@ -192,34 +189,3 @@ int main(int argc, char * argv[])
 
 	return 1;
 }
-
-float getWaterTemperature(string owname)
-{
-	//Create the One Wire device object
-    aquarius::OneWireDevice ow(owname);
-    
-    float temp;
-    
-    //Path validation...
-    if(ow.isValidPath())
-    {
-        //Device path is valid
-        if(ow.updateTemperature())
-        {
-            //Temperature updated
-            if(ow.getLastTemperature(&temp))
-            {
-                if(temp == 85.0f)
-                {
-                    return 125;
-                }
-                else
-                {
-                    return temp;
-                }
-				
-            }
-        }
-    }
-}
-

@@ -59,6 +59,7 @@ int main(int argc, char * argv[])
             //Temperature updated
             if(ow.getLastTemperature(&temp))
             {
+                //If temp == 85 there is an error
                 if(temp == 85.0f)
                 {
                     aquarius::outputError(NOM_TEMPORAIRE, OW_DEVICE_NOT_READY);

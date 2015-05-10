@@ -1,3 +1,7 @@
+# RTC DS3231 Driver
+# Is used when the Station shutsdown to conserve energy
+# @author Jean-Philippe Fournier
+
 import sys, getopt
 from Adafruit_I2C import Adafruit_I2C
 from subprocess import check_output
@@ -5,15 +9,18 @@ from subprocess import call
 
 i2c = Adafruit_I2C(0x68)
 
+######################################################
 # function that permits to get a bit in a byte at a position
+######################################################
 def getBit (byte, position):
     
     bit = (byte >> position) & 1
     
     return bit
-#////////////////////////////////////////////////////////////////
 
+######################################################
 # function that permits to set a bit in a byte at a position
+######################################################
 def setBit(byte, position, bit):
 
     print "Byte before : " + str(byte)
@@ -27,10 +34,9 @@ def setBit(byte, position, bit):
     print "Byte after : " + str(byte)
 
     return byte
-#////////////////////////////////////////////////////////////////
-
+######################################################
 # function that sets the alarm at the 
-
+######################################################
 def setAlarm( hours, minutes ):
     
     print "Hour is : " + str(hours) + " and minutes : " + str(minutes)
@@ -50,37 +56,41 @@ def setAlarm( hours, minutes ):
     i2c.write8(0x0A, setBit(i2c.readU8(0x0A), 7, 1))
     
     return 
-#///////////////////////////////////////////////////////////////
-
+######################################################
 #function that enables the alarm bit on the RTC
+######################################################
 def enableAlarm():
     resetFlag()
     #Set alarm enable bit
     i2c.write8(0x0E, setBit(i2c.readU8(0x0E), 0, 1))
     
     return 
-#///////////////////////////////////////////////////////////////
-
+######################################################
 #function that enables the alarm bit on the RTC
+######################################################
 def disableAlarm():
     resetFlag()
     #Set alarm enable bit
     i2c.write8(0x0E, setBit(i2c.readU8(0x0E), 0, 0))
     
     return 
-#///////////////////////////////////////////////////////////////
-
+######################################################
 #function that resets the alarm flag
+######################################################
 def resetFlag():
     
     #Reset alarm flag
     i2c.write8(0x0F, setBit(i2c.readU8(0x0F), 0, 0))
     
     return
-#///////////////////////////////////////////////////////////////
-
+######################################################
 #Set date from BBB to RTC
+######################################################
 def setDateFromBBB():
+
+    #With system call to create an RTC device, set and write the date to 
+    #the RTC device using system date
+
     f = open('/sys/class/i2c-adapter/i2c-1/new_device', 'a')
     f.write("ds3231 0x68")
     f.close()
@@ -91,10 +101,14 @@ def setDateFromBBB():
     f.write("0x68")
     f.close() 
     return 
-#///////////////////////////////////////////////////////////////
-
+######################################################
 #Set date from RTC to BBB
+######################################################
 def setDateFromRTC():
+
+    #With system call to create an RTC device, set and write the date to system
+    #with the date in the RTC
+
     f = open('/sys/class/i2c-adapter/i2c-1/new_device', 'a')
     f.write("ds3231 0x68")
     f.close()
@@ -106,29 +120,33 @@ def setDateFromRTC():
     f.write("0x68")
     f.close()
     return 
-#///////////////////////////////////////////////////////////////
-
+######################################################
 #Function to set alarm minutes
+######################################################
 def setAlarmMinutes( minutes ):
     m = int(minutes)
+    #Sets all Alarm1 bits to enable the minutes and second matching
+    #operation mode. Also set the minutes to use as a wake up time
     i2c.write8(0x07, setBit(i2c.readU8(0x07), 7, 0))
     i2c.write8(0x08, setBit(((m / 10) << 4) | ((m % 10)), 7, 0))
     i2c.write8(0x09,setBit(i2c.readU8(0x09), 7, 1))
     i2c.write8(0x0A,setBit(i2c.readU8(0x0A), 7, 1))
     return
-#///////////////////////////////////////////////////////////////
-
+######################################################
 #Function to set alarm hour
+######################################################
 def setAlarmHour( hour ):
     h = int(hour)
+    #Sets all Alarm1 bits to enable the hour, minutes and second matching
+    #operation mode. Also set the hour to use as a wake up time
     i2c.write8(0x07, setBit(i2c.readU8(0x07), 7, 0))
     i2c.write8(0x08, setBit(i2c.readU8(0x08), 7, 0))
     i2c.write8(0x09,setBit(((h / 10) << 4) | ((h % 10)), 7, 1))
     i2c.write8(0x0A,setBit(i2c.readU8(0x0A), 7, 1))
     return
-#///////////////////////////////////////////////////////////////
-
+######################################################
 #Function to get alarm
+######################################################
 def getTimeFrom( register ):
     
     if register == "time":
@@ -140,40 +158,39 @@ def getTimeFrom( register ):
     else:
         print "Invalid arguments"
     return
-#///////////////////////////////////////////////////////////////
-
+######################################################
 #Function to get seconds from read register
+######################################################
 def getSecondsFromRegister( byte ):
     return ((byte >> 4) * 10) + (byte & 0x0F)
-#///////////////////////////////////////////////////////////////
-
+######################################################
 #Function to get minutes from read register
+######################################################
 def getMinutesFromRegister( byte ):
     return (((byte >> 4) & 0x7)* 10) + (byte & 0x0F)
-#///////////////////////////////////////////////////////////////
-
+######################################################
 #function to get hours from read register
+######################################################
 def getHoursFromRegister( byte ):
     return (((byte >> 4) & 0x01) * 10) + (byte & 0x0F)
-#///////////////////////////////////////////////////////////////
-
+######################################################
 #function to get day from read register
+######################################################
 def getDayFromRegister( byte ):
     return (((byte >> 4) & 0x03) * 10) + (byte & 0x0F)
-#///////////////////////////////////////////////////////////////
-
+######################################################
 #function to get day from read register
+######################################################
 def getYearFromRegister( byte ):
     return ((byte >> 4) * 10) + (byte & 0x0F)
-#///////////////////////////////////////////////////////////////
-
+######################################################
 #function to get day from read register
+######################################################
 def getMonthFromRegister( byte ):
     return (((byte >> 4) & 0x01) * 10) + (byte & 0x0F)
-#///////////////////////////////////////////////////////////////
-
-print 'Number of arguments: ', len(sys.argv), 'arguments.'
-print 'Argument List:', str(sys.argv)
+######################################################
+# Main program which handles the arguments passed to the script
+######################################################
 
 if len(sys.argv) > 1:
     command = sys.argv[1]
@@ -195,6 +212,8 @@ if len(sys.argv) > 1:
             setAlarmHour(sys.argv[3])
     elif command == "gettime":
         getTimeFrom(sys.argv[2])
+    else:
+        print "Unknown command"
  
 #Read lines again
 #var = i2c.readList(0x00, 19)

@@ -1,3 +1,10 @@
+/**
+ * @file   Atlas_I2C.cpp
+ * @author Jean-Philippe Fournier and Jean-Pascal McGee
+ * @date   Febuary 18 2015
+ * @brief  Main implementation of Atlas I2C object for control of commands
+ */
+
 #include "Atlas_I2C.h"
 
 namespace aquarius
@@ -39,6 +46,7 @@ namespace aquarius
     {
         string returnString;
        
+        //Execution of I2C command with parameter
         int commandResult = aquarius::i2cCommand(i2c_, (string)I2C_COMMAND_L + I2C_DELIMITER + parameter, I2C_COMMAND_L_DELAY, &returnString);
        
         if(commandResult == I2C_READ_BACK_OK)
@@ -134,10 +142,6 @@ namespace aquarius
         return I2C_READ_BACK_OK;
     }
 	
-	/**
-	 * @brief Output the missing arguments phrase for help
-	 * @return A string that explains the minimum args for the driver to work
-	 */
 	string Atlas_I2C::output_missingArguments()
 	{
 		return "Missing arguments, could not execute \n\r [Executable] [bus:address] [command]";
