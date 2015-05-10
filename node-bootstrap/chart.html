@@ -179,7 +179,7 @@
 			io.emit('requestMeasure', { ID : sensorID });
 			$("#btn"+sensorID).html('Updating <i class="fa fa-repeat"></i>');
 			$("#btn"+sensorID).attr('disabled','disabled');
-			$("#btn"+sensorID).find(".fa-repeat").addClass("gly-spin");
+			$("#btn"+sensorID).find(".fa-repeat").addClass("fa-spin");
 		}
 	
 
@@ -190,7 +190,7 @@
         	
         	$("#btn"+data.ID).html('Update <i class="fa fa-repeat"></i>');    
 			$("#btn"+data.ID).removeAttr('disabled','disabled');
-			$("#btn"+data.ID).find(".fa-reapet").removeClass("gly-spin");
+			$("#btn"+data.ID).find(".fa-reapet").removeClass("fa-spin");
 			
         	var chart = $('#chart' + data.ID).highcharts();
         	var measure = parseFloat(data.result.replace(/[^\d.-]/g, ''));

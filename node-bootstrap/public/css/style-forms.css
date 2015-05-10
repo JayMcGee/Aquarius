@@ -371,7 +371,7 @@ textarea[disabled],
 input[readonly],
 select[readonly],
 textarea[readonly] {
-  cursor: not-allowed;
+  cursor: pointer; cursor:hand;
   background-color: #eeeeee;
 }
 
