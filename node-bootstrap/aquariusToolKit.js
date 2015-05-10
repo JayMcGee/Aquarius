@@ -261,6 +261,17 @@ module.exports = {
         return connection.query(sql, callBackToApp)
     },
     
+    getCoord:function(connection,qty,callBackToApp){
+      connection.query('USE `station_aquarius`;')
+            var sql = 'SELECT t_Data.data_value AS Value, ' + 
+                    't_Data.data_t_virtual as ID ' + 
+                    'FROM `t_Data`' + 
+                    'WHERE t_Data.data_t_virtual = 12 ' + 
+                    'or t_Data.data_t_virtual = 13 ' + 
+                    'ORDER BY t_Data.idt_Data LIMIT 2;'
+            connection.query(sql,callBackToApp);
+    },
+    
     setDataAsSent : function (connection, id, callback){
         log("Selecting database", 3)   
         connection.query('USE `station_aquarius`;')
