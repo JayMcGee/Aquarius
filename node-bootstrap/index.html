@@ -612,7 +612,7 @@
         // When user click on a dataCircle it sends a request to the server
 	function getMeasure(sensorID){
 		io.emit('requestMeasure', { ID : sensorID });
-		$("#itemBox"+sensorID).find(".footer").html("Updating");
+		$("#itemBox"+sensorID).find(".footer").html('Updating <i class="fa fa-repeat fa-spin"></i>');
 	}
 	
         ////////////////////////////////////////////////////////////////////////

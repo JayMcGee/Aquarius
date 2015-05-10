@@ -7,12 +7,14 @@ io = io.connect();
 io.emit('ready');
 io.on('ReceiveSensors',function(data){
 		data.row.forEach(function(entry){
+			
 			var chartID = entry.VirtualID
 			var chartName = entry.UnitName
 			var chartUnit = entry.MeasureUnit
 			var chartMax = entry.Max
 			var chartMin = entry.Min
 			var chartColor = entry.Color
+			
 			var minDate = new Date().getTime();
 			var highcharts ={chart:{
 					            type: 'line',
