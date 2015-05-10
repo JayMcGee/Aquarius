@@ -11,11 +11,10 @@
 */
 
 //Var Global
-var dbRows = []
+var dbRows = [];
 
 /**
  * @brief Display the datePicker in the right format
- * 
  */
 $('#datetimepicker1').datetimepicker({
     format: 'dd/MM/yyyy hh:mm:ss',
@@ -23,41 +22,44 @@ $('#datetimepicker1').datetimepicker({
 });
 var picker = $('#datetimepicker1').data('datetimepicker')
 
-io = io.connect()
-io.emit('ready')
+io = io.connect();
+io.emit('ready');
 
-io.emit('RequestConfig')
+io.emit('RequestConfig');
 
-io.on('ReceiveConfig',function( data )
-{
-    dbRows = data.row
+/**
+ * @brief 	ReceiveConfig,  
+ * @details Receive the most recent config in the dataBase
+ */
+io.on('ReceiveConfig',function( data ){
+    dbRows = data.row;
     
     for ( var i = 0; i < dbRows.length; i++)
     {
-        var id    = dbRows[i].Id
-        var name  = dbRows[i].Name
-        var value = dbRows[i].Value
-        var desc  = dbRows[i].Description
+        var id    = dbRows[i].Id;
+        var name  = dbRows[i].Name;
+        var value = dbRows[i].Value;
+        var desc  = dbRows[i].Description;
         
         if(name == "STATION_ID")
         {
-            $("#idInput").val(value)
+            $("#idInput").val(value);
         }
         else if(name == "NUMBER_RETRIES")
         {
-             $("#retriesInput").val(value)
+             $("#retriesInput").val(value);
         }
         else if(name == "SEND_ADDRESS")
         {
-            $("#addressInput").val(value)
+            $("#addressInput").val(value);
         }
         else if (name == "READ_INTERVAL")
         {
-         	$("#intervalInput").val(value)   
+         	$("#intervalInput").val(value);   
         }
         else if (name == "LAST_KNOWN_DATE")
         {
-            $("#dateInput").html(value)
+            $("#dateInput").html(value);
         }
     }
 })
@@ -72,6 +74,9 @@ function sendConfig(KeyName,Value){
     io.emit('UpdateConfig',{'Name': KeyName, 'Value': Value})
 }
 
+/**
+ * @brief saveButton, sends the config to the database
+ */
 $("#saveButton" ).click(function() {
     
      var localDate = picker.getLocalDate()

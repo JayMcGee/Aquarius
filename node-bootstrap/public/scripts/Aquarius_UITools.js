@@ -8,7 +8,13 @@
  * @date    13 MAY 2015
  * @version 1.0 : First Version
 */
-		
+
+/**
+ * @brief 	setButtonStatus
+ * @details Function that enables or disables a button
+ * @param   buttonId, The identification of the button to modify
+ * @param   status, 1 for enable, 0 for disabled
+ */
 	function setButtonStatus(buttonId,status)
 	{
 		var buttonIdString = ("#" + buttonId);

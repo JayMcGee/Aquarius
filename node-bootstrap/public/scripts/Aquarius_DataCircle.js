@@ -70,9 +70,7 @@ $(function() {
                 "inputColor" :"#EEF8F2",
             }
         );
-    
     }
-    
     window.circle=circle;
 });
 
