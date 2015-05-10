@@ -116,8 +116,31 @@ def checkPLine():
 ##############################################
 def outputDataStringGPS(data):
     splitted = data.split(",")    
-    print "NAME;SIM908;DATQ;5;SATS;" + str(splitted[6]) + ";LONG;" + str(splitted[1]) + ";LAT;" + str(splitted[2]) + ";ALT;" + str(splitted[3]) + ";TIME;" + str(splitted[4])
+    print "NAME;SIM908;DATQ;5;SATS;" + str(splitted[6]) + ";LONG;" + ConvertLong(str(splitted[1])) + ";LAT;" + ConvertLat(str(splitted[2])) + ";ALT;" + str(splitted[3]) + ";TIME;" + str(splitted[4])
     return
+##############################################
+# Convert the Latitude from NMEA to Degrees Decimal
+##############################################
+def ConvertLat(latitude):
+    degrees_lat  = float(latitude[:2])
+    fraction_lat = float(latitude[2:]) / 60
+    if degrees_lat > 0 : 
+        DD_latitude= degrees_lat + fraction_lat  # longitude (decimal degrees)
+    else :
+        DD_latitude = degrees_lat - fraction_lat  # longitude (decimal degrees)
+    return DD_latitude
+##############################################
+# Convert the Longitude from NMEA to Degrees Decimal
+##############################################
+def ConvertLong(longitude):
+    degrees_lon  = float(longitude[:3])
+    fraction_lon = float(longitude[3:]) / 60
+    if degrees_lon > 0 : 
+        DD_longitude = degrees_lon + fraction_lon  # longitude (decimal degrees)
+    else :
+        DD_longitude = degrees_lon - fraction_lon  # longitude (decimal degrees)
+    return DD_longitude
+
 ######################################################
 # Does a reset of the GPS
 ######################################################
@@ -204,6 +227,11 @@ if ser.isOpen() and len(sys.argv) > 1:
             print "ON"
         else:
             print "OFF"
+    elif command == "lat":
+        print ConvertLat(sys.argv[2])
+    elif command == "long":
+        print ConvertLong(sys.argv[2])
+        
     #If the argument is an unknown commad, simply write the argument to the SIM908
     else :
         lines = writeAndReadSIM908(command)    

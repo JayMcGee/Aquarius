@@ -34,7 +34,6 @@
 </head>
 
 <body>
-
 	<!-- start: Header -->
 	<div class="navbar">
 		<div class="navbar-inner">
@@ -43,6 +42,7 @@
 			</div>
 		</div>
 	</div>
+	
 <div class="s3-loader">
 	<!-- start: Header -->
 	
@@ -270,74 +270,44 @@
 	</footer>
 	
 	<!-- start: JavaScript-->
-
 		<script src="js/jquery-1.9.1.min.js"></script>
 		<script src="js/jquery-migrate-1.0.0.min.js"></script>
-	
 		<script src="js/jquery-ui-1.10.0.custom.min.js"></script>
-	
 		<script src="js/jquery.ui.touch-punch.js"></script>
-	
 		<script src="js/modernizr.js"></script>
-	
 		<script src="js/bootstrap.min.js"></script>
-	
 		<script src="js/jquery.cookie.js"></script>
-	
 		<script src='js/fullcalendar.min.js'></script>
-	
 		<script src='js/jquery.dataTables.min.js'></script>
-
 		<script src="js/excanvas.js"></script>
 		<script src="js/jquery.flot.js"></script>
 		<script src="js/jquery.flot.pie.js"></script>
 		<script src="js/jquery.flot.stack.js"></script>
 		<script src="js/jquery.flot.resize.min.js"></script>
-		
 		<script src="js/highcharts.js"></script>
 		<script src="js/modules/exporting.js"></script>
 		<script src="/js/themes/grid-dark.js"></script>
-
 		<script src="js/jquery.chosen.min.js"></script>
-	
 		<script src="js/jquery.uniform.min.js"></script>
-		
 		<script src="js/jquery.cleditor.min.js"></script>
-	
 		<script src="js/jquery.noty.js"></script>
-	
 		<script src="js/jquery.elfinder.min.js"></script>
-	
 		<script src="js/jquery.raty.min.js"></script>
-	
 		<script src="js/jquery.iphone.toggle.js"></script>
-	
 		<script src="js/jquery.uploadify-3.1.min.js"></script>
-	
 		<script src="js/jquery.gritter.js"></script>
-	
 		<script src="js/jquery.imagesloaded.js"></script>
-	
 		<script src="js/jquery.masonry.min.js"></script>
-	
 		<script src="js/jquery.knob.js"></script>
-	
 		<script src="js/jquery.sparkline.min.js"></script>
-	
 		<script src="js/counter.js"></script>
-	
 		<script src="js/retina.js"></script>
-		
 		<script src="js/pleased.js"></script>
-
 		<script src="js/custom.js"></script>
-		
 		<!-- Aquarius Script  -->
 		<script src="scripts/Aquarius_Calibrate.js"></script>
 		<script src="scripts/Aquarius_DataCircle.js"></script>
-
-	
-	
+		
 	<!-- Get Data from station -->
     <script src="/socket.io/socket.io.js"></script>
     <script>
@@ -349,6 +319,9 @@
 	// Emit ready event.
 	io.emit('ready');
 	var allSensors;
+	var map;
+	var myLayers;
+	var features = [];
 
 	/////// Manage Buttons
 	$("#shutdownBtn").click(function(){
@@ -363,96 +336,6 @@
 	});
 	$("#restartBtn").click(function(){
 		io.emit("restartService");
-	});
-	
-	/////// Ph Calibrate
-	$("#midPointBtn_ph").click(function(){
-		sendCalibrationEmit(1,"mid", 7);
-	});
-	$("#lowPointBtn_ph").click(function(){
-		sendCalibrationEmit(1,"low", $("#lowPoint_ph").val() );
-	});
-	$("#highPointBtn_ph").click(function(){
-		sendCalibrationEmit(1,"high",$("#highPoint_ph").val());
-	});
-	$("#clearBtn_ph").click(function(){
-		sendCalibrationEmit(1,"clear");
-	});
-	
-	/////// Do Calibrate
-	$("#ambientBtn_do").click(function(){
-		sendCalibrationEmit(4,"Oxy");
-	})
-	$("#zeroBtn_do").click(function(){
-		sendCalibrationEmit(4,"0");
-	});
-	$("#clearBtn_do").click(function(){
-		sendCalibrationEmit(4,"clear");
-	});
-	
-	
-	/////// Cond Calibrate
-	$("#dryPointBtn_cond").click(function(){
-		sendCalibrationEmit(5,"dry");
-	});
-	$("#lowPointBtn_cond").click(function(){
-		sendCalibrationEmit(5,"low", $("#lowPoint_cond").val() );
-	});
-	$("#highPointBtn_cond").click(function(){
-		sendCalibrationEmit(5,"high",$("#highPoint_cond").val());
-	});
-	$("#clearBtn_cond").click(function(){
-		sendCalibrationEmit(5,"clear");
-	});
-
-	function sendCalibrationEmit(id,point,value)
-	{
-		if( value == null){
-			io.emit('calibration',{Id:id, Point:point, Value:value});
-		}
-		else{
-			io.emit('calibration',{Id:id, Point:point, Value:null});
-		}
-	}
-		
-	io.on('calibrationSuccess',function(data){
-		if(data.sensorId == 1){
-			if(data.status == 1)
-			{
-				setButtonStatus("lowPointBtn_ph",1);
-			}
-			if(data.status == 2)
-			{
-				setButtonStatus("highPointBtn_ph",1);
-			}
-			if(data.status == 0)
-			{
-				setButtonStatus("lowPointBtn_ph",0);
-				setButtonStatus("highPointBtn_ph",0);
-			}
-		}
-		else if(data.sensorId == 4){
-			if(data.status == 1)
-			{
-				setButtonStatus("zeroBtn_do",1);
-			}
-			if(data.status == 0)
-			{
-				setButtonStatus("zeroBtn_do",0);
-			}
-		}
-		else if(data.sensorId == 5){
-			if(data.status == 0)
-			{
-				setButtonStatus("lowPointBtn_cond",1);
-				setButtonStatus("highPointBtn_cond",1);
-			}
-			if(data.status == -1)
-			{
-				setButtonStatus("lowPointBtn_cond",0);
-				setButtonStatus("highPointBtn_cond",0);
-			}
-		}
 	});
 		
 	function setButtonStatus(buttonId,status)
@@ -634,36 +517,73 @@
 			})
         });
 
-	function createMap(aLong,aLat,Title,Desc)
+	function createMap()
 	{
 		L.mapbox.accessToken = 'pk.eyJ1IjoiamF5bWNnZWUiLCJhIjoiOVZ5U1NtNCJ9.FQQeoEnRBCDeb8CBH-GZow';
-		var map = L.mapbox.map('map', 'jaymcgee.e83238e7').setView([aLong,aLat], 10);
-		var myLayer = L.mapbox.featureLayer({
-		    // this feature is in the GeoJSON format: see geojson.org
-		    // for the full specification
-		    type: 'Feature',
-		    geometry: {
-		        type: 'Point',
-		        // coordinates here are in longitude, latitude order because
-		        // x, y is the standard for GeoJSON and many formats
-		        coordinates: [aLat,aLong]
-		    },
-		    properties: {
-		        title: Title,
-		        description: Desc,
-		        // one can customize markers by adding simplestyle properties
-		        // https://www.mapbox.com/guides/an-open-platform/#simplestyle
-		        'marker-size': 'large',
-		        'marker-color': '#2D89EF',
-		        'marker-symbol': 'water'
-		    }
-		}).addTo(map);	
-		
-		myLayer.on('click', function(e) {
-			map.setView(e.layer.getLatLng(),12);
-		});
+		map = L.mapbox.map('map', 'jaymcgee.e83238e7');
+		myLayer = L.mapbox.featureLayer().addTo(map);
+		features = [];
 	}
-	createMap(-30.034647,-51.217658,"Aquarius1","Porto Alegre");
+	
+	function addMarker(aLat,aLong,Title,Desc)
+	{
+		var line_points = [];
+		// Define polyline options
+		// http://leafletjs.com/reference.html#polyline
+		var polyline_options = {
+		    color: '#08F'
+		};
+		
+		features.push(	{
+			    // this feature is in the GeoJSON format: see geojson.org
+			    // for the full specification
+			    type: 'Feature',
+			    geometry: {
+			        type: 'Point',
+			        // coordinates here are in longitude, latitude order because
+			        // x, y is the standard for GeoJSON and many formats
+			        coordinates: [aLong,aLat]
+			    },
+			    properties: {
+			        title: Title,
+			        description: Desc,
+			        'marker-size': 'large',
+			        'marker-color': '#2D89EF',
+			        'marker-symbol': 'water'
+			    }
+			}
+		);
+		
+		line_points.push([aLat,aLong]);
+	
+		myLayer.setGeoJSON({
+		    type: 'FeatureCollection',
+		    features: features
+		});
+		
+		map.setView([aLat,aLong], 10);
+		
+	
+		// Defining a polygon here instead of a polyline will connect the
+		// endpoints and fill the path.
+		// http://leafletjs.com/reference.html#polygon
+		var polyline = L.polyline(line_points, polyline_options).addTo(map);
+	}
+	
+	
+	
+	io.emit('getGPSCoord');
+	io.on('receiveGPS',function(data){
+		//La Bonne ligne // createMap(data.Lat,data.Long,"Aquarius1","Porto Alegre");
+		createMap();
+		addMarker(45.411,-71.895666,"Aquarius1","");
+		addMarker(45.411, -71.897,"Aquarius2","");
+		
+	});
+	
+
+	
+	
 	
 	</script>
 </body>
