@@ -367,7 +367,7 @@
 	
 	/////// Ph Calibrate
 	$("#midPointBtn_ph").click(function(){
-		sendCalibrationEmit(1,"mid", 7);
+		sendCalibrationEmit(1,"mid", "7");
 	});
 	$("#lowPointBtn_ph").click(function(){
 		sendCalibrationEmit(1,"low", $("#lowPoint_ph").val() );
@@ -407,7 +407,7 @@
 
 	function sendCalibrationEmit(id,point,value)
 	{
-		if( value == null){
+		if( value !== null){
 			io.emit('calibration',{Id:id, Point:point, Value:value});
 		}
 		else{

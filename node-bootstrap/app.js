@@ -544,7 +544,7 @@ function drawSeparator() {
  * @details [long description]
  * @return [description]
  */
-function finishedReadingSensors() {
+function finishedReadingSensors() {
     writeToWatchDog(fileWatch)
     
     
