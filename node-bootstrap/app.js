@@ -30,7 +30,7 @@ var schedule = require('node-schedule'); //In application schedule creator
 var fs = require('fs');         //File system manipluation for the watchdog
 var sh = require('execSync'); //Permits the execution of external applications synchronously
 
-var aquairusTools = require('./aquairusToolKit') //External file that helps the connection and querying to the database
+var aquairusTools = require('./aquariusToolKit') //External file that helps the connection and querying to the database
 
 //Execution path for the RTC driver and Switches and Watchdog feeder
 var rtcExecPath = "python /var/lib/cloud9/Aquarius/exec/driverRTC.py";
