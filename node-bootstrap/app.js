@@ -305,7 +305,7 @@ function assignConfigurationValues(err, rows, fields){
     
     updateDates();
 
-    //Select what 
+    //Select what mode to go in
     if(CONFIG_dont_reboot && CONFIG_Operation_Mode){
         log("Auto mode with no reboot", 2);
         exec(flashLED, function(){});
@@ -391,63 +391,71 @@ function getSensorReadingCallback(err, rows, fields) {
         if (alreadyDone.indexOf(PhysicalID) == -1) {
             log("Reading : " + UnitName, 2)
             alreadyDone[alreadyDone.length] = PhysicalID
-
-            
+			/***
+			* Start init of exceptions
+			****/            
             if(Driver.indexOf("SIM908") > -1){
                 aquairusTools.StartSIM908();
                 aquairusTools.StartGPS();
             }
-            /////////////////////////////////////
-            
-            /////////////////////////////////////
-            var tryCount = 0
-            var splittedStdOutput
-            var result
+            /****
+			* Stop init of exceptions
+			*****/
+            var tryCount = 0;
+            var splittedStdOutput;
+            var result;
+			var execution;
+			//Try executing the sensor drivers to read
             do{
-                if (temperatureCompensation !== null)
-                {
-                    var execution;
-                    if(Driver.indexOf("AtlasI2C") > -1){
-                        execution= Driver + " " + Address + " R:-t:" + temperatureCompensation;
-                    }
-                    else{
-                        execution = Driver + " " + Address + " R";
-                    }
-                    result = sh.exec(execution);
-                    log(execution, 3);
+				//If temperature compensation is set, read sensor with temperature compensation
+                if (temperatureCompensation !== null && Driver.indexOf("AtlasI2C") > -1){
+					execution= Driver + " " + Address + " R:-t:" + temperatureCompensation;
+				}
+                else{
+                    execution = Driver + " " + Address + " R";                
                 }
-                else
-                {
-                    result = sh.exec(Driver + " " + Address + " R")
-                    log(Driver + " " + Address + " R", 3)
-                }
-                
-                tryCount++
-                log("Try counts :" + tryCount, 2)
+				//Execute the driver
+				result = sh.exec(execution);                
+				log(execution, 3);
+				//Increment the try count
+                tryCount++;
+                log("Try counts :" + tryCount, 2);
             }while(result.stdout.indexOf("ERROR") > -1 && tryCount <= parseInt(CONFIG_Number_Retries));
 
-            splittedStdOutput = result.stdout.split(';')  
+            splittedStdOutput = result.stdout.split(';');
             log("Executed : " + splittedStdOutput, 2);
-
+	
+			/***
+			* Start after execution exceptions
+			****/ 
+			
+			//Sleep the atlas device
             if(Driver.indexOf("AtlasI2C") > -1){
                 sh.exec(Driver + " " + Address + " Sleep");
             }
-            
+            //Set temperature compensation 
             if(Driver.indexOf("OneWire") > -1 && splittedStdOutput.length > 5){
                 temperatureCompensation = splittedStdOutput[5];
             }
-            
+            //Stop SIM908 device
             if(Driver.indexOf("SIM908") > -1){
-                aquairusTools.StopGPS();
                 aquairusTools.StopSIM908();
-            }
+            }			
+            /****
+			* Stop after execution exceptions
+			*****/
 
+			//For each virtual sensor
             for (i = 0; i < rows.length; ++i) {
                 writeToWatchDog(fileWatch)
+				
+				//If the physical_id of the virtual_driver is the same as the current physical_id
                 if (rows[i].PhysicalID == PhysicalID) {
-
-                    if (splittedStdOutput.length > rows[i].Position) {
+					
+					//Check if the seached data is at its position
+                    if (splittedStdOutput.length > rows[i].Position) {						
                         var value;
+						//If the precision is not set as 0, round to precision
                         if(rows[i].ValuePrecision == 0){
                             value = splittedStdOutput[rows[i].Position];
                         }
@@ -457,19 +465,20 @@ function getSensorReadingCallback(err, rows, fields) {
                             
                         }
                         log("Inserting into database value : " + value + " " + rows[i].MeasureUnit, 2);
+						//Set data in the database
                         aquairusTools.setData(connection, value, rows[i].VirtualID, 0, t_Data_insertCallBack);  
                     }
+					//If data is not present in the frame from the driver, set as a missing data
                     else {
                         log("Missing data : " + UnitName, 1)
                         Sensors_Done++
+						//If all sensor are finished, call finishedReadingSensors 
                         if (Sensors_Count <= Sensors_Done) {
                             finishedReadingSensors()
                         }
                     }
                 }
-            }
-
-            
+            }  			
         }
     }
 }
@@ -511,13 +520,13 @@ function readDataFromSensorsNotSent(callback) {
 }
 
 /**
- * @brief [brief description]
- * @details [long description]
+ * @brief Send configuration retrieved from the station
+ * @details Sends to a socket the configuration 
  * 
- * @param err [description]
- * @param rows [description]
- * @param fields [description]
- * @return [description]
+ * @param err error var
+ * @param rows rows returned from the query
+ * @param fields fields in the query
+ * @return null
  */
 function sendConfigToWeb(err, rows, fields) {
     if (err) {
@@ -530,7 +539,7 @@ function sendConfigToWeb(err, rows, fields) {
 }
 
 /**
- * @brief [brief description]
+ * @brief Draws a separator in the interface
  * @details [long description]
  * @return [description]
  */
@@ -540,26 +549,20 @@ function drawSeparator() {
 
 
 /**
- * @brief [brief description]
- * @details [long description]
- * @return [description]
+ * @brief Called when sensors are finished being read
  */
-function finishedReadingSensors() {
-    writeToWatchDog(fileWatch)
-    
-    
-    
+function finishedReadingSensors() {
+    writeToWatchDog(fileWatch)   
     readDataFromSensorsNotSent(createJSONfromDatabase)
 }
 
 /**
- * @brief [brief description]
- * @details [long description]
+ * @brief Create JSON from query
+ * @details Creates a JSON structured file and sends it to Dweet and ClouDIA
  * 
- * @param r [description]
- * @param s [description]
- * @param s [description]
- * @return [description]
+ * @param err
+ * @param rows Rows from the query
+ * @param fields Fields in the query
  */
 function createJSONfromDatabase(err, rows, fields) {
     if (err) {
@@ -569,11 +572,11 @@ function createJSONfromDatabase(err, rows, fields) {
     else
     {
         writeToWatchDog(fileWatch)
-        //var baseEvent = { 'sensorunitid' :  'data': [] }
         //JSON Formatter
         var t = new Date()
         var stationID = CONFIG_Station_ID
         
+        //Create the base JSON message
         var JSONsession = 
         {
     	    "stationmessage": 
@@ -585,51 +588,50 @@ function createJSONfromDatabase(err, rows, fields) {
         	}
         }
         
+        //Base event in which each sensor unit will be put
         var event = { 'sensorunit' : CONFIG_Sensor_unit, 'data': [] }
-        var previousPhysicalID = null
         var PhysicalID;
         var ids = []
         for (var i = 0; i < rows.length; i++)
         {
-            writeToWatchDog(fileWatch)
+            writeToWatchDog(fileWatch);
             // Get current SensorUnitID (Physical sensor)
-            PhysicalID = rows[i].PhysicalID
-            ids.push(rows[i].ID)
-            log("JSON creation at : " + PhysicalID, 3)   
+            PhysicalID = rows[i].PhysicalID;
+            ids.push(rows[i].ID);
+            log("JSON creation at : " + PhysicalID, 3);
             // If the last sensorunitID is not the same as the current one
             
-            var sensorsubunitid = rows[i].CloudiaSubUnitID
-            var value =rows[i].ReadValue
-            var measureunit = rows[i].UnitType
-            var datetime = rows[i].ReadDate
-            var physicalname = rows[i].PhysicalName
+            //Assign all vars
+            var sensorsubunitid = rows[i].CloudiaSubUnitID;
+            var value =rows[i].ReadValue;
+            var measureunit = rows[i].UnitType;
+            var datetime = rows[i].ReadDate;
+            var physicalname = rows[i].PhysicalName;         
             
-            
-            //var JSON_sensorData = {'id': sensorsubunitid, 'physicalname': physicalname, 'measureunit' : measureunit, 'valuetytpe':"asis", 'value':value, 'datetime':datetime.toISOString().slice(0, 19).replace('T', ' ')}
-            var JSON_sensorData = {'id': sensorsubunitid, 'physicalname': physicalname, 'measureunit' : measureunit, 'valuetype':"asis", 'value': value, 'datetime':datetime.toISOString().slice(0, 19).replace('T', ' ')}
-            
-            
+            //Put data in an object
+            var JSON_sensorData = {'id': sensorsubunitid, 'physicalname': physicalname, 'measureunit' : measureunit, 'valuetype':"asis", 'value': value, 'datetime':datetime.toISOString().slice(0, 19).replace('T', ' ')};
             log("JSON Sensor Data : " + JSON_sensorData, 3)
             
-            event.data.push(JSON_sensorData)
-            
-            previousPhysicalID = PhysicalID
+            //Push the data object into the event.data array
+            event.data.push(JSON_sensorData);
         }
-        
-        JSONsession.stationmessage.event.push(event)
-        log(JSON.stringify(JSONsession), 3)
-        
+        //Puts the event in the station message
+        JSONsession.stationmessage.event.push(event);
         var message = JSON.stringify(JSONsession);
+        log(message, 3);        
+        
+        //For test purposes, JSON known to work
         //message = '{"stationmessage":{"datetime":"2015-04-15 11:59:23","stationid":"bra003","eventtype":"regularreading","event":[{"sensorunit":"su0008","data":[{"id":"01","datetime":"2015-04-15 11:55:15","valuetype":"asis","value":"8.65"}]}]}}'
         //JSONsession = JSON.parse(message)
-        log (message, 2);
         
+        //Check if eth0 internet is available
         if(sh.exec("ip addr | grep eth0").stdout.indexOf("DOWN") == -1){
             log("Ethernet is available, sending data",2);
             
             aquairusTools.sendPostFile(JSONsession, "https://dweet.io:443/dweet/for/", "Aquarius", setIDsAsSent, ids);
             aquairusTools.sendPost(message, CONFIG_Cloudia_Address, setIDsAsSent, ids);
         }
+        //Else try PPP connection through SIM908
         else{
             log("Trying PPP connection setup", 2);
             aquairusTools.StartSIM908();
