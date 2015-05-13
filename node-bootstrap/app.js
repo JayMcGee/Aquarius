@@ -635,18 +635,12 @@ function createJSONfromDatabase(err, rows, fields) {
         else{
             log("Trying PPP connection setup", 2);
             aquairusTools.StartSIM908();
-            exec(pppStartup, function (error, stdout, stderr) {
-                //console.log('stdout: ' + stdout);
-                //console.log('stderr: ' + stderr);
-                //if (error !== null) {
-                 // console.log('exec error: ' + error);
-                //W}
-            });
+            exec(pppStartup, function (error, stdout, stderr) {});
         
             setTimeout(function(){
-                var pppExec = sh.exec("ifconfig | grep ppp0");
+                var testPPP = sh.exec("ifconfig | grep ppp0");
                 
-                if(pppExec.stdout.indexOf("ppp") > -1){
+                if(testPPP.stdout.indexOf("ppp") > -1){
                     log("PPP connection successful", 2);
                     
                     aquairusTools.sendPostFile(JSONsession, "https://dweet.io:443/dweet/for/", "Aquarius", setIDsAsSent, ids);
@@ -663,11 +657,11 @@ function createJSONfromDatabase(err, rows, fields) {
 }
 
 /**
- * @brief [brief description]
- * @details [long description]
+ * @brief Sets the furnished IDs as sent in  the database
+ * @details With the furnished IDs, set them all as sent in the database
  * 
- * @param  [description]
- * @return [description]
+ * @param  List of Ids to be set as sent in the database
+ * @return null
  */
 function setIDsAsSent(ids){
     writeToWatchDog(fileWatch);
@@ -693,12 +687,12 @@ function setIDsAsSent(ids){
 }
 
 /**
- * @brief [brief description]
+ * @brief Count data set as sent, to complete operation after finishing
  * @details [long description]
  * @return [description]
  */
 function countDataSent(){
-    log("Data coutn for dweet or cloudia", 1);
+    log("Data count for dweet or cloudia", 1);
     DataSent_Count = DataSent_Count + 1;
     log("Data sent count == " + DataSent_Count, 1);
     if(DataSent_Count > 1){
@@ -708,13 +702,13 @@ function countDataSent(){
 }
 
 /**
- * @brief [brief description]
- * @details [long description]
+ * @brief Callback function for setting as set
+ * @details 
  * 
- * @param r [description]
- * @param t [description]
+ * @param err Error code if error occured
+ * @param result Result of the SQL operation
  * 
- * @return [description]
+ * @return null
  */
 function idWasSet(err, result){
     
@@ -722,11 +716,12 @@ function idWasSet(err, result){
 }
 
 /**
- * @brief [brief description]
- * @details [long description]
+ * @brief Completes operations of the station, called at the end of an operation mode
+ * @details Update dates. If mode is manual, start GPS and start express server. If in automatic mode,
+ *          set the alarm and close down. If in auto but no reboot mode, simply log that
+ *          he station is waiting for next execution
  * 
- * @param s [description]
- * @return [description]
+ * @return null
  */
 function completeOperations()
  {
@@ -776,38 +771,41 @@ function completeOperations()
  }
 
 /**
- * @brief [brief description]
- * @details [long description]
+ * @brief Log to file and stdout
+ * @details Outputs to file and stdout the data passed. Function is
+ *          called with a level of log, and only logging with a level lower than the current config
+ *          value will be outputted
  * 
- * @param d [description]
- * @param l [description]
+ * @param dataToAppend Data to output in log
+ * @param level Logging level
  * 
- * @return [description]
+ * @return null
  */
 function log(dataToAppend, level)
-{
-    dataToAppend =  "[" + new Date().toISOString() + "]: " + dataToAppend + "\r";
+{    
     if(level <= CONFIG_Verbose_Level){
+        dataToAppend =  "[" + new Date().toISOString() + "]: " + dataToAppend + "\r";
         console.log(dataToAppend);
         fs.appendFileSync(CONFIG_Log_File_Directory + 'log.txt', dataToAppend);    
     }
 }
 
 /**
- * @brief [brief description]
- * @details [long description]
- * @return [description]
+ * @brief Initialize the watchdog file
+ * @details Initialize a file descriptor to the watchdog device
+ * @return null
  */
 function watchdog(){
     return fs.openSync('/dev/watchdog', 'w');
 }
 
 /**
- * @brief [brief description]
- * @details [long description]
+ * @brief Writes to watchdog file
+ * @details Write to the watchdog file. If the file is initialized, it will 
+ *          write to the file and keep the system alive. 
  * 
- * @param  [description]
- * @return [description]
+ * @param fd File descriptor
+ * @return null
  */
 function writeToWatchDog(fd){
     if(fd !== null && CONFIG_dont_reboot == 0){
@@ -818,8 +816,8 @@ function writeToWatchDog(fd){
 
 /**
  * @brief Function that starts the express server for the user web page
- * @details [long description]
- * @return [description]
+ * @details 
+ * @return null
  */
 function startServer(){
     log("STARTING WEB SERVER", 2);
@@ -883,12 +881,13 @@ function startServer(){
     //Receive update Command
     app.io.on('connection', function(socket) {
         
+        //On the reception of the config interval
         socket.on('configInterval', function(data) {
             var interval = data.interval;
             log("Interval = " + interval, 2)
         });
         
-        
+        //When the socket requests a measure with an ID
         socket.on('requestMeasure', function(ID) {
             var sensorId=ID.ID
             
@@ -973,17 +972,21 @@ function startServer(){
            
         });
         
+        //On get the status of the mode switch
         socket.on('getSwitchStatus',function(){
             var currentMode = sh.exec(modeSwitchExec).stdout; //High auto; Low manual
             socket.emit('switchStatus',{mode:currentMode})
         });
         
+        //When the service is requested to restart
         socket.on('restartService',function()
         {
            var service = sh.exec("systemctl restart aquarius.service").stdout; 
         });
         
+        //On the system asking system information
         socket.on('sysInfo', function() {
+            //Execute system querys with grep to get wanted information
             var execPathTemp="cat /sys/class/hwmon/hwmon0/device/temp1_input | sed 's/...$//'";
             var execPathIpUsb = "ifconfig usb0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'";
             var execPathIpEth = "ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'";
@@ -1035,6 +1038,7 @@ function startServer(){
                 var diskUsed = result.stdout;
             }
             
+            //Emit system information
             socket.emit('sysInfoResult', {
                     Temp: cpuTemp,
                     UsbIp: usbIp,
