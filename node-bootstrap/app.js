@@ -23,6 +23,10 @@
  *      BeagleBone Black (Rev.C recommended)
  */
 
+
+
+ 
+
 var express = require('express.io'); //Express and Socket.io integration
 var mysql = require('mysql'); //Javascript mySql Connector
 var exec = require('child_process').exec;
