@@ -1,3 +1,26 @@
+
+/**
+ * @file   aquariusToolKit.js
+ * @author Jean-Pascal McGee et Jean-Philippe Fournier
+ * @date   6 Feb 2015
+ * @brief  Application file to run on the NodeJs server. This service application will
+ *          create the main server for the aquarius station. Its goals are :
+ *          - Create a connection to the mysql database
+ *          - Get all of the configuration parameters from the db
+ *          - Get the state of the station (auto mode or manual)
+ *          - (Maybe other switch modes)
+ *          - Get or set date on the RTC or BBB if one is backwards 
+ *          - If mode is automatic, read all sensors, set new alarm on rtc (following current configuration) and reboot
+ *          - If mode is manual, read sensors and wait for connections          
+ *
+ * @version 1.0 : Première version with database communication 
+ * @version 2.0 : Added new functions reduce code in app.js
+ *
+ * Hardware:
+ *      Board Aquarius
+ *      BeagleBone Black (Rev.C recommended)
+ */
+
 var mysql = require('mysql');
 var http = require('http');
 var fs = require('fs');
@@ -7,11 +30,20 @@ var requestModule = require('request')
 var net = require('net');
 var CONFIG_Verbose_Level = null;
 
+/**
+ * @brief Log data in console and log files
+ * @details [long description]
+ * 
+ * @param dataToAppend data to log
+ * @param level log level
+ * 
+ * @return null
+ */
 function log(dataToAppend, level)
 {
     dataToAppend =  "[" + new Date().toISOString() + "]: " + dataToAppend + "\r"
     if(level <= CONFIG_Verbose_Level){
-        console.log("SQL : " + dataToAppend)
+        console.log(dataToAppend)
         fs.appendFileSync('/var/lib/cloud9/Aquarius/' + 'logsql.txt', dataToAppend)    
     }
 }
@@ -43,6 +75,15 @@ function assignConfigurationValues(err, rows, fields) {
     }
 }
 
+/**
+ * @brief Read configuration table 
+ * @details Reads the configuration table in the database
+ * 
+ * @param connection Connection to database
+ * @param callBackToApp Callback to process received data
+ * 
+ * @return query information
+ */
 function readConfigurationTable(connection, callBackToApp) {
     log("Selecting database", 3)
     connection.query('USE `station_aquarius`;')
@@ -55,13 +96,31 @@ function readConfigurationTable(connection, callBackToApp) {
 
 module.exports = {
     
+    //Export function readConfigurationTable to module for external use
     readConfig : readConfigurationTable,
     
+    /**
+     * @brief Init module
+     * @details Init aquarius toolkit module functions
+     * 
+     * @param connection 
+     * 
+     * @return [description]
+     */
     init : function(connection)
     {
         readConfigurationTable(connection, assignConfigurationValues)
     },
 
+    /**
+     * @brief Read configuration and emit data to socket
+     * @details Reads configuration parameters in t_Config table and emit to web socket
+     * 
+     * @param connection Connection to sql database
+     * @param socket Socket to 
+     * 
+     * @return [description]
+     */
     readConfigAndEmit: function(connection, socket) {
         log("Selecting database", 3)
         connection.query('USE `station_aquarius`;')
