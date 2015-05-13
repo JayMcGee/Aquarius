@@ -3,17 +3,9 @@
  * @file   aquariusToolKit.js
  * @author Jean-Pascal McGee et Jean-Philippe Fournier
  * @date   6 Feb 2015
- * @brief  Application file to run on the NodeJs server. This service application will
- *          create the main server for the aquarius station. Its goals are :
- *          - Create a connection to the mysql database
- *          - Get all of the configuration parameters from the db
- *          - Get the state of the station (auto mode or manual)
- *          - (Maybe other switch modes)
- *          - Get or set date on the RTC or BBB if one is backwards 
- *          - If mode is automatic, read all sensors, set new alarm on rtc (following current configuration) and reboot
- *          - If mode is manual, read sensors and wait for connections          
+ * @brief  Function file, mainly for MySQL communications.         
  *
- * @version 1.0 : Première version with database communication 
+ * @version 1.0 : First version with database communication 
  * @version 2.0 : Added new functions reduce code in app.js
  *
  * Hardware:
@@ -105,7 +97,7 @@ module.exports = {
      * 
      * @param connection 
      * 
-     * @return [description]
+     * @return null
      */
     init : function(connection)
     {
@@ -119,7 +111,7 @@ module.exports = {
      * @param connection Connection to sql database
      * @param socket Socket to 
      * 
-     * @return [description]
+     * @return query information
      */
     readConfigAndEmit: function(connection, socket) {
         log("Selecting database", 3)
@@ -139,6 +131,16 @@ module.exports = {
         return query
     },
 
+    /**
+     * @brief Set a configuration key to value
+     * @details [long description]
+     * 
+     * @param connection Connection to SQL
+     * @param name Name of the key to set
+     * @param value Value to set
+     * @param callBackToApp Callback function
+     * @return Query information
+     */
     setConfig: function(connection, name, value, callBackToApp) {
         log("Selecting database", 3)
         connection.query('USE `station_aquarius`;')
@@ -149,7 +151,17 @@ module.exports = {
         return connection.query(sql, callBackToApp)
     },
 
-
+    /**
+     * @brief Set a new data in the database
+     * @details 
+     * 
+     * @param connection SQL connection
+     * @param value Value to add in database
+     * @param unit Virtual sensor
+     * @param isSent Set as sent or not
+     * @param callBackToApp 
+     * @return query information
+     */
     setData: function(connection, value, unit, isSent, callBackToApp) {
         log("Selecting database", 3)
         connection.query('USE `station_aquarius`;')
@@ -162,6 +174,15 @@ module.exports = {
         return connection.query(sql, callBackToApp)
     },
 
+    /**
+     * @brief Get all sensors in the database
+     * @details 
+     * 
+     * @param connection Connection to mysql
+     * @param callBackToApp 
+     * 
+     * @return Query information
+     */
     getSensors: function(connection, callBackToApp) {
         log("Selecting database", 3)
         connection.query('USE `station_aquarius`;')
@@ -184,6 +205,15 @@ module.exports = {
         return connection.query(sql, callBackToApp)
     },
     
+    /**
+     * @brief Get only one sensor   
+     * @details 
+     * 
+     * @param connection Get a connection
+     * @param physicalid The physical ID of the sensor wanted   
+     * @param callBackToApp 
+     * @return Query information
+     */
     getASensor: function(connection,physicalId,callBackToApp){
         log("Selecting database", 3)
         connection.query('USE `station_aquarius`;')
@@ -206,6 +236,15 @@ module.exports = {
         return connection.query(sql, callBackToApp)  
     },
     
+    /**
+     * @brief Get sensors and emit them to socket
+     * @details 
+     * 
+     * @param connection MySQL connection
+     * @param socket Socket to emit
+     * @param callBackToApp
+     * @return Query information
+     */
     getSensorsAndEmit: function(connection,socket, callBackToApp) {
         log("Selecting database", 3)
         connection.query('USE `station_aquarius`;')
@@ -240,6 +279,15 @@ module.exports = {
         return query
     },
 
+    /**
+     * @brief  Get data of the non sent sensor data
+     * @details 
+     * 
+     * @param connection MySQL connection   
+     * @param callBackToApp 
+     * 
+     * @return Query information
+     */
     getDataForSensorsNotSent: function(connection, callBackToApp) {
         log("Selecting database", 3)
         connection.query('USE `station_aquarius`;')
@@ -261,6 +309,15 @@ module.exports = {
         return connection.query(sql, callBackToApp)
     },
     
+    /**
+     * @brief Get coordinates
+     * @details 
+     * 
+     * @param connection MySQL connection
+     * @param qty Quantity of coordinates to get
+     * @param callBackToApp 
+     * @return null
+     */
     getCoord:function(connection,qty,callBackToApp){
       connection.query('USE `station_aquarius`;')
             var sql = 'SELECT t_Data.data_value AS Value, ' + 
@@ -272,6 +329,16 @@ module.exports = {
             connection.query(sql,callBackToApp);
     },
     
+
+    /**
+     * @brief Sets a data as sent in the database
+     * @details Sets a data for ID as sent in the database  
+     * 
+     * @param connection MySQL connection   
+     * @param id ID to set as sent
+     * @param callback 
+     * @return Query information
+     */
     setDataAsSent : function (connection, id, callback){
         log("Selecting database", 3)   
         connection.query('USE `station_aquarius`;')
@@ -281,6 +348,16 @@ module.exports = {
         return connection.query(sql, callback)
     },
     
+    /**
+     * @brief Send a post to a web page 
+     * @details Send data as json to a web page through a post request
+     * 
+     * @param jsonInString JSON data in string
+     * @param address Address to send data
+     * @param callback
+     * @param ids ID list to be set as sent after a successful post
+     * @return null
+     */
     sendPost : function ( jsonInString, address, callback, ids ){
         
         var fs = require('fs');
@@ -305,6 +382,17 @@ module.exports = {
         });
     },
     
+    /**
+     * @brief Send a post to dweet
+     * @details 
+     * 
+     * @param file JSON data
+     * @param sendAddress sendAdress Unused, to be refactored
+     * @param path Unused, to be refactored
+     * @param callback 
+     * @param ids ID list to be set as sent
+     * @return null
+     */    
     sendPostFile : function ( file , sendAddress , path , callback, ids){
 
         requestModule({
@@ -336,6 +424,16 @@ module.exports = {
         });
     },
     
+    /**
+     * @brief Calibrate and atlas sensor 
+     * @details Manages the calibration of an atlas sensor, checks if it is succesful
+     * 
+     * @param execPath The atlas driver path
+     * @param address Address of the device
+     * @param point Point of calibration    
+     * @param value Value of calibration
+     * @return Number of calibration points or -2 if error
+     */
     calibrateAtlasSensor : function ( execPath , address , point , value ){
         var checkFirst;
         if(point === "mid"){
@@ -375,6 +473,11 @@ module.exports = {
         }
     },
     
+    /**
+     * @brief Stops the SIM908 module 
+     * @details Ensures the SIM908 is properly closed
+     * @return true if closed down successfully
+     */
     StopSIM908 : function (){
         var driver = "python /var/lib/cloud9/Aquarius/exec/driverSIM908.py ";
         var initDevice = sh.exec(driver + "initDevice");
@@ -416,6 +519,11 @@ module.exports = {
         
     },
     
+    /**
+     * @brief Starts the SIM908
+     * @details Ensures the SIM908 is powered on
+     * @return true if the SIM908 is on
+     */
     StartSIM908 : function(){
         var driver = "python /var/lib/cloud9/Aquarius/exec/driverSIM908.py ";
         var initDevice = sh.exec(driver + "initDevice");
@@ -456,6 +564,11 @@ module.exports = {
         else return true;
     },
     
+    /**
+     * @brief Start the GPS module
+     * @details 
+     * @return 
+     */ 
     StartGPS : function(){
         var driver = "python /var/lib/cloud9/Aquarius/exec/driverSIM908.py ";
         
@@ -464,6 +577,11 @@ module.exports = {
         var result2 = sh.exec(driver + "ResetGPS");
     },
     
+    /**
+     * @brief Get the GPS coordinates
+     * @details 
+     * @return 
+     */
     GetGPS : function(){
         var driver = "python /var/lib/cloud9/Aquarius/exec/driverSIM908.py ";
         
@@ -472,6 +590,11 @@ module.exports = {
         console.log(result.stdout);
     },
 
+    /**
+     * @brief Stops the GPS
+     * @details 
+     * @return 
+     */
     StopGPS : function(){
         var driver = "python /var/lib/cloud9/Aquarius/exec/driverSIM908.py ";
         
