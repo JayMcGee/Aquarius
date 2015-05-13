@@ -72,10 +72,6 @@ def getCurrentGPSInformation():
         i = i + 1
     print "ERROR : Could not get GPS location"
     return 0
-###############################################
-def convertGPSInformation():
-    
-    return
 ############################################### 
 def initDevice():
     f = open('/sys/class/gpio/export', 'a')

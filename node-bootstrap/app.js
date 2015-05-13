@@ -13,7 +13,7 @@
  *          - If mode is automatic, read all sensors, set new alarm on rtc (following current configuration) and reboot
  *          - If mode is manual, read sensors and wait for connections          
  *
- * @version 1.0 : Première version with limited functionnality
+ * @version 1.0 : First version with limited functionnality
  * @version 2.0 : March 18, 2015 Added looping and restarting functionnality
  * Environnement: Linux Debian
  * @version 3.0 : May 12, 2015 First completely functional milestone
@@ -34,7 +34,11 @@ var schedule = require('node-schedule'); //In application schedule creator
 var fs = require('fs');         //File system manipluation for the watchdog
 var sh = require('execSync'); //Permits the execution of external applications synchronously
 
+<<<<<<< HEAD
+var aquariusTools = require('./aquariusToolKit') //External file that helps the connection and querying to the database
+=======
 var aquairusTools = require('./aquariusToolKit') //External file that helps the connection and querying to the database
+>>>>>>> cd8056af4261a35af9c899f406c5ec46d05aabd4
 
 //Execution path for the RTC driver and Switches and Watchdog feeder
 var rtcExecPath = "python /var/lib/cloud9/Aquarius/exec/driverRTC.py";
@@ -118,9 +122,9 @@ connection.connect(function(err){
     log('Connected as id ' + connection.threadId, 2);
     drawSeparator()
 
-    //Calls configuration read from aquairusTools, callsback to assignConfigurationValues
-    aquairusTools.init(connection)
-    aquairusTools.readConfig(connection, assignConfigurationValues);
+    //Calls configuration read fromaquariusTools, callsback to assignConfigurationValues
+    aquariusTools.init(connection)
+    aquariusTools.readConfig(connection, assignConfigurationValues);
 });
 
  /**
@@ -229,7 +233,7 @@ function setDatesOnDevices(dateToUse){
     var execSetCurrentSysDate = sh.exec('date -s "' + dateToUse + '"');
     if(CONFIG_dont_reboot == 0)
         var rtcSetDate = sh.exec(rtcExecPath + " setdate");
-    aquairusTools.setConfig(connection, 'LAST_KNOWN_DATE', dateToUse, configurationSetCallBack);
+    aquariusTools.setConfig(connection, 'LAST_KNOWN_DATE', dateToUse, configurationSetCallBack);
     
 }
 
@@ -399,8 +403,8 @@ function getSensorReadingCallback(err, rows, fields) {
 			* Start init of exceptions
 			****/            
             if(Driver.indexOf("SIM908") > -1){
-                aquairusTools.StartSIM908();
-                aquairusTools.StartGPS();
+               aquariusTools.StartSIM908();
+               aquariusTools.StartGPS();
             }
             /****
 			* Stop init of exceptions
@@ -443,11 +447,17 @@ function getSensorReadingCallback(err, rows, fields) {
             }
             //Stop SIM908 device
             if(Driver.indexOf("SIM908") > -1){
+<<<<<<< HEAD
+               aquariusTools.StopGPS();
+               aquariusTools.StopSIM908();
+            }
+=======
                 aquairusTools.StopSIM908();
             }			
             /****
 			* Stop after execution exceptions
 			*****/
+>>>>>>> cd8056af4261a35af9c899f406c5ec46d05aabd4
 
 			//For each virtual sensor
             for (i = 0; i < rows.length; ++i) {
@@ -469,8 +479,12 @@ function getSensorReadingCallback(err, rows, fields) {
                             
                         }
                         log("Inserting into database value : " + value + " " + rows[i].MeasureUnit, 2);
+<<<<<<< HEAD
+                       aquariusTools.setData(connection, value, rows[i].VirtualID, 0, t_Data_insertCallBack);  
+=======
 						//Set data in the database
                         aquairusTools.setData(connection, value, rows[i].VirtualID, 0, t_Data_insertCallBack);  
+>>>>>>> cd8056af4261a35af9c899f406c5ec46d05aabd4
                     }
 					//If data is not present in the frame from the driver, set as a missing data
                     else {
@@ -508,7 +522,7 @@ function roundToX(num, x) {
  */
 function readAllSensorsInDataBase(callback) {
     writeToWatchDog(fileWatch)
-    aquairusTools.getSensors(connection, callback)
+   aquariusTools.getSensors(connection, callback)
 }
 
 /**
@@ -520,7 +534,7 @@ function readAllSensorsInDataBase(callback) {
  */
 function readDataFromSensorsNotSent(callback) {
     writeToWatchDog(fileWatch)
-    aquairusTools.getDataForSensorsNotSent(connection, callback)
+   aquariusTools.getDataForSensorsNotSent(connection, callback)
 }
 
 /**
@@ -632,14 +646,25 @@ function createJSONfromDatabase(err, rows, fields) {
         if(sh.exec("ip addr | grep eth0").stdout.indexOf("DOWN") == -1){
             log("Ethernet is available, sending data",2);
             
-            aquairusTools.sendPostFile(JSONsession, "https://dweet.io:443/dweet/for/", "Aquarius", setIDsAsSent, ids);
-            aquairusTools.sendPost(message, CONFIG_Cloudia_Address, setIDsAsSent, ids);
+           aquariusTools.sendPostFile(JSONsession, "https://dweet.io:443/dweet/for/", "Aquarius", setIDsAsSent, ids);
+           aquariusTools.sendPost(message, CONFIG_Cloudia_Address, setIDsAsSent, ids);
         }
         //Else try PPP connection through SIM908
         else{
             log("Trying PPP connection setup", 2);
+<<<<<<< HEAD
+           aquariusTools.StartSIM908();
+            exec(pppStartup, function (error, stdout, stderr) {
+                //console.log('stdout: ' + stdout);
+                //console.log('stderr: ' + stderr);
+                //if (error !== null) {
+                 // console.log('exec error: ' + error);
+                //W}
+            });
+=======
             aquairusTools.StartSIM908();
             exec(pppStartup, function (error, stdout, stderr) {});
+>>>>>>> cd8056af4261a35af9c899f406c5ec46d05aabd4
         
             setTimeout(function(){
                 var testPPP = sh.exec("ifconfig | grep ppp0");
@@ -647,12 +672,12 @@ function createJSONfromDatabase(err, rows, fields) {
                 if(testPPP.stdout.indexOf("ppp") > -1){
                     log("PPP connection successful", 2);
                     
-                    aquairusTools.sendPostFile(JSONsession, "https://dweet.io:443/dweet/for/", "Aquarius", setIDsAsSent, ids);
-                    aquairusTools.sendPost(message, CONFIG_Cloudia_Address, setIDsAsSent, ids);
+                   aquariusTools.sendPostFile(JSONsession, "https://dweet.io:443/dweet/for/", "Aquarius", setIDsAsSent, ids);
+                   aquariusTools.sendPost(message, CONFIG_Cloudia_Address, setIDsAsSent, ids);
                 }
                 else{
                     log("Could not create ppp connection", 2);
-                    aquairusTools.StopSIM908();
+                   aquariusTools.StopSIM908();
                     completeOperations();
                 }
             }, 10000);
@@ -675,7 +700,7 @@ function setIDsAsSent(ids){
         for(var s = 0; s < ids.length; s++)
         {
             writeToWatchDog(fileWatch)
-            aquairusTools.setDataAsSent(connection, ids[s], function(err, result){
+           aquariusTools.setDataAsSent(connection, ids[s], function(err, result){
                 log("Set as sent : " + result, 2);
                 idToSet++;
                 if(idToSet >= ids.length)
@@ -732,7 +757,7 @@ function completeOperations()
     
     updateDates();
     if (CONFIG_Operation_Mode == 1 && CONFIG_dont_reboot == 0) {
-        aquairusTools.StopSIM908();
+       aquariusTools.StopSIM908();
         var date = new Date()
 
         //Creates a date with added minutes from the interval configuration
@@ -768,8 +793,8 @@ function completeOperations()
         drawSeparator();
         //Prepare Data for server ( Format to Json )
         log("Starting server and GPS for manual operation", 2);
-        aquairusTools.StartSIM908();
-        aquairusTools.StartGPS();
+       aquariusTools.StartSIM908();
+       aquariusTools.StartGPS();
         startServer();
     }
  }
@@ -861,7 +886,7 @@ function startServer(){
     app.io.on('connection', function(socket) {
         socket.on('ready', function() {
             log("Requested sensors", 2)
-            aquairusTools.getSensorsAndEmit(connection, socket)
+           aquariusTools.getSensorsAndEmit(connection, socket)
         })
     })
     
@@ -870,11 +895,11 @@ function startServer(){
     app.io.on('connection', function(socket) {
         socket.on('RequestConfig', function() {
             log("Requested configuration", 2)
-            aquairusTools.readConfigAndEmit(connection, socket)
+           aquariusTools.readConfigAndEmit(connection, socket)
         })
         socket.on('UpdateConfig', function(data) {
             log("Requested an update to configuration", 2)
-            aquairusTools.setConfig(connection, data.Name, data.Value, configurationSetCallBack)
+           aquariusTools.setConfig(connection, data.Name, data.Value, configurationSetCallBack)
         })
         socket.on('RequestNewMeasure', function(data) {
             log("Requested a new measure on XX sensor", 2)
@@ -891,7 +916,29 @@ function startServer(){
             log("Interval = " + interval, 2)
         });
         
+<<<<<<< HEAD
+        socket.on('getGPSCorrd',function(data){
+            var quantity = data.QTY;
+            aquariusTools.getCoord(connection,quantity,function(err,rows,fields){
+                if(rows[0].ID == 12)
+                {
+                    var Longitude = rows[0].Value;
+                    var Latitude = rows[1].Value;
+                }
+                else
+                {
+                    var Longitude = rows[1].Value;
+                    var Latitude = rows[0].Value;
+                } 
+                socket.emit('receiveGPS',{Lat:Latitude,
+                    Long:Longitude});
+                })   
+            });
+        });
+        
+=======
         //When the socket requests a measure with an ID
+>>>>>>> cd8056af4261a35af9c899f406c5ec46d05aabd4
         socket.on('requestMeasure', function(ID) {
             var sensorId=ID.ID
             
@@ -934,7 +981,7 @@ function startServer(){
     app.io.on('connection', function(socket) {
         socket.on('calibration', function(data) {
             log("Starting Calibration",1)
-            aquairusTools.getASensor(connection,data.Id,function(err,rows,fields){
+           aquariusTools.getASensor(connection,data.Id,function(err,rows,fields){
                 //log(rows[0].Driver,1)
                 var driverPath = rows[0].Driver;
                 var address = rows[0].PhysicalAddress;
@@ -942,7 +989,7 @@ function startServer(){
                 var value = data.Value;
                 var calibrationStatus;
                 console.log("Driver : " + driverPath + " addredss : " + address + " point : " + point + " value : "+ value);
-                calibrationStatus = aquairusTools.calibrateAtlasSensor(driverPath, address, point, value);
+                calibrationStatus =aquariusTools.calibrateAtlasSensor(driverPath, address, point, value);
                 
                 if(calibrationStatus >= 0){
                     log("Calibration Successful",2);
