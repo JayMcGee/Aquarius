@@ -239,16 +239,6 @@ module.exports = {
 
         return query
     },
-    getCoord:function(connection,qty,callBackToApp){
-      connection.query('USE `station_aquarius`;')
-            var sql = 'SELECT t_Data.data_value AS Value, ' + 
-                    't_Data.data_t_virtual as ID ' + 
-                    'FROM `t_Data`' + 
-                    'WHERE t_Data.data_t_virtual = 12 ' + 
-                    'or t_Data.data_t_virtual = 13 ' + 
-                    'ORDER BY t_Data.idt_Data LIMIT 2;'
-            connection.query(sql,callBackToApp);
-    },
 
     getDataForSensorsNotSent: function(connection, callBackToApp) {
         log("Selecting database", 3)
@@ -307,17 +297,17 @@ module.exports = {
     sendPostFile : function ( file , sendAddress , path , callback, ids){
 
         requestModule({
-    			url: "https://dweet.io:443/dweet/for/Aquarius",
-    			jar: true,
-    			method: "POST",
-    			followAllRedirects: true,
-    			timeout: 5000,
-    			strictSSL: true,
-    			json: file
-    		}, function (err, response, body) {
-    		    if(!err)
-    		    {
-        			if (response.statusCode === 200) {
+                url: "https://dweet.io:443/dweet/for/Aquarius",
+                jar: true,
+                method: "POST",
+                followAllRedirects: true,
+                timeout: 5000,
+                strictSSL: true,
+                json: file
+            }, function (err, response, body) {
+                if(!err)
+                {
+                    if (response.statusCode === 200) {
                         console.log(body)
                         callback(ids);
                     }
@@ -326,13 +316,13 @@ module.exports = {
                         console.log("response.statusText: " + response.statusText)
                         callback(null);
                     }
-    		    }
-    		    else {
+                }
+                else {
                     log("error: " + err)
                     callback(null);
-    		    }
-    		    
-		});
+                }
+                
+        });
     },
     
     calibrateAtlasSensor : function ( execPath , address , point , value ){
