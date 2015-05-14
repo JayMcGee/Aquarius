@@ -1,1 +1,0 @@
-#File that closes the USR leds on the Beaglebone Black
