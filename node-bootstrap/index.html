@@ -44,7 +44,8 @@
 			</div>
 		</div>
 	</div>
-	
+
+<!-- s3-loader, Everything in s3-loader will be hidden while loading the page-->
 <div class="s3-loader">
 	<!-- start: Header -->
 	
@@ -294,22 +295,24 @@
 	<script src="js/retina.js"></script>
 	<script src="js/pleased.js"></script>
 	<script src="js/custom.js"></script>
-	<script src="scripts/Aquarius_Map.js"></script>
-
 		
 	<!-- Get Data from station -->
 	<script src="/socket.io/socket.io.js"></script>
+	<!-- Aquarius Scripts -->
+	<script src="scripts/Aquarius_Map.js"></script>
 	<script>
-		////////////////////////////////////////////////////////////////////////
-		// Connect the web client to the Station Server
-		// Sends a ready event
-		io = io.connect();
+
+/**
+ * @brief 	Connect webPage to server
+ */
+		var io = io.connect();
 		// Emit ready event.
 		io.emit('ready');
 		var allSensors;
 	
-	
-		/////// Manage Buttons
+/**
+ * @brief 	Manager for Aquarius tools buttons
+ */
 		$("#shutdownBtn").click(function(){
 			io.emit("shutdown");
 		});
@@ -324,36 +327,37 @@
 			io.emit("restartService");
 		});
 		
-		////////////////////////////////////////////////////////////////////////
-	        // ReceiveSensors contains an array representing all the 
-	        // sensors and their properties
+
+/** 		
+ * @brief	sysInfoResult Asks server for some information on system status
+ * @details	Displays Cpu temp, USB ETH and Wifi interface Ip and %used disk space
+ */
 		io.on('sysInfoResult',function(data){
 			
 			var disk = data.Disk.split(" ");
 			
 			disk.forEach(function(element){
-				if(element.indexOf("%") > -1)
+				if (element.indexOf("%") > -1)
 				{
 					disk = element;
 				}
 			});
 			
-			if(data.UsbIp)
+			if (data.UsbIp)
 			{
 				var usb0 = "Usb0 Ip : " + data.UsbIp;
 			}
-			if(data.EthIp)
+			if (data.EthIp)
 			{
 				var eth0 = "Eth0 Ip : " + data.EthIp;
 			}
-			if(data.WlanIp)
+			if (data.WlanIp)
 			{
 				var wlan0 = "Wlan0 Ip : " + data.WlanIp;
 			}
 			
 			
 			var cpuTemp = "Cpu Temperature : " + data.Temp + "°C";
-			
 			var diskUsed = "Used disk : " + disk;
 			
 			$(".cpuTemp").replaceWith(cpuTemp);
@@ -362,12 +366,12 @@
 			$(".wlanIp").replaceWith(wlan0);
 			$(".diskUsed").replaceWith(diskUsed);
 		});
-	
 			
 			
-	        ////////////////////////////////////////////////////////////////////////
-	        // ReceiveSensors contains an array representing all the 
-	        // sensors and their properties
+/** 		
+ * @brief	ReceiveSensors, Aslks server for all the activated sensors
+ * @details	Creates the interface for the sensor that are activated
+ */
 		io.on('ReceiveSensors',function(data){
 			var position = 1;
 			allSensors = data;
@@ -383,7 +387,7 @@
 				var circle = '<div class="span2" onTablet="span2" onDesktop="span2" onclick="getMeasure('+ sensorID +')"><div class="circleStatsItemBox" id="itemBox'+sensorID+'"><div class="header">'+ circleName + '</div><div class="circleStat"><input id="sensor'+ sensorID +'" type="text" value = "" data-skin="tron" data-readOnly="true" data-step="0.1" data-min="'+ circleMin +'" data-max="'+ circleMax +'" class="whiteCircle"></div><div class="footer">' + circleUnit + '</div></div></div>'
 				
 				
-				if(position == 1)
+				if (position == 1)
 				{
 					$('#circleBox').append('<div class="row-fluid hideInIE8 circleStats" id="circleRow1"></div>')
 					$('#circleRow1').append(circle)
@@ -397,7 +401,7 @@
 					$('#circleBox').append('<div class="row-fluid hideInIE8 circleStats" id="circleRow2"></div>')
 					$('#circleRow2').append(circle)	
 				}
-				else if(position > 7 && position < 13)
+				else if (position > 7 && position < 13)
 				{
 					$('#circleRow2').append(circle)	
 				}
@@ -406,7 +410,7 @@
 					$('#circleBox').append('<div class="row-fluid hideInIE8 circleStats" id="circleRow3"></div>')
 					$('#circleRow3').append(circle)	
 				}
-				else if(position > 13 && position < 19)
+				else if (position > 13 && position < 19)
 				{
 					$('#circleRow3').append(circle)	
 				}
@@ -426,31 +430,27 @@
 						getMeasure(entry.VirtualID);
 					})	
 			});
-			
-			
-			circle()
-			/*	
-			setInterval(function(){
-				data.row.forEach(function(entry){
-					getMeasure(entry.VirtualID);
-				})
-			}, (data.row.length * 1100));
-			*/
+			//Aquarius_DataCircle
+			circle();
 		})
 		
+/** 		
+ * @brief	getSwitchStatus
+ * @details	Creates the interface for the sensor that are activated
+ */
 		function getSwitchStatus(){
 			io.emit('getSwitchStatus');
 		}
 		
 		io.on('switchStatus',function(data){
 			
-			if(data.mode.indexOf("HIGH") > -1){
+			if (data.mode.indexOf("HIGH") > -1){
 				$("#switchMode").find(".fa").switchClass( "fa-toggle-off", "fa-toggle-on", 500, "easeInOutQuad" );
 				$("#switchMode").find(".fa").animate({color:"green"},500);
 				setButtonStatus("restartBtn",1)
 				$("#restartBtn").removeAttr('disabled','disabled');
 			}
-			else{
+			else {
 				setButtonStatus("restartBtn",0)
 				$("#switchMode").find(".fa").animate({color:"red"},500);
 				$("#switchMode").find(".fa").switchClass( "fa-toggle-on", "fa-toggle-off", 500, "easeInOutQuad" );
@@ -460,16 +460,21 @@
 				}, 1000);
 		});
 	
-	        ////////////////////////////////////////////////////////////////////////
-	        // When user click on a dataCircle it sends a request to the server
+/** 		
+ * @brief	getMeasure
+ * @details	send an update request to the serveur when the dataCircle is Clicked
+ * 			the footer is change to indicates the process is working
+ */
 		function getMeasure(sensorID){
 			io.emit('requestMeasure', { ID : sensorID });
 			$("#itemBox"+sensorID).find(".footer").html('Updating <i class="fa fa-repeat fa-spin"></i>');
 		}
 		
-	        ////////////////////////////////////////////////////////////////////////
-	        // This is where we process the answer from the server
-	        // Update the circle value 
+/** 		
+ * @brief	updateSensor
+ * @details	The answer from the server to getMeasuer, We update the value of the corresponding dataCircle
+ * 			The update is animated and the footer is resetted to the unit
+ */
 	        io.on('updateSensor',function(data){
 	        	
 		  	var measure = parseFloat(data.result.replace(/[^\d.-]/g, ''));
@@ -485,13 +490,22 @@
 					}
 				})
 	        });
-		
+	        
+/** 		
+ * @brief	getGPScoord
+ * @details	Asks the server for the latest GPS coordinates in the database, 
+ * 			A quantity of coordinates can be specified
+ */		
 		io.emit('getGPSCoord',{Qty:10});
+		
+/** 		
+ * @brief	receiveGPS
+ * @details	the answer from the server, We receive a data Object containing 
+ */	
 		io.on('receiveGPS',function(data){
-			//La Bonne ligne // createMap(data.Lat,data.Long,"Aquarius1","Porto Alegre");
-			createMap();
+			createMap(); //From : public/scripts/Aquarius_Map
 			data.Data.forEach(function(entry){
-				addMarker(entry.lat,entry.long,"Aquarius",entry.date);
+				addMarker(entry.lat,entry.long,"Aquarius",entry.date); //From : public/scripts/Aquarius_Map
 			});
 			
 		});
