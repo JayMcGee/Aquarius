@@ -231,7 +231,7 @@ module.exports = {
                 'WHERE t_PhysicalSensor.physical_id = ' + physicalId + ' ' + 
                 'and t_PhysicalSensor.physical_t_type = t_Types.types_id ' +
                 'and t_VirtualSensor.virtual_t_physical = t_PhysicalSensor.physical_id ' + 
-                'ORDER BY t_PhysicalSensor.cloudia_unit_id, t_VirtualSensor.cloudia_id;'
+                'ORDER BY t_VirtualSensor.cloudia_id;'
         log(sql, 3)
         return connection.query(sql, callBackToApp)  
     },
@@ -303,7 +303,7 @@ module.exports = {
         'WHERE t_Data.data_t_virtual = t_VirtualSensor.virtual_id ' +
         'and t_VirtualSensor.virtual_t_physical = t_PhysicalSensor.physical_id ' +
         'and t_Data.data_is_sent = 0 ' +
-        'ORDER BY t_PhysicalSensor.cloudia_unit_id, t_Data.data_date, t_VirtualSensor.cloudia_id ' + 
+        'ORDER BY t_VirtualSensor.cloudia_id, t_Data.data_date, t_VirtualSensor.cloudia_id ' + 
         'LIMIT 40;'
         log(sql, 3)
         return connection.query(sql, callBackToApp)
@@ -489,7 +489,7 @@ module.exports = {
         
         //console.log("Checking current state : " +  CheckOn.stdout);
         
-        if(CheckOn.stdout.indexOf("ON") > -1){
+        if(CheckOn.stdout.length > 0 && CheckOn.stdout.indexOf("ON") > -1){
             //console.log("IS ON");
             result = 1;
         }

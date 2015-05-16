@@ -1,0 +1,1 @@
+ls /sys/devices/w1_bus_master1 | grep 28-

@@ -49,9 +49,6 @@ var _2SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw2.py";
 var _3SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw3.py";
 var _4SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw4.py";
 
-//PPP startup command to create a PPP connection through SIM908
-var pppStartup = "pon fona";
-
 //Var to keep up with the watchdog file
 var fileWatch = null
 
@@ -78,6 +75,8 @@ var CONFIG_Sensor_unit = null;
 var CONFIG_Temperature_Compensation = null;
 
 var CONFIG_dont_reboot = 1;
+
+var CONFIG_APN = null;
 
 //Vars used to count data sent to ClouDIA
 var DataSent_Count = 0;
@@ -287,6 +286,10 @@ function assignConfigurationValues(err, rows, fields){
             log("Assigned temperature compensation", 3);
             CONFIG_Temperature_Compensation = currentValue;
         }
+        else if ( currentName == "PPP_APN"){
+            log("Assigned PPP carrier setting", 3);
+            CONFIG_APN = "pon " + currentValue;
+        }
     }
     
     //Reset RTC so it does not retrigger or stay at low logic
@@ -399,6 +402,7 @@ function getSensorReadingCallback(err, rows, fields) {
             * Start init of exceptions
             ****/            
             if(Driver.indexOf("SIM908") > -1){
+                stopPPPD()
                 aquariusTools.StartSIM908();
                 aquariusTools.StartGPS();
             }
@@ -636,10 +640,10 @@ function createJSONfromDatabase(err, rows, fields) {
             aquariusTools.sendPost(message, CONFIG_Cloudia_Address, setIDsAsSent, ids);
         }
         //Else try PPP connection through SIM908
-        else{
+        else if(CONFIG_APN !== null){
             log("Trying PPP connection setup", 2);
             aquariusTools.StartSIM908();
-            exec(pppStartup, function (error, stdout, stderr) {});
+            exec(CONFIG_APN, function (error, stdout, stderr) {});
         
             setTimeout(function(){
                 var testPPP = sh.exec("ifconfig | grep ppp0");
@@ -652,10 +656,16 @@ function createJSONfromDatabase(err, rows, fields) {
                 }
                 else{
                     log("Could not create ppp connection", 2);
+                    stopPPPD();
                     aquariusTools.StopSIM908();
                     completeOperations();
                 }
             }, 10000);
+        }
+        else
+        {
+            log("Could not create connection", 2);
+            completeOperations();
         }
     }
 }
@@ -732,9 +742,10 @@ function completeOperations()
     
     updateDates();
     if (CONFIG_Operation_Mode == 1 && CONFIG_dont_reboot == 0) {
-        aquariusTools.StopSIM908();
+        stopPPPD();
+        
         var date = new Date()
-
+        aquariusTools.StopSIM908();
         //Creates a date with added minutes from the interval configuration
         drawSeparator()
         log("Date without added interval : " + date.toISOString().slice(0, 19).replace('T', ' '), 2)
@@ -762,6 +773,8 @@ function completeOperations()
     }
     else if(CONFIG_Operation_Mode == 1 && CONFIG_dont_reboot == 1){
         log("Waiting for next execution", 2);
+        stopPPPD();
+        aquariusTools.StopSIM908();
     }
     else if(CONFIG_Operation_Mode == 0){
         log("Manual mode", 2);            
@@ -792,6 +805,28 @@ function log(dataToAppend, level)
         console.log(dataToAppend);
         fs.appendFileSync(CONFIG_Log_File_Directory + 'log.txt', dataToAppend);    
     }
+}
+
+/**
+ * @brief Stops PPPD execution
+ * @details Stops PPPD to permit other drivers to operate the SIM908 on the serial line
+ * 
+ * @return True if PPPD is closed succesfully
+ */
+function stopPPPD(){
+    var getPID = sh.exec("pidof pppd");
+    log("Length of stdout : " + getPID.stdout.length + " data : " + getPID.stdout + " :");
+    if(getPID.stdout.length > 0){
+        sh.exec("kill " + getPID.stdout);
+        var getPID2 = sh.exec("pidof pppd");
+        if(getPID2.stdout.length > 0){
+            return true;
+        }
+        else{
+            return false
+        }
+    }
+    return true;
 }
 
 /**
