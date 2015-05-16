@@ -87,6 +87,7 @@
 								<button class="btn yellow btn-setting" id="sysInfoBtn">System Information</button>
 								<button class="btn btn-primary" data-toggle="modal" data-target="#switchMode" id="modetBtn">Switch to Auto mode</button>
 								<button class="btn red" id="shutdownBtn">ShutDown</button>
+								<a id="downloadBtn" href="/export.csv" hidden></a>
 							</p>
 						</div>
 					</div><!--/span-->
@@ -158,6 +159,11 @@
 									<div class="span8"> Place the probe in a high conductivity solution </div>
 									<div class = "span2">  <input id="highPoint_cond" class="span4" value="1278">uS </div>
 									<div class = "span2"> <button id= "highPointBtn_cond" class="btn btn-primary" disabled="disabled" > High point </button> </div>
+								</div>
+								<div class="row-fluid calibrate-row">
+									<div class="span8"> Place the probe in a solution for one point </div>
+									<div class = "span2">  <input id="onePoint_cond" class="span4" value="348">uS </div>
+									<div class = "span2"> <button id= "onePointBtn_cond" class="btn btn-primary" disabled="disabled" > One point </button> </div>
 								</div>
 							</div>
 							
@@ -326,8 +332,13 @@
 		$("#restartBtn").click(function(){
 			io.emit("restartService");
 		});
-		
+		$("#exportBtn").click(function(){
+			io.emit("exportDatabase");
+		});
 
+		io.on('downloadNow', function(){
+			$("#downloadBtn")[0].click()
+		});
 /** 		
  * @brief	sysInfoResult Asks server for some information on system status
  * @details	Displays Cpu temp, USB ETH and Wifi interface Ip and %used disk space
@@ -472,23 +483,28 @@
 		
 /** 		
  * @brief	updateSensor
- * @details	The answer from the server to getMeasuer, We update the value of the corresponding dataCircle
+ * @details	The answer from the server to getMeasure, We update the value of the corresponding dataCircle
  * 			The update is animated and the footer is resetted to the unit
  */
 	        io.on('updateSensor',function(data){
-	        	
-		  	var measure = parseFloat(data.result.replace(/[^\d.-]/g, ''));
-	        	var valInit = $('#sensor' + data.ID).val();
-	
-				$({value: valInit}).animate({value:measure}, {
-					duration: 500,
-					easing:'swing',
-					step: function()
-					{
-						$('#sensor' + data.ID).val(this.value).trigger('change');
-						$("#itemBox"+ data.ID).find(".footer").html(allSensors.row[(data.ID-1)].MeasureUnit);
-					}
-				})
+	        	if(data.result.indexOf("Error") > -1){
+	        		$("#itemBox"+data.ID).find(".footer").html('Sensor error');
+	        	}
+	        	else{
+	        		var measure = parseFloat(data.result.replace(/[^\d.-]/g, ''));
+		        	var valInit = $('#sensor' + data.ID).val();
+		
+					$({value: valInit}).animate({value:measure}, {
+						duration: 500,
+						easing:'swing',
+						step: function()
+						{
+							$('#sensor' + data.ID).val(this.value).trigger('change');
+							$("#itemBox"+ data.ID).find(".footer").html(allSensors.row[(data.ID-1)].MeasureUnit);
+						}
+					})
+	        	}
+		  		
 	        });
 	        
 /** 		

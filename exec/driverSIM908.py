@@ -71,13 +71,15 @@ def stopGPS():
 def getCurrentGPSInformation():
     print "Querying GPS module"
     datas = writeAndReadSIM908( "AT+CGPSINF=0" )
-    ok = checkIfOK(datas)
-    gpsOk = checkIfFix(datas)
-    if ok == 1 and gpsOk == 1:
-        print datas
-        outputDataStringGPS(datas[1])
+
+    if checkIfOK(datas) == 1:
+        if checkIfFix(datas[1]) == 1:
+            print datas
+            outputDataStringGPS(datas[1])
+        else:
+            print "ERROR : Could not get GPS location"
     else:
-        print "Could not get GPS location"
+        print "ERROR : Could not get an answer from device"
     return datas
 ###############################################
 # Inits the GPIO responsible for the control of power 
@@ -117,7 +119,10 @@ def checkPLine():
 ##############################################
 def outputDataStringGPS(data):
     splitted = data.split(",")    
-    print "NAME;SIM908;DATQ;5;SATS;" + str(splitted[6]) + ";LONG;" + str(ConvertLong(str(splitted[1]))) + ";LAT;" + str(ConvertLat(str(splitted[2]))) + ";ALT;" + str(splitted[3]) + ";TIME;" + str(splitted[4])
+    if len(splitted) >= 7:
+        print "NAME;SIM908;DATQ;5;SATS;" + str(splitted[6]) + ";LONG;" + str(ConvertLong(str(splitted[1]))) + ";LAT;" + str(ConvertLat(str(splitted[2]))) + ";ALT;" + str(splitted[3]) + ";TIME;" + str(splitted[4])
+    else:
+        print "NAME;SIM908;NODQ;ERROR_NO_DATA"
     return
 ##############################################
 # Convert the Latitude from NMEA to Degrees Decimal
@@ -193,10 +198,10 @@ def checkIfOn():
 # If it doesn't, return 0 or 1 if a fix was made
 ######################################################
 def checkIfFix(datas):
-    splitted = data.split(",")
-    if splitted[5] !== "0"
+    splitted = datas.split(",")
+    if len(splitted) >= 6 and splitted[5] != "0":
         ok = 1
-    else
+    else:
         ok = 0
     return ok 
 ######################################################

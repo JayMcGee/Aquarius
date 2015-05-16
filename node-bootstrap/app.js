@@ -28,6 +28,7 @@ var mysql = require('mysql'); //Javascript mySql Connector
 var exec = require('child_process').exec;
 var fs = require('fs');         //File system manipluation for the watchdog
 var sh = require('execSync'); //Permits the execution of external applications synchronously
+var http = require('http');
 
 var aquariusTools = require('./aquariusToolKit') //External file that helps the connection and querying to the database
 
@@ -108,12 +109,12 @@ connection.connect(function(err){
         return;
     }
 
-    drawSeparator()
+    drawSeparator();
     log('Connected as id ' + connection.threadId, 2);
-    drawSeparator()
+    drawSeparator();
 
     //Calls configuration read from aquariusTools, callsback to assignConfigurationValues
-    aquariusTools.init(connection)
+    aquariusTools.init(connection);
     aquariusTools.readConfig(connection, assignConfigurationValues);
 });
 
@@ -130,6 +131,8 @@ function autoMode(){
         fileWatch = watchdog();
         fs.writeSync(fileWatch, "\n");
     }
+    
+    sh.exec("sh /var/lib/cloud9/Aquarius/exec/close_usr_led.sh");
     
     writeToWatchDog(fileWatch);
     log("Auto mode", 2);
@@ -192,7 +195,7 @@ function updateDates(){
         var currentSysDate = Date.parse(strCurrentSysDate);
         
         //Get a date object from last known date from configuration
-        var lastDate = Date.parse(CONFIG_Last_Date)
+        var lastDate = Date.parse(CONFIG_Last_Date);
     
         log("Current Sys date : " + strCurrentSysDate, 2);
         log("Last known date : " + CONFIG_Last_Date, 2);
@@ -866,24 +869,27 @@ function startServer(){
     // Setup the ready route, and emit talk event.
     app.io.route('ready', function(req) {
         log('User Connected');
-    })
+    });
     // Send the client html.
     app.get('/', function(req, res) {
-        res.sendfile(__dirname + '/index.html')
-    })
+        res.sendfile(__dirname + '/index.html');
+    });
     app.get('/index.html', function(req, res) {
-        res.sendfile(__dirname + '/index.html')
-    })
+        res.sendfile(__dirname + '/index.html');
+    });
     app.get('/form.html', function(req, res) {
-        res.sendfile(__dirname + '/form.html')
-    })
+        res.sendfile(__dirname + '/form.html');
+    });
     app.get('/chart.html', function(req, res) {
-        res.sendfile(__dirname + '/chart.html')
-    })
+        res.sendfile(__dirname + '/chart.html');
+    });
+    app.all('/export.csv', function(req, res){
+        res.download(__dirname + '/export.csv');
+    });
     //The 404 Route (ALWAYS Keep this as the last route)
     app.get('*', function(req, res) {
-        res.sendfile(__dirname + '/404.html')
-    })
+        res.sendfile(__dirname + '/404.html');
+    });
     //////////////////////////////////////////////////////////////
     // Manage any Socket.io Event
     
@@ -892,8 +898,8 @@ function startServer(){
         socket.on('ready', function() {
             log("Requested sensors", 2)
             aquariusTools.getSensorsAndEmit(connection, socket)
-        })
-    })
+        });
+    });
     
     //On connection to the client send the most recent data from the DB
     //Send  
@@ -984,7 +990,9 @@ function startServer(){
                 else{
                     log("Calibration Failed",2);
                                    
-                    socket.emit('calibrationFailure');
+                    socket.emit('calibrationFailure', { sensorId : data.Id,
+                                                   status : calibrationStatus
+                    });
                 }
             }) 
         });
@@ -1038,6 +1046,15 @@ function startServer(){
            var service = sh.exec("systemctl restart aquarius.service").stdout; 
         });
         
+        socket.on("exportDatabase", function(){
+            var removeOldFile = sh.exec("rm /var/lib/cloud9/Aquarius/node-bootstrap/export.csv");
+            aquariusTools.ExportDatabase(connection, function(err, rows, fields){
+                var moveFile = sh.exec("mv /tmp/export.csv /var/lib/cloud9/Aquarius/node-bootstrap/");
+                socket.emit("downloadNow");
+            });
+        });
+
+
         //On the system asking system information
         socket.on('sysInfo', function() {
             //Execute system querys with grep to get wanted information

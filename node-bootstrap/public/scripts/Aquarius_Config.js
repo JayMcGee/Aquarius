@@ -45,6 +45,10 @@ io.on('ReceiveConfig',function( data ){
         {
             $("#idInput").val(value);
         }
+        else if(name == "SENSOR_UNIT")
+        {
+        	$("#unitInput").val(value);
+        }
         else if(name == "NUMBER_RETRIES")
         {
              $("#retriesInput").val(value);
@@ -60,6 +64,10 @@ io.on('ReceiveConfig',function( data ){
         else if (name == "LAST_KNOWN_DATE")
         {
             $("#dateInput").html(value);
+        }
+        else if (name == "DEBUG_LEVEL")
+        {
+        	$("#debugLevel").val(value);
         }
     }
 })
