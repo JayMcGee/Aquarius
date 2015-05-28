@@ -23,5 +23,6 @@ mkdir -p /var/lib/cloud9/Aquarius/src/build_src/libs
 make
 cd /var/lib/cloud9/Aquarius/exec/
 ./driverAtlasI2CDO 1:97 O:%:1
+./driverAtlasI2CK 1:100 K:0.1
 echo "Thy shall reboot, for thy need to reseat" 
 reboot 
