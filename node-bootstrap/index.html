@@ -87,7 +87,7 @@
 								<button class="btn yellow btn-setting" id="sysInfoBtn">System Information</button>
 								<button class="btn btn-primary" data-toggle="modal" data-target="#switchMode" id="modetBtn">Switch to Auto mode</button>
 								<button class="btn red" id="shutdownBtn">ShutDown</button>
-								<a id="downloadBtn" href="/export.csv" download hidden></a>
+								<a id="downloadBtn" href="/export.csv" hidden></a>
 							</p>
 						</div>
 					</div><!--/span-->
@@ -332,7 +332,7 @@
 		});
 
 		io.on('downloadNow', function(){
-			$("#downloadBtn").trigger("click");
+			$("#downloadBtn")[0].click()
 		});
 /** 		
  * @brief	sysInfoResult Asks server for some information on system status

@@ -28,6 +28,7 @@ var mysql = require('mysql'); //Javascript mySql Connector
 var exec = require('child_process').exec;
 var fs = require('fs');         //File system manipluation for the watchdog
 var sh = require('execSync'); //Permits the execution of external applications synchronously
+var http = require('http');
 
 var aquariusTools = require('./aquariusToolKit') //External file that helps the connection and querying to the database
 
@@ -868,24 +869,27 @@ function startServer(){
     // Setup the ready route, and emit talk event.
     app.io.route('ready', function(req) {
         log('User Connected');
-    })download
+    });
     // Send the client html.
     app.get('/', function(req, res) {
-        res.sendfile(__dirname + '/index.html')
-    })
+        res.sendfile(__dirname + '/index.html');
+    });
     app.get('/index.html', function(req, res) {
-        res.sendfile(__dirname + '/index.html')
-    })
+        res.sendfile(__dirname + '/index.html');
+    });
     app.get('/form.html', function(req, res) {
-        res.sendfile(__dirname + '/form.html')
-    })
+        res.sendfile(__dirname + '/form.html');
+    });
     app.get('/chart.html', function(req, res) {
-        res.sendfile(__dirname + '/chart.html')
-    })
+        res.sendfile(__dirname + '/chart.html');
+    });
+    app.all('/export.csv', function(req, res){
+        res.download(__dirname + '/export.csv');
+    });
     //The 404 Route (ALWAYS Keep this as the last route)
     app.get('*', function(req, res) {
-        res.sendfile(__dirname + '/404.html')
-    })
+        res.sendfile(__dirname + '/404.html');
+    });
     //////////////////////////////////////////////////////////////
     // Manage any Socket.io Event
     
@@ -894,8 +898,8 @@ function startServer(){
         socket.on('ready', function() {
             log("Requested sensors", 2)
             aquariusTools.getSensorsAndEmit(connection, socket)
-        })
-    })
+        });
+    });
     
     //On connection to the client send the most recent data from the DB
     //Send  

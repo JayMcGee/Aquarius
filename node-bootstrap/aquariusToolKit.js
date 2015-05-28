@@ -632,7 +632,7 @@ module.exports = {
             'INTO OUTFILE \'/tmp/export.csv\' ' + 
             'FIELDS TERMINATED BY \',\' ' + 
             'ENCLOSED BY \'\"\' ' + 
-            'LINES TERMINATED BY \';\';';
+            'LINES TERMINATED BY \'\n\';';
         log(sql, 3);
         return connection.query(sql, callback);
     }
