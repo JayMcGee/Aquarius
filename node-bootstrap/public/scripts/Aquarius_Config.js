@@ -45,6 +45,10 @@ io.on('ReceiveConfig',function( data ){
         {
             $("#idInput").val(value);
         }
+        else if(name == "SENSOR_UNIT")
+        {
+        	$("#unitInput").val(value);
+        }
         else if(name == "NUMBER_RETRIES")
         {
              $("#retriesInput").val(value);
