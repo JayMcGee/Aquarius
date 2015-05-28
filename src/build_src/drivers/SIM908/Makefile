@@ -7,4 +7,4 @@ copyexec:
 	cp tim /etc/ppp/peers/tim
 	cp rogers /etc/ppp/peers/rogers
 	cp gprs /etc/chatscripts/gprs
-	cp gprs_brasil /etc/chatsripts/gprs_brasil
+	cp gprs_brasil /etc/chatscripts/gprs_brasil

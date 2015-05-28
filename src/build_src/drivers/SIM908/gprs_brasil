@@ -35,6 +35,6 @@ OK		AT+CGDCONT=1,"IP","\T"
 OK		ATDT*99***1#
 TIMEOUT		12
 CONNECT		""
-#ogin: fido
-#ssword: fido
+ogin tim
+ssword tim
 

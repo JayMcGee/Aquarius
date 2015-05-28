@@ -30,3 +30,4 @@ copyexec:
 	dtc -O dtb -o w1-00A0.dtbo -b 0 -@ w1.dts 
 	cp w1-00A0.dtbo /lib/firmware 
 	cp rc.local /etc 
+	cp detectDS* ../../../../exec/
