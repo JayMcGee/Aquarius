@@ -19,9 +19,6 @@ GPIODriver:
 
 RTCDriver:
 	$(MAKE) -C RTC
-	
-WatchdogDriver:
-	$(MAKE) -C Watchdog
 
 SIM908Driver:
 	$(MAKE) -C SIM908
