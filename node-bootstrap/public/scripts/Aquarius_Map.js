@@ -53,5 +53,5 @@ function addMarker(aLat,aLong,Title,Desc)
 	    features: features
 	});
 	
-	map.setView([aLat,aLong], 10);
+	map.setView([aLat,aLong], 15);
 }

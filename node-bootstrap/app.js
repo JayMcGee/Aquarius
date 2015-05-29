@@ -1,4 +1,3 @@
-
 /**
  * @file   app.js
  * @author Jean-Pascal McGee et Jean-Philippe Fournier
@@ -927,9 +926,24 @@ function startServer(){
             log("Interval = " + interval, 2)
         });
         
+        socket.on('requestInitData', function(Data) {
+           var sensorId = Data.ID;
+           aquariusTools.getDataForASensor(connection,sensorId,Data.QTY,function(err,rows,fields){
+               if(err){
+                    throw err;
+                    log("Could not get sensor for init", 1);
+               }
+               else{
+                    socket.emit('initData', {
+                        ID : sensorId,
+                        result: rows
+                    });
+               }
+           })
+        });
         //When the socket requests a measure with an ID
         socket.on('requestMeasure', function(ID) {
-            var sensorId=ID.ID
+            var sensorId=ID.ID;
             
             var sql = 'SELECT * FROM `t_PhysicalSensor`,`t_VirtualSensor`,`t_Types` WHERE physical_t_type = types_id and virtual_t_physical = physical_id and virtual_id ='+ sensorId
             connection.query(sql, function(err, rows, fields) {
@@ -1006,13 +1020,14 @@ function startServer(){
                 var data = {lat:0,long:0,date:0};
                 var i =0;
                 
-                for(i=0;i<rows.length;i=i+2){
+                for(i=0;i<rows.length - 1;i+=2){
                    data.lat = rows[i].Value;
                    data.long = rows[i+1].Value;
                    data.date = rows[i].DateOf;
                    
                    gpsData.push(data);
                 }
+                log(gpsData,1);
                 socket.emit('receiveGPS',{Data:gpsData});
            })
            

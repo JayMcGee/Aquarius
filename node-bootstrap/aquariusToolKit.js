@@ -280,6 +280,40 @@ module.exports = {
 
         return query
     },
+    
+    /**
+     * @brief  Get data of a sensor
+     * @details 
+     * 
+     * @param connection MySQL connection   
+     * @param the id of the virtual sensor
+     * @param the quantity of dataPoints to return
+     * @param callBackToApp 
+     * 
+     * @return Query information
+     */
+    getDataForASensor: function(connection,virtualID,Qty,callBackToApp) {
+        log("Selecting database", 3)
+        connection.query('USE `station_aquarius`;')
+
+        sql = 'SELECT t_Data.data_value AS ReadValue, ' +
+        't_Data.idt_Data AS ID, ' +
+        't_Data.data_date AS ReadDate, ' +
+        't_VirtualSensor.cloudia_id AS CloudiaSubUnitID, ' +
+        't_PhysicalSensor.physical_id AS PhysicalID, ' +
+        't_PhysicalSensor.physical_name AS PhysicalName, ' +
+        't_VirtualSensor.virtual_measure_unit AS UnitType ' +
+        'FROM t_Data, t_VirtualSensor, t_PhysicalSensor ' +
+        'WHERE t_Data.data_t_virtual = t_VirtualSensor.virtual_id ' +
+        'and t_VirtualSensor.virtual_t_physical = t_PhysicalSensor.physical_id ' +
+        'and t_VirtualSensor.virtual_id = ' + virtualID + ' ' +
+        'ORDER BY t_VirtualSensor.cloudia_id, t_Data.data_date, t_VirtualSensor.cloudia_id ' +
+        'LIMIT ' + Qty +';'
+        log(sql, 3)
+        
+        return connection.query(sql, callBackToApp)
+    },
+    
 
     /**
      * @brief  Get data of the non sent sensor data
@@ -328,7 +362,7 @@ module.exports = {
                     'FROM `t_Data`' + 
                     'WHERE t_Data.data_t_virtual = 12 ' + 
                     'or t_Data.data_t_virtual = 13 ' + 
-                    'ORDER BY t_Data.idt_Data LIMIT '+ qty +';';
+                    'ORDER BY t_Data.idt_Data DESC LIMIT '+ (qty * 2) +';';
             connection.query(sql,callBackToApp);
     },
     
