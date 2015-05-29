@@ -1040,6 +1040,15 @@ function startServer(){
            var service = sh.exec("systemctl restart aquarius.service").stdout; 
         });
         
+        socket.on("exportDatabase", fucntion(){
+            var removeOldFile = sh.exec("rm /var/lib/cloud9/Aquarius/export.csv");
+            aquariusTools.ExportDatabase(function(err, rows, fields){
+                app.get('/', function (req, res) {
+                  res.sendfile('/var/lib/cloud9/Aquarius/export.csv');
+                })
+            });
+        });
+
         //On the system asking system information
         socket.on('sysInfo', function() {
             //Execute system querys with grep to get wanted information

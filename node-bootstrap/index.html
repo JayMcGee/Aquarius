@@ -326,6 +326,9 @@
 		$("#restartBtn").click(function(){
 			io.emit("restartService");
 		});
+		$("#exportBtn").click(function(){
+			io.emit("exportDatabase");
+		});
 		
 
 /** 		

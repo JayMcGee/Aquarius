@@ -604,6 +604,37 @@ module.exports = {
         var result = sh.exec(driver + "StopGPS");
         
         console.log(result.stdout);        
+    },
+
+    ExportDatabase : function(callback){
+        /*var query = "SELECT order_id,product_name,qty"
+                    "FROM orders"
+                    "INTO OUTFILE '/tmp/orders.csv'"
+                    "FIELDS TERMINATED BY ','"
+                    "ENCLOSED BY '\"'"
+                    "LINES TERMINATED BY '\n';\";"
+*/
+
+        log("Selecting database", 3);
+        connection.query('USE `station_aquarius`;');
+        
+        sql = 'SELECT t_Data.data_value AS ReadValue, ' +
+            't_Data.idt_Data AS ID, ' +
+            't_Data.data_date AS ReadDate, ' +
+            't_VirtualSensor.cloudia_id AS CloudiaSubUnitID, ' +
+            't_PhysicalSensor.physical_id AS PhysicalID, ' +
+            't_PhysicalSensor.physical_name AS PhysicalName, ' +
+            't_VirtualSensor.virtual_measure_unit AS UnitType ' +
+            'FROM t_Data, t_VirtualSensor, t_PhysicalSensor ' +
+            'WHERE t_Data.data_t_virtual = t_VirtualSensor.virtual_id ' +
+            'and t_VirtualSensor.virtual_t_physical = t_PhysicalSensor.physical_id ' +
+            'ORDER BY t_VirtualSensor.cloudia_id, t_Data.data_date, t_VirtualSensor.cloudia_id ' + 
+            'INTO OUTFILE \'/var/lib/cloud9/Aquarius/export.csv\' ' + 
+            'FIELDS TERMINATED BY \',\' ' + 
+            'ENCLOSED BY \'\"\' ' + 
+            'LINES TERMINATED BY \'\n\';';
+        log(sql, 3);
+        return connection.query(sql, callback);
     }
 };
 
