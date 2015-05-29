@@ -868,7 +868,7 @@ function startServer(){
     // Setup the ready route, and emit talk event.
     app.io.route('ready', function(req) {
         log('User Connected');
-    })
+    })download
     // Send the client html.
     app.get('/', function(req, res) {
         res.sendfile(__dirname + '/index.html')
@@ -1043,14 +1043,13 @@ function startServer(){
         });
         
         socket.on("exportDatabase", function(){
-            var removeOldFile = sh.exec("rm /var/lib/cloud9/Aquarius/export.csv");
+            var removeOldFile = sh.exec("rm /var/lib/cloud9/Aquarius/node-bootstrap/export.csv");
             aquariusTools.ExportDatabase(connection, function(err, rows, fields){
-                var moveFile = sh.exec("mv /tmp/export.csv /var/lib/cloud9/");
-                app.('/', function (req, res) {
-                  res.sendfile('/var/lib/cloud9/export.csv');
-                })
+                var moveFile = sh.exec("mv /tmp/export.csv /var/lib/cloud9/Aquarius/node-bootstrap/");
+                socket.emit("downloadNow");
             });
         });
+
 
         //On the system asking system information
         socket.on('sysInfo', function() {

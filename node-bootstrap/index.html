@@ -87,6 +87,7 @@
 								<button class="btn yellow btn-setting" id="sysInfoBtn">System Information</button>
 								<button class="btn btn-primary" data-toggle="modal" data-target="#switchMode" id="modetBtn">Switch to Auto mode</button>
 								<button class="btn red" id="shutdownBtn">ShutDown</button>
+								<a id="downloadBtn" href="/export.csv" download hidden></a>
 							</p>
 						</div>
 					</div><!--/span-->
@@ -329,8 +330,10 @@
 		$("#exportBtn").click(function(){
 			io.emit("exportDatabase");
 		});
-		
 
+		io.on('downloadNow', function(){
+			$("#downloadBtn").trigger("click");
+		});
 /** 		
  * @brief	sysInfoResult Asks server for some information on system status
  * @details	Displays Cpu temp, USB ETH and Wifi interface Ip and %used disk space
