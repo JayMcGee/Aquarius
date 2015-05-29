@@ -194,9 +194,9 @@ def checkIfOn():
 ######################################################
 def checkIfFix(datas):
     splitted = data.split(",")
-    if splitted[5] != "0"
+    if splitted[5] != "0":
         ok = 1
-    else
+    else:
         ok = 0
     return ok 
 ######################################################
