@@ -71,13 +71,15 @@ def stopGPS():
 def getCurrentGPSInformation():
     print "Querying GPS module"
     datas = writeAndReadSIM908( "AT+CGPSINF=0" )
-    ok = checkIfOK(datas)
-    gpsOk = checkIfFix(datas)
-    if ok == 1 and gpsOk == 1:
-        print datas
-        outputDataStringGPS(datas[1])
+
+    if checkIfOK(datas) == 1:
+        if checkIfFix(datas[1]) == 1:
+            print datas
+            outputDataStringGPS(datas[1])
+        else:
+            print "ERROR : Could not get GPS location"
     else:
-        print "Could not get GPS location"
+        print "ERROR : Could not get an answer from device"
     return datas
 ###############################################
 # Inits the GPIO responsible for the control of power 
