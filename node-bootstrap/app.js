@@ -44,6 +44,8 @@ var _2SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw2.py";
 var _3SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw3.py";
 var _4SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw4.py";
 
+var oneWireScript = "ls /sys/devices/w1_bus_master1 | grep 28-"
+
 //Var to keep up with the watchdog file
 var fileWatch = null
 
@@ -66,8 +68,6 @@ var CONFIG_Log_File_Directory = null;
 var CONFIG_Verbose_Level = 4;
 //Cloudia Sensor Unit 
 var CONFIG_Sensor_unit = null;
-//Temperature compensation device address
-var CONFIG_Temperature_Compensation = null;
 
 var CONFIG_dont_reboot = 1;
 
@@ -79,6 +79,8 @@ var DataSent_Count = 0;
 var Sensors_Count = null
 //Number of sensors that have been read
 var Sensors_Done = null
+
+var led_Process = null;
 
 /**
 * @brief Establishing connection object to Station database (local DB)   
@@ -124,7 +126,7 @@ connection.connect(function(err){
   * @return null
   */
 function autoMode(){      
-    
+    led_Process = exec(flashLED, function(){});
     //If current mode is to shutdown at the end of sensor reading
     if(CONFIG_dont_reboot == 0){
         fileWatch = watchdog();
@@ -285,7 +287,7 @@ function assignConfigurationValues(err, rows, fields){
         }
         else if ( currentName == "PPP_APN"){
             log("Assigned PPP carrier setting", 3);
-            CONFIG_APN = "pon " + currentValue;
+            CONFIG_APN = currentValue
         }
     }
     
@@ -309,25 +311,26 @@ function assignConfigurationValues(err, rows, fields){
     
     updateDates();
 
-    //Select what mode to go in
-    if(CONFIG_dont_reboot && CONFIG_Operation_Mode){
-        log("Auto mode with no reboot", 2);
-        exec(flashLED, function(){});
-        if(CONFIG_Interval !== null){
-            autoMode();
-            setInterval( autoMode , 60000 * CONFIG_Interval );
+    aquariusTools.SetDS18B20Address(connection, sh.exec(oneWireScript).stdout, function(err, results){
+        //Select what mode to go in
+        if(CONFIG_dont_reboot && CONFIG_Operation_Mode){
+            log("Auto mode with no reboot", 2);
+            
+            if(CONFIG_Interval !== null){
+                autoMode();
+                setInterval( autoMode , 60000 * CONFIG_Interval );
+            }
+            else{
+                autoMode();
+                setInterval( autoMode , 300000 );
+            }
         }
         else{
-            autoMode();
-            setInterval( autoMode , 300000 );
+            exec(keepLED, function(){});
+            completeOperations();
         }
-    }
-    else{
-        exec(keepLED, function(){});
-        completeOperations();
-    }
-    
-   
+
+    });  
 }
 
 /**
@@ -376,7 +379,7 @@ function getSensorReadingCallback(err, rows, fields) {
         throw err;
         log("Could not read sensors table", 1)
     }
-    log("Reading and adding data"   , 2)
+    log("Reading and adding data", 2)
     writeToWatchDog(fileWatch)
     alreadyDone = []
 
@@ -384,8 +387,10 @@ function getSensorReadingCallback(err, rows, fields) {
     Sensors_Done = 0
     
     var temperatureCompensation = null;
-
+    
+    
     for (index = 0; index < rows.length; ++index) {
+       
         writeToWatchDog(fileWatch)
         var Driver = rows[index].Driver
         var Address = rows[index].PhysicalAddress
@@ -399,7 +404,7 @@ function getSensorReadingCallback(err, rows, fields) {
             * Start init of exceptions
             ****/            
             if(Driver.indexOf("SIM908") > -1){
-                stopPPPD()
+                //stopPPPD()
                 aquariusTools.StartSIM908();
                 aquariusTools.StartGPS();
             }
@@ -440,7 +445,7 @@ function getSensorReadingCallback(err, rows, fields) {
             }
             //Set temperature compensation 
             if(Driver.indexOf("OneWire") > -1 && splittedStdOutput.length > 5){
-                temperatureCompensation = splittedStdOutput[5];
+                temperatureCompensation = splittedStdOutput[5].trim();
             }
             //Stop SIM908 device
             if(Driver.indexOf("SIM908") > -1){
@@ -637,6 +642,7 @@ function createJSONfromDatabase(err, rows, fields) {
             aquariusTools.sendPost(message, CONFIG_Cloudia_Address, setIDsAsSent, ids);
         }
         //Else try PPP connection through SIM908
+        /*
         else if(CONFIG_APN !== null){
             log("Trying PPP connection setup", 2);
             aquariusTools.StartSIM908();
@@ -658,6 +664,13 @@ function createJSONfromDatabase(err, rows, fields) {
                     completeOperations();
                 }
             }, 10000);
+        }
+        */
+        else if(CONFIG_APN !== null){
+            log("Creating connection with SIM908", 2)   
+            aquariusTools.StopSIM908();
+            aquariusTools.StartSIM908();
+            aquariusTools.SendPostSerial(CONFIG_Cloudia_Address, CONFIG_APN, "/var/lib/cloud9/Aquarius/data.json", message, setIDsAsSent, ids);
         }
         else
         {
@@ -739,7 +752,7 @@ function completeOperations()
     
     updateDates();
     if (CONFIG_Operation_Mode == 1 && CONFIG_dont_reboot == 0) {
-        stopPPPD();
+        //stopPPPD();
         
         var date = new Date()
         aquariusTools.StopSIM908();
@@ -770,8 +783,10 @@ function completeOperations()
     }
     else if(CONFIG_Operation_Mode == 1 && CONFIG_dont_reboot == 1){
         log("Waiting for next execution", 2);
-        stopPPPD();
+        //stopPPPD();
         aquariusTools.StopSIM908();
+        if(led_Process !== null)
+            led_Process.kill();
     }
     else if(CONFIG_Operation_Mode == 0){
         log("Manual mode", 2);            

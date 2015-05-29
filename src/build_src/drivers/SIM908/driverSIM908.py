@@ -25,12 +25,24 @@ def checkIfOK(lines):
             ok = 1
     return ok
 ###############################################
+# Function that check if any of the returned
+# lines from the SIM908 constain OK
+###############################################
+def checkIfDownload(lines):
+    ok = 0
+    for line in lines:
+        if "DOWNLOAD" in line:
+            ok = 1
+    return ok
+###############################################
 # Function that writes a command and 
 # waits for a response, returns the response
 ###############################################
 def writeAndReadSIM908(dataToWrite):
+    #print "Sending " + str(dataToWrite)
     ser.write(dataToWrite + "\r")
     read = ser.readlines()
+    #print "Received " + str(read)
     return read
 ###############################################
 # Function that starts the GPS by sending the two required commands
@@ -199,11 +211,81 @@ def checkIfOn():
 ######################################################
 def checkIfFix(datas):
     splitted = datas.split(",")
+    print "current fix time :" + str(splitted[5]) + ":"
     if len(splitted) >= 6 and splitted[5] != "0":
         ok = 1
     else:
         ok = 0
     return ok 
+######################################################
+# Data sending function
+# Sends data to the address with the apn, user and password
+######################################################
+def sendJSON(address, apn, user, password, path):
+    baud = "AT+IPR=115200"
+    apn_sett = "AT+SAPBR=3,1,\"APN\",\"" + apn + "\""
+    user_sett = "AT+SAPBR=3,1,\"USER\",\"" + user + "\""
+    pwd_sett = "AT+SAPBR=3,1,\"PWD\",\"" + password + "\""
+    sapbr = "AT+SAPBR=1,1"
+    sapbr_close = "AT+SAPBR=0,1"
+    http_io = "AT+HTTPINIT"
+    cid_sett = "AT+HTTPPARA=\"CID\",1"
+    url_sett = "AT+HTTPPARA=\"URL\",\"" + address + "\""
+    content_sett = "AT+HTTPPARA=\"CONTENT\",application/x-www-form-urlencoded"
+    
+
+    send_post = "AT+HTTPACTION=1"
+    close_conn = "AT+HTTPTERM"
+    
+    
+    f = open(path, "r")
+    data = f.read()
+    
+    #print "Data to send : " + str(data)
+    
+    http_post_para = "AT+HTTPDATA=" + str(len(data)) + ", 10000";
+
+    configurationOk = 0
+    if checkIfOK(writeAndReadSIM908(baud)):
+        if checkIfOK(writeAndReadSIM908(apn_sett)):
+            if checkIfOK(writeAndReadSIM908(user_sett)):
+                if checkIfOK(writeAndReadSIM908(pwd_sett)):
+                    if checkIfOK(writeAndReadSIM908(sapbr)):
+                        configurationOk = 1
+    if configurationOk == 0:
+        print "ERROR ON CONFIGURATION"
+        writeAndReadSIM908(sapbr_close)
+        return 0
+
+    dataTransmissionOk = 0
+    if checkIfOK(writeAndReadSIM908(http_io)):
+        if checkIfOK(writeAndReadSIM908(cid_sett)):
+            if checkIfOK(writeAndReadSIM908(url_sett)):
+                if checkIfOK(writeAndReadSIM908(content_sett)):
+                    if checkIfDownload(writeAndReadSIM908(http_post_para)):
+                        ser.write(data + "\r")
+                        time.sleep(10)
+                        ser.write(send_post + "\r")
+                        time.sleep(30)
+                        results = ser.readlines()
+                        #print results
+                        #results = writeAndReadSIM908(send_post)
+                        ser.write("AT+HTTPREAD=0,10000" + "\r")
+                        time.sleep(2)
+                        results = ser.readlines()
+                        #print results
+                        for result in results:
+                            if "Successfully parsed JSON" in result:
+                                    dataTransmissionOk = 1
+    writeAndReadSIM908(sapbr_close)
+    writeAndReadSIM908(close_conn)
+    if dataTransmissionOk == 0:
+        print "DATA TRANSMISSION ERROR"
+        return 0
+
+    print "DATA TRANSMISSION SUCCESSFULL"
+
+    return 1
 ######################################################
 # Main program
 # Manages the arguments passed to the script
@@ -249,7 +331,12 @@ if ser.isOpen() and len(sys.argv) > 1:
         print ConvertLat(sys.argv[2])
     elif command == "long":
         print ConvertLong(sys.argv[2])
-        
+    elif command == "send":
+        print "Sending data"
+        if len(sys.argv) >= 7: 
+            sendJSON(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6])
+        else:
+            print "Sending data could not be done, not enough arguments"
     #If the argument is an unknown commad, simply write the argument to the SIM908
     else :
         lines = writeAndReadSIM908(command)    

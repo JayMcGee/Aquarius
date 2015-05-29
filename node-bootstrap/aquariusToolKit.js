@@ -669,6 +669,50 @@ module.exports = {
             'LINES TERMINATED BY \'\n\';';
         log(sql, 3);
         return connection.query(sql, callback);
+    },
+
+    SetDS18B20Address : function(connection, address, callback){
+        log("Selecting database", 3);
+        connection.query('USE `station_aquarius`;');
+        address = address.trim();
+        console.log("This is the adddress : " + address)
+        sql = 'UPDATE t_PhysicalSensor ' + 
+                'SET t_PhysicalSensor.physical_address = "' + address + '" ' +
+                'WHERE t_PhysicalSensor.physical_t_type = 4;';
+        log(sql, 3);
+        return connection.query(sql, callback);
+    },
+    
+    SendPostSerial : function (address, apnSettings, file, jsonInString, callback, ids){
+        
+        var fs = require('fs');
+        
+        fs.writeFile(file, "data=" + jsonInString, function(err) {
+            if(err) {
+                return console.log(err);
+            }
+            log("The file was saved!", 4);
+            var counts = 5;
+            var driver = "python /var/lib/cloud9/Aquarius/exec/driverSIM908.py send";
+            log("Sending data to web page : " + driver + " " + address + " "  + apnSettings + " " + file, 2);
+            var result = sh.exec(driver + " " + address + " "  + apnSettings + " " + file);
+            console.log(result);
+            var good = result.stdout.indexOf("SUCCESSFULL")
+            while(good == -1 && counts >= 0){
+                result = sh.exec(driver + " " + address + " "  + apnSettings + " " + file);
+                console.log(result);
+                counts = counts - 1;
+                good = result.stdout.indexOf("SUCCESSFULL");
+            }
+            
+            if(good > -1)
+            {
+                callback(ids)
+            }
+            else{
+                callback(null);
+            }
+        });
     }
 };
 

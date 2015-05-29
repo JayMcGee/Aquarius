@@ -171,11 +171,13 @@ io.on('calibrationSuccess',function(data){
 		{
 			setButtonStatus("lowPointBtn_cond",1);
 			setButtonStatus("highPointBtn_cond",1);
+			setButtonStatus("onePointBtn_cond", 1)
 		}
 		if(data.status == -1)
 		{
 			setButtonStatus("lowPointBtn_cond",0);
 			setButtonStatus("highPointBtn_cond",0);
+			setButtonStatus("onePointBtn_cond", 0)
 		}
 	}
 });
