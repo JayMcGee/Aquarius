@@ -984,7 +984,9 @@ function startServer(){
                 else{
                     log("Calibration Failed",2);
                                    
-                    socket.emit('calibrationFailure');
+                    socket.emit('calibrationFailure', { sensorId : data.Id,
+                                                   status : calibrationStatus
+                    });
                 }
             }) 
         });

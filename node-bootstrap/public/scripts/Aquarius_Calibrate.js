@@ -176,3 +176,7 @@ io.on('calibrationSuccess',function(data){
 		}
 	}
 });
+
+io.on('calibrationSuccess',function(data){
+	alert("Calibration failed");
+});
