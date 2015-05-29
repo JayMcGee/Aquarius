@@ -477,7 +477,7 @@
  */
 	        io.on('updateSensor',function(data){
 	        	if(data.result.indexOf("Error") > -1){
-	        		$("#itemBox"+data.ID).find(".footer").html('Sensor error <i class="fa fa-repeat fa-spin"></i>');
+	        		$("#itemBox"+data.ID).find(".footer").html('Sensor error');
 	        	}
 	        	else{
 	        		var measure = parseFloat(data.result.replace(/[^\d.-]/g, ''));
