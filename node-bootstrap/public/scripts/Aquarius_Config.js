@@ -65,6 +65,10 @@ io.on('ReceiveConfig',function( data ){
         {
             $("#dateInput").html(value);
         }
+        else  if (name == "DEBUG_LEVEL")
+        {
+        	$("#debugLevel").html(value);
+        }
     }
 })
 
