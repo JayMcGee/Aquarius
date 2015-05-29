@@ -117,7 +117,10 @@ def checkPLine():
 ##############################################
 def outputDataStringGPS(data):
     splitted = data.split(",")    
-    print "NAME;SIM908;DATQ;5;SATS;" + str(splitted[6]) + ";LONG;" + str(ConvertLong(str(splitted[1]))) + ";LAT;" + str(ConvertLat(str(splitted[2]))) + ";ALT;" + str(splitted[3]) + ";TIME;" + str(splitted[4])
+    if len(splitted) >= 7:
+        print "NAME;SIM908;DATQ;5;SATS;" + str(splitted[6]) + ";LONG;" + str(ConvertLong(str(splitted[1]))) + ";LAT;" + str(ConvertLat(str(splitted[2]))) + ";ALT;" + str(splitted[3]) + ";TIME;" + str(splitted[4])
+    else:
+        print "NAME;SIM908;NODQ;ERROR_NO_DATA"
     return
 ##############################################
 # Convert the Latitude from NMEA to Degrees Decimal
@@ -193,8 +196,8 @@ def checkIfOn():
 # If it doesn't, return 0 or 1 if a fix was made
 ######################################################
 def checkIfFix(datas):
-    splitted = data.split(",")
-    if splitted[5] != "0":
+    splitted = datas.split(",")
+    if len(splitted) >= 6 and splitted[5] != "0":
         ok = 1
     else:
         ok = 0
