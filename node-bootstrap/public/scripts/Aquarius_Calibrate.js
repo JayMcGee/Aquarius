@@ -111,6 +111,9 @@ $("#highPointBtn_cond").click(function(){
 $("#clearBtn_cond").click(function(){
 	sendCalibrationEmit(5,"clear");
 });
+$("#onePointBtn_cond").click(function(){
+	sendCalibrationEmit(5,"one");
+});
 
 ///////////////// SendCalibrationEmit  /////////////////////
 /**
