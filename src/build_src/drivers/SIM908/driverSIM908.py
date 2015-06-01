@@ -39,10 +39,10 @@ def checkIfDownload(lines):
 # waits for a response, returns the response
 ###############################################
 def writeAndReadSIM908(dataToWrite):
-    print "Sending " + str(dataToWrite)
+    #print "Sending " + str(dataToWrite)
     ser.write(dataToWrite + "\r")
     read = ser.readlines()
-    print "Received " + str(read)
+    #print "Received " + str(read)
     return read
 ###############################################
 # Function that starts the GPS by sending the two required commands
@@ -240,7 +240,7 @@ def sendJSON(address, apn, user, password, data):
     f = open("/var/lib/cloud9/Aquarius/data.json", "r")
     data = f.read()
     
-    print "Data to send : " + str(data)
+    #print "Data to send : " + str(data)
     
     http_post_para = "AT+HTTPDATA=" + str(len(data)) + ", 10000";
 
@@ -252,7 +252,7 @@ def sendJSON(address, apn, user, password, data):
                     if checkIfOK(writeAndReadSIM908(sapbr)):
                         configurationOk = 1
     if configurationOk == 0:
-        print "ERROR ON CONFIGURATION"
+        #print "ERROR ON CONFIGURATION"
         return 0
 
     dataTransmissionOk = 0
@@ -266,12 +266,12 @@ def sendJSON(address, apn, user, password, data):
                         ser.write(send_post + "\r")
                         time.sleep(30)
                         results = ser.readlines()
-                        print results
+                        #print results
                         #results = writeAndReadSIM908(send_post)
                         ser.write("AT+HTTPREAD=0,10000" + "\r")
                         time.sleep(2)
                         results = ser.readlines()
-                        print results
+                        #print results
                         for result in results:
                             if "Successfully parsed JSON" in result:
                                     dataTransmissionOk = 1
@@ -280,7 +280,7 @@ def sendJSON(address, apn, user, password, data):
         print "DATA TRANSMISSION ERROR"
         return 0
 
-    print "Data transmission completed"
+    print "DATA TRANSMISSION SUCCESSFULL"
 
     return 1
 ######################################################
