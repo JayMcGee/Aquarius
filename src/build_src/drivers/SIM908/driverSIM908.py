@@ -39,8 +39,10 @@ def checkIfDownload(lines):
 # waits for a response, returns the response
 ###############################################
 def writeAndReadSIM908(dataToWrite):
+    print "Sending " + str(dataToWrite)
     ser.write(dataToWrite + "\r")
     read = ser.readlines()
+    print "Received " + str(read)
     return read
 ###############################################
 # Function that starts the GPS by sending the two required commands
@@ -229,10 +231,18 @@ def sendJSON(address, apn, user, password, data):
     cid_sett = "AT+HTTPPARA=\"CID\",1"
     url_sett = "AT+HTTPPARA=\"URL\",\"" + address + "\""
     content_sett = "AT+HTTPPARA=\"CONTENT\",application/x-www-form-urlencoded"
-    http_post_para = "AT+HTTPDATA=" + http_post_para + data.length() + ", 10000";
+    
 
     send_post = "AT+HTTPACTION=1"
     close_conn = "AT+HTTPTERM"
+    
+    
+    f = open("/var/lib/cloud9/Aquarius/data.json", "r")
+    data = f.read()
+    
+    print "Data to send : " + str(data)
+    
+    http_post_para = "AT+HTTPDATA=" + str(len(data)) + ", 10000";
 
     configurationOk = 0
     if checkIfOK(writeAndReadSIM908(baud)):
@@ -251,19 +261,28 @@ def sendJSON(address, apn, user, password, data):
             if checkIfOK(writeAndReadSIM908(url_sett)):
                 if checkIfOK(writeAndReadSIM908(content_sett)):
                     if checkIfDownload(writeAndReadSIM908(http_post_para)):
-                        ser.write(data)
-                        results = writeAndReadSIM908(send_post)
+                        ser.write(data + "\r")
+                        time.sleep(10)
+                        ser.write(send_post + "\r")
+                        time.sleep(30)
+                        results = ser.readlines()
+                        print results
+                        #results = writeAndReadSIM908(send_post)
+                        ser.write("AT+HTTPREAD=0,10000" + "\r")
+                        time.sleep(2)
+                        results = ser.readlines()
+                        print results
                         for result in results:
                             if "Successfully parsed JSON" in result:
                                     dataTransmissionOk = 1
     writeAndReadSIM908(close_conn)
-    if dataTransmissionOk == 0
+    if dataTransmissionOk == 0:
         print "DATA TRANSMISSION ERROR"
         return 0
 
     print "Data transmission completed"
 
-    return ok
+    return 1
 ######################################################
 # Main program
 # Manages the arguments passed to the script
