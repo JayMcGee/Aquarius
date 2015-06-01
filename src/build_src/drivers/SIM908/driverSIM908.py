@@ -220,7 +220,7 @@ def checkIfFix(datas):
 # Data sending function
 # Sends data to the address with the apn, user and password
 ######################################################
-def sendJSON(address, apn, user, password, data):
+def sendJSON(address, apn, user, password, path):
     baud = "AT+IPR=115200"
     apn_sett = "AT+SAPBR=3,1,\"APN\",\"" + apn + "\""
     user_sett = "AT+SAPBR=3,1,\"USER\",\"" + user + "\""
@@ -237,7 +237,7 @@ def sendJSON(address, apn, user, password, data):
     close_conn = "AT+HTTPTERM"
     
     
-    f = open("/var/lib/cloud9/Aquarius/data.json", "r")
+    f = open(path, "r")
     data = f.read()
     
     #print "Data to send : " + str(data)
@@ -252,7 +252,7 @@ def sendJSON(address, apn, user, password, data):
                     if checkIfOK(writeAndReadSIM908(sapbr)):
                         configurationOk = 1
     if configurationOk == 0:
-        #print "ERROR ON CONFIGURATION"
+        print "ERROR ON CONFIGURATION"
         return 0
 
     dataTransmissionOk = 0
