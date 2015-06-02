@@ -40,10 +40,6 @@
 	<!-- start: Favicon -->
 	<link rel="shortcut icon" href="img/favicon.png">
 	<!-- end: Favicon -->
-	
-		
-		
-		
 </head>
 
 <body>
@@ -81,19 +77,11 @@
 			</noscript>
 			<!-- start: Content -->
 			<div id="content" class="span10">
-
-
-
-		
-		
-
 			</div><!--/.fluid-container-->
 				<!-- end: Content -->
 		</div><!--/#content.span10-->
 		</div><!--/fluid-row-->
 		
-
-	
 	<div class="clearfix"></div>
 	
 	<footer>
@@ -168,10 +156,11 @@
         
               	<!-- Aquarius Script  -->
 		<script src="/socket.io/socket.io.js"></script>
-		<script src="scripts/Aquarius_Calibrate.js"></script>
+		<!-- <script src="scripts/Aquarius_Calibrate.js"></script> -->
 		<script src="scripts/Aquarius_DataCircle.js"></script>
 		<script src="scripts/Aquarius_Chart.js"></script>
 		<script>
+		
 		////////////////////////////////////////////////////////////////////////
         // When user click on a dataCircle it sends a request to the server
 		function getMeasure(sensorID){
@@ -181,7 +170,17 @@
 			$("#btn"+sensorID).find(".fa-repeat").addClass("fa-spin");
 		}
 	
+		io.on('initData',function(data){
+			var chart = $('#chart' + data.ID).highcharts();
+			data.result.forEach(function(entry){
+				
+				var measure = parseFloat(entry.ReadValue);
 
+				if(!isNaN(measure) && (measure !== null) && (measure !== "")){
+			        chart.series[0].addPoint(measure,true,false);
+			    }
+			});
+		});
         ////////////////////////////////////////////////////////////////////////
         // This is where we process the answer from the server
         // Update the circle value 
@@ -196,14 +195,9 @@
         	
             var shift = (chart.series[0].data.length > 10); //Shift the graph to display only 10 results at a time
             
-            var dateNow = new Date().getTime();
-            
-			[Date.UTC(2012, 12, 10, 00, 00, 43), measure]
 			 if(!isNaN(measure) && (measure !== null) && (measure !== "")){
-			        chart.series[0].addPoint([dateNow, measure],true,shift);
+			        chart.series[0].addPoint(measure,true,shift);
 			    }
-			
-			
 		});
 	   	</script>
 </div>

@@ -32,21 +32,14 @@ io.on('ReceiveSensors',function(data){
 					            marginRight: 10
 						        },
 						        title: {
-						        text: 'pH'
+						        text: chartUnit
 						        },
 						        colors: [],
-						        xAxis: {
-					                type: 'datetime',
-                                    title: {
-                                        text: 'Date',
-                                        minRange: 15 * 24 * 3600000,
-                                    }
-						        },
 						        yAxis: {
 						            floor: -30,
 						            ceiling: 100,
 						            title: {
-						                text: 'pH'
+						                text: chartUnit
 						            }
 						        },
 						        plotOptions: {
@@ -67,11 +60,11 @@ io.on('ReceiveSensors',function(data){
 						            formatter: function () {
 						                return '<b>' + this.series.name + '</b><br/>' +
 						                    Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br/>' +
-						                    Highcharts.numberFormat(this.y, 2) + " °C";
+						                    Highcharts.numberFormat(this.y, 2) + " " + chartUnit;
 						            }
 						        },
 						            series:[{
-						                name: "pH sensor",
+						                name: chartName,
 						                data:[null]
 						            }]
 					        };
@@ -87,8 +80,14 @@ io.on('ReceiveSensors',function(data){
 		$(function(){
 		    $('#' + "chart"+chartID ).highcharts(highcharts);
 		});
+		
+		initialiseCharts(chartID,10);
 	});
 });
+
+function initialiseCharts(sensorID,Qty){
+	io.emit('requestInitData', { ID : sensorID, QTY:Qty });
+}
 
 
 

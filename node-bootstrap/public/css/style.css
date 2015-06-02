@@ -2568,7 +2568,8 @@ footer {
 	position: relative;
 	padding-top:17%;
 	padding-bottom:17%;
-	height: 120px;
+	margin-bottom:10%;
+	height:120px;
 }
 
 .circleStats {	
