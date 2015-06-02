@@ -45,6 +45,8 @@ var _2SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw2.py";
 var _3SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw3.py";
 var _4SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw4.py";
 
+var oneWireScript = "sh /var/lib/cloud9/Aquarius/scripts/getOneWireDevices.sh"
+
 //Var to keep up with the watchdog file
 var fileWatch = null
 
@@ -67,8 +69,6 @@ var CONFIG_Log_File_Directory = null;
 var CONFIG_Verbose_Level = 4;
 //Cloudia Sensor Unit 
 var CONFIG_Sensor_unit = null;
-//Temperature compensation device address
-var CONFIG_Temperature_Compensation = null;
 
 var CONFIG_dont_reboot = 1;
 
@@ -310,25 +310,26 @@ function assignConfigurationValues(err, rows, fields){
     
     updateDates();
 
-    //Select what mode to go in
-    if(CONFIG_dont_reboot && CONFIG_Operation_Mode){
-        log("Auto mode with no reboot", 2);
-        exec(flashLED, function(){});
-        if(CONFIG_Interval !== null){
-            autoMode();
-            setInterval( autoMode , 60000 * CONFIG_Interval );
+    aquariusTools.SetDS18B20Address(connection, sh.exec(oneWireScript).stdout, function(err, results){
+        //Select what mode to go in
+        if(CONFIG_dont_reboot && CONFIG_Operation_Mode){
+            log("Auto mode with no reboot", 2);
+            exec(flashLED, function(){});
+            if(CONFIG_Interval !== null){
+                autoMode();
+                setInterval( autoMode , 60000 * CONFIG_Interval );
+            }
+            else{
+                autoMode();
+                setInterval( autoMode , 300000 );
+            }
         }
         else{
-            autoMode();
-            setInterval( autoMode , 300000 );
+            exec(keepLED, function(){});
+            completeOperations();
         }
-    }
-    else{
-        exec(keepLED, function(){});
-        completeOperations();
-    }
-    
-   
+
+    });  
 }
 
 /**

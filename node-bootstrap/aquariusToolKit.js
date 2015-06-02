@@ -635,6 +635,17 @@ module.exports = {
             'LINES TERMINATED BY \'\n\';';
         log(sql, 3);
         return connection.query(sql, callback);
+    },
+
+    SetDS18B20Address : function(connection, address, callback){
+        log("Selecting database", 3);
+        connection.query('USE `station_aquarius`;');
+
+        sql = 'UPDATE t_PhysicalSensor ' + 
+                'SET t_PhysicalSensor.physical_address = ' + address + ' ' +
+                'WHERE t_PhysicalSensor.physical_t_type = 4;';
+        log(sql, 3);
+        return connection.query(sql, callback);
     }
 };
 
