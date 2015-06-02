@@ -45,7 +45,7 @@ var _2SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw2.py";
 var _3SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw3.py";
 var _4SwitchExec = "python /var/lib/cloud9/Aquarius/exec/get_gpio_sw4.py";
 
-var oneWireScript = "sh /var/lib/cloud9/Aquarius/scripts/getOneWireDevices.sh"
+var oneWireScript = "ls /sys/devices/w1_bus_master1 | grep 28-"
 
 //Var to keep up with the watchdog file
 var fileWatch = null
@@ -444,7 +444,7 @@ function getSensorReadingCallback(err, rows, fields) {
             }
             //Set temperature compensation 
             if(Driver.indexOf("OneWire") > -1 && splittedStdOutput.length > 5){
-                temperatureCompensation = splittedStdOutput[5];
+                temperatureCompensation = splittedStdOutput[5].trim();
             }
             //Stop SIM908 device
             if(Driver.indexOf("SIM908") > -1){

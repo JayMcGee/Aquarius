@@ -636,19 +636,18 @@ module.exports = {
         log(sql, 3);
         return connection.query(sql, callback);
     },
-<<<<<<< HEAD
 
     SetDS18B20Address : function(connection, address, callback){
         log("Selecting database", 3);
         connection.query('USE `station_aquarius`;');
-
+        address = address.trim();
+        console.log("This is the adddress : " + address)
         sql = 'UPDATE t_PhysicalSensor ' + 
-                'SET t_PhysicalSensor.physical_address = ' + address + ' ' +
+                'SET t_PhysicalSensor.physical_address = "' + address + '" ' +
                 'WHERE t_PhysicalSensor.physical_t_type = 4;';
         log(sql, 3);
         return connection.query(sql, callback);
-=======
-    
+    },
     
     SendPostSerial : function (address, apnSettings, file, jsonInString, callback, ids){
         
@@ -680,7 +679,6 @@ module.exports = {
                 callback(null);
             }
         });
->>>>>>> ed66b19dda35d1336e08a7af80a8711316736446
     }
 };
 
