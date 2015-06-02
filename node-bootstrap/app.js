@@ -81,6 +81,8 @@ var Sensors_Count = null
 //Number of sensors that have been read
 var Sensors_Done = null
 
+var led_Process = null;
+
 /**
 * @brief Establishing connection object to Station database (local DB)   
 *        with parameters
@@ -125,7 +127,7 @@ connection.connect(function(err){
   * @return null
   */
 function autoMode(){      
-    
+    led_Process = exec(flashLED, function(){});
     //If current mode is to shutdown at the end of sensor reading
     if(CONFIG_dont_reboot == 0){
         fileWatch = watchdog();
@@ -314,7 +316,7 @@ function assignConfigurationValues(err, rows, fields){
         //Select what mode to go in
         if(CONFIG_dont_reboot && CONFIG_Operation_Mode){
             log("Auto mode with no reboot", 2);
-            exec(flashLED, function(){});
+            
             if(CONFIG_Interval !== null){
                 autoMode();
                 setInterval( autoMode , 60000 * CONFIG_Interval );
@@ -784,6 +786,8 @@ function completeOperations()
         log("Waiting for next execution", 2);
         //stopPPPD();
         aquariusTools.StopSIM908();
+        if(led_Process !== null)
+            led_Process.kill();
     }
     else if(CONFIG_Operation_Mode == 0){
         log("Manual mode", 2);            
