@@ -226,7 +226,7 @@ def sendJSON(address, apn, user, password, path):
     user_sett = "AT+SAPBR=3,1,\"USER\",\"" + user + "\""
     pwd_sett = "AT+SAPBR=3,1,\"PWD\",\"" + password + "\""
     sapbr = "AT+SAPBR=1,1"
-
+    sapbr_close = "AT+SAPBR=0,1"
     http_io = "AT+HTTPINIT"
     cid_sett = "AT+HTTPPARA=\"CID\",1"
     url_sett = "AT+HTTPPARA=\"URL\",\"" + address + "\""
@@ -253,6 +253,7 @@ def sendJSON(address, apn, user, password, path):
                         configurationOk = 1
     if configurationOk == 0:
         print "ERROR ON CONFIGURATION"
+        writeAndReadSIM908(sapbr_close)
         return 0
 
     dataTransmissionOk = 0
@@ -275,6 +276,7 @@ def sendJSON(address, apn, user, password, path):
                         for result in results:
                             if "Successfully parsed JSON" in result:
                                     dataTransmissionOk = 1
+    writeAndReadSIM908(sapbr_close)
     writeAndReadSIM908(close_conn)
     if dataTransmissionOk == 0:
         print "DATA TRANSMISSION ERROR"
