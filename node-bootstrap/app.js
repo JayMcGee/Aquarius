@@ -286,7 +286,7 @@ function assignConfigurationValues(err, rows, fields){
         }
         else if ( currentName == "PPP_APN"){
             log("Assigned PPP carrier setting", 3);
-            CONFIG_APN = "pon " + currentValue;
+            CONFIG_APN = currentValue
         }
     }
     
@@ -378,7 +378,7 @@ function getSensorReadingCallback(err, rows, fields) {
         throw err;
         log("Could not read sensors table", 1)
     }
-    log("Reading and adding data"   , 2)
+    log("Reading and adding data", 2)
     writeToWatchDog(fileWatch)
     alreadyDone = []
 
@@ -386,8 +386,10 @@ function getSensorReadingCallback(err, rows, fields) {
     Sensors_Done = 0
     
     var temperatureCompensation = null;
-
+    
+    
     for (index = 0; index < rows.length; ++index) {
+       
         writeToWatchDog(fileWatch)
         var Driver = rows[index].Driver
         var Address = rows[index].PhysicalAddress
@@ -401,7 +403,7 @@ function getSensorReadingCallback(err, rows, fields) {
             * Start init of exceptions
             ****/            
             if(Driver.indexOf("SIM908") > -1){
-                stopPPPD()
+                //stopPPPD()
                 aquariusTools.StartSIM908();
                 aquariusTools.StartGPS();
             }
@@ -639,6 +641,7 @@ function createJSONfromDatabase(err, rows, fields) {
             aquariusTools.sendPost(message, CONFIG_Cloudia_Address, setIDsAsSent, ids);
         }
         //Else try PPP connection through SIM908
+        /*
         else if(CONFIG_APN !== null){
             log("Trying PPP connection setup", 2);
             aquariusTools.StartSIM908();
@@ -660,6 +663,13 @@ function createJSONfromDatabase(err, rows, fields) {
                     completeOperations();
                 }
             }, 10000);
+        }
+        */
+        else if(CONFIG_APN !== null){
+            log("Creating connection with SIM908", 2)   
+            aquariusTools.StopSIM908();
+            aquariusTools.StartSIM908();
+            aquariusTools.SendPostSerial(CONFIG_Cloudia_Address, CONFIG_APN, "/var/lib/cloud9/Aquarius/data.json", message, setIDsAsSent, ids);
         }
         else
         {
@@ -741,7 +751,7 @@ function completeOperations()
     
     updateDates();
     if (CONFIG_Operation_Mode == 1 && CONFIG_dont_reboot == 0) {
-        stopPPPD();
+        //stopPPPD();
         
         var date = new Date()
         aquariusTools.StopSIM908();
@@ -772,7 +782,7 @@ function completeOperations()
     }
     else if(CONFIG_Operation_Mode == 1 && CONFIG_dont_reboot == 1){
         log("Waiting for next execution", 2);
-        stopPPPD();
+        //stopPPPD();
         aquariusTools.StopSIM908();
     }
     else if(CONFIG_Operation_Mode == 0){
