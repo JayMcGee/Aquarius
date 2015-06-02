@@ -211,6 +211,7 @@ def checkIfOn():
 ######################################################
 def checkIfFix(datas):
     splitted = datas.split(",")
+    print "current fix time :" + str(splitted[5]) + ":"
     if len(splitted) >= 6 and splitted[5] != "0":
         ok = 1
     else:
