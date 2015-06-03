@@ -405,6 +405,7 @@ function getSensorReadingCallback(err, rows, fields) {
             ****/            
             if(Driver.indexOf("SIM908") > -1){
                 //stopPPPD()
+                log("Starting SIM908 and GPS", 2);
                 aquariusTools.StartSIM908();
                 aquariusTools.StartGPS();
             }
@@ -449,6 +450,7 @@ function getSensorReadingCallback(err, rows, fields) {
             }
             //Stop SIM908 device
             if(Driver.indexOf("SIM908") > -1){
+                log("Stopping SIM908 and GPS", 2);
                 aquariusTools.StopSIM908();
             }           
             /****
@@ -466,14 +468,17 @@ function getSensorReadingCallback(err, rows, fields) {
                     if (splittedStdOutput.length > rows[i].Position) {                      
                         var value;
                         //If the precision is not set as 0, round to precision
-                        if(rows[i].ValuePrecision == 0){
-                            value = splittedStdOutput[rows[i].Position];
-                        }
-                        else{
-                            value = splittedStdOutput[rows[i].Position];
+                        
+                        value = splittedStdOutput[rows[i].Position];
+                        
+                        if(Driver.indexOf("AtlasI2CDO") > -1 && rows[i].Position == 7)
+                            value = unpolluteValues(value);
+                        
+                        log("Value not rounded :" + value + ":", 2);
+                        if(rows[i].ValuePrecision > 0){
                             value = roundToX(Number(value), rows[i].ValuePrecision);
-                            
                         }
+                        
                         log("Inserting into database value : " + value + " " + rows[i].MeasureUnit, 2);
                         //Set data in the database
                         aquariusTools.setData(connection, value, rows[i].VirtualID, 0, t_Data_insertCallBack);  
@@ -491,6 +496,14 @@ function getSensorReadingCallback(err, rows, fields) {
             }           
         }
     }
+}
+
+function unpolluteValues(value){
+    log("Before recycling :" +value+":",2);
+    vale = (String(value)).substring(1, 5);
+    log("After recycling :" +vale+":",2);
+    return vale;
+    
 }
 
 /**
@@ -619,7 +632,10 @@ function createJSONfromDatabase(err, rows, fields) {
             var physicalname = rows[i].PhysicalName;         
             
             //Put data in an object
-            var JSON_sensorData = {'id': sensorsubunitid, 'physicalname': physicalname, 'measureunit' : measureunit, 'valuetype':"asis", 'value': value, 'datetime':datetime.toISOString().slice(0, 19).replace('T', ' ')};
+            //var for Dweet
+            //var JSON_sensorData = {'id': sensorsubunitid, 'physicalname': physicalname, 'measureunit' : measureunit, 'valuetype':"asis", 'value': value, 'datetime':datetime.toISOString().slice(0, 19).replace('T', ' ')};
+            //var for low data consumption
+            var JSON_sensorData = {'id': sensorsubunitid, 'valuetype':"asis", 'value': value, 'datetime':datetime.toISOString().slice(0, 19).replace('T', ' ')};
             log("JSON Sensor Data : " + JSON_sensorData, 3)
             
             //Push the data object into the event.data array
@@ -638,34 +654,9 @@ function createJSONfromDatabase(err, rows, fields) {
         if(sh.exec("ip addr | grep eth0").stdout.indexOf("DOWN") == -1){
             log("Ethernet is available, sending data",2);
             
-            aquariusTools.sendPostFile(JSONsession, "https://dweet.io:443/dweet/for/", "Aquarius", setIDsAsSent, ids);
+            //aquariusTools.sendPostFile(JSONsession, "https://dweet.io:443/dweet/for/", "Aquarius", setIDsAsSent, ids);
             aquariusTools.sendPost(message, CONFIG_Cloudia_Address, setIDsAsSent, ids);
         }
-        //Else try PPP connection through SIM908
-        /*
-        else if(CONFIG_APN !== null){
-            log("Trying PPP connection setup", 2);
-            aquariusTools.StartSIM908();
-            exec(CONFIG_APN, function (error, stdout, stderr) {});
-        
-            setTimeout(function(){
-                var testPPP = sh.exec("ifconfig | grep ppp0");
-                
-                if(testPPP.stdout.indexOf("ppp") > -1){
-                    log("PPP connection successful", 2);
-                    
-                    aquariusTools.sendPostFile(JSONsession, "https://dweet.io:443/dweet/for/", "Aquarius", setIDsAsSent, ids);
-                    aquariusTools.sendPost(message, CONFIG_Cloudia_Address, setIDsAsSent, ids);
-                }
-                else{
-                    log("Could not create ppp connection", 2);
-                    stopPPPD();
-                    aquariusTools.StopSIM908();
-                    completeOperations();
-                }
-            }, 10000);
-        }
-        */
         else if(CONFIG_APN !== null){
             log("Creating connection with SIM908", 2)   
             aquariusTools.StopSIM908();
@@ -719,7 +710,7 @@ function countDataSent(){
     log("Data count for dweet or cloudia", 1);
     DataSent_Count = DataSent_Count + 1;
     log("Data sent count == " + DataSent_Count, 1);
-    if(DataSent_Count > 1){
+    if(DataSent_Count > 0){
         DataSent_Count = 0;
         completeOperations();
     }
@@ -782,11 +773,12 @@ function completeOperations()
         }, 2000);
     }
     else if(CONFIG_Operation_Mode == 1 && CONFIG_dont_reboot == 1){
-        log("Waiting for next execution", 2);
+        
         //stopPPPD();
         aquariusTools.StopSIM908();
         if(led_Process !== null)
             led_Process.kill();
+        log("Waiting for next execution", 2);
     }
     else if(CONFIG_Operation_Mode == 0){
         log("Manual mode", 2);            

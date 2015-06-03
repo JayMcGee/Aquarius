@@ -521,10 +521,11 @@ module.exports = {
         var tries = 0;
         var result = 1;
         var CheckOn = sh.exec(driver + "checkIfOn");
+        CheckOn = sh.exec(driver + "checkIfOn");
         var PowerState;
         
         //console.log("Checking current state : " +  CheckOn.stdout);
-        
+        log("Stopping sim908", 2);
         if(CheckOn.stdout.indexOf("ON") > -1){
             //console.log("IS ON");
             result = 1;
@@ -567,6 +568,7 @@ module.exports = {
         var tries = 0;
         var result = 0;
         var CheckOn = sh.exec(driver + "checkIfOn");
+        CheckOn = sh.exec(driver + "checkIfOn");
         var PowerState;
         
         //console.log("Checking current state : " +  CheckOn.stdout);
@@ -713,6 +715,29 @@ module.exports = {
                 callback(null);
             }
         });
+    },
+    
+    SendAllDataToCloudia : function (connection, callback){
+        log("Selecting database", 3);
+        connection.query('USE `station_aquarius`;');
+        
+        sql = 'SELECT t_Data.data_value AS ReadValue, ' +
+            't_Data.idt_Data AS ID, ' +
+            't_Data.data_date AS ReadDate, ' +
+            't_VirtualSensor.cloudia_id AS CloudiaSubUnitID, ' +
+            't_PhysicalSensor.physical_id AS PhysicalID, ' +
+            't_PhysicalSensor.physical_name AS PhysicalName, ' +
+            't_VirtualSensor.virtual_measure_unit AS UnitType ' +
+            'FROM t_Data, t_VirtualSensor, t_PhysicalSensor ' +
+            'WHERE t_Data.data_t_virtual = t_VirtualSensor.virtual_id ' +
+            'and t_VirtualSensor.virtual_t_physical = t_PhysicalSensor.physical_id ' +
+            'ORDER BY t_VirtualSensor.cloudia_id, t_Data.data_date, t_VirtualSensor.cloudia_id ' + 
+            'INTO OUTFILE \'/tmp/export.csv\' ' + 
+            'FIELDS TERMINATED BY \',\' ' + 
+            'ENCLOSED BY \'\"\' ' + 
+            'LINES TERMINATED BY \'\n\';';
+        log(sql, 3);
+        return connection.query(sql, callback);
     }
 };
 
