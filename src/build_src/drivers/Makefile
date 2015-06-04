@@ -3,7 +3,7 @@ CFLAGS=-std=c++0x -c -Wall
 MAKE=make
 export DIR_EXEC=/var/lib/cloud9/Aquarius/exec/
 
-all: DHT22Driver OneWireDriver I2CDriver RTCDriver GPIODriver WatchdogDriver SIM908Driver
+all: DHT22Driver OneWireDriver I2CDriver RTCDriver GPIODriver SIM908Driver
 
 DHT22Driver: 
 	$(MAKE) -C DHT22
