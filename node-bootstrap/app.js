@@ -500,7 +500,7 @@ function getSensorReadingCallback(err, rows, fields) {
 
 function unpolluteValues(value){
     log("Before recycling :" +value+":",2);
-    vale = (String(value)).substring(1, 5);
+    vale = (String(value)).substring(1, String(value).length - 1);
     log("After recycling :" +vale+":",2);
     return vale;
     
@@ -776,8 +776,8 @@ function completeOperations()
         
         //stopPPPD();
         aquariusTools.StopSIM908();
-        if(led_Process !== null)
-            led_Process.kill();
+        //if(led_Process !== null)
+            //led_Process.kill();
         log("Waiting for next execution", 2);
     }
     else if(CONFIG_Operation_Mode == 0){
