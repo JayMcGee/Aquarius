@@ -131,10 +131,10 @@ $("#saveButton" ).click(function() {
 	        }
 	        else if (name == "LAST_KNOWN_DATE")
 	        {
-	            if($("#dateInput").html() !== value)
+	            if(localDate !== value)
 	            {
-	                sendConfig(name,$("#dateInput").html())
-	                dbRows[i].Value = $("#dateInput").html()
+	                sendConfig(name,localDate);
+	                dbRows[i].Value = localDate;
 	            }
 	        }
 	    }

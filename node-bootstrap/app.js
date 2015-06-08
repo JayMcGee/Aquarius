@@ -672,7 +672,7 @@ function createJSONfromDatabase(err, rows, fields) {
             //aquariusTools.sendPostFile(JSONsession, "https://dweet.io:443/dweet/for/", "Aquarius", setIDsAsSent, ids);
             aquariusTools.sendPost(message, CONFIG_Cloudia_Address, setIDsAsSent, ids);
         }
-        else if(CONFIG_APN !== null){
+        else if(CONFIG_APN !== null && CONFIG_Operation_Mode){
             log("Creating connection with SIM908", 2)   
             aquariusTools.StopSIM908();
             aquariusTools.StartSIM908();
