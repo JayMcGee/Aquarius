@@ -66,19 +66,7 @@ function assignConfigurationValues(err, rows, fields) {
         }
     }
 
-    //Get current mode of operation
-    var currentMode = sh.exec(modeSwitchExec).stdout;
-    log("Switch is  : " + currentMode, 2);
-
-    //Set current operation mode with switch state
-    if (currentMode.indexOf("HIGH") > -1) {
-        CONFIG_Operation_Mode = 1;
-        log("Operation mode is  : AUTO", 2);
-    }
-    else {
-        CONFIG_Operation_Mode = 0;
-        log("Operation mode is  : MANUAL", 2);
-    }
+    
 }
 
 /**
