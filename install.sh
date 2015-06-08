@@ -2,7 +2,7 @@
 apt-get update; apt-get install build-essential python-dev python-setuptools python-pip python-smbus mysql-server mysql-client phpmyadmin
 echo "Include /etc/phpmyadmin/apache.conf" >> /etc/apache2/apache2.conf
 cd /var/lib/cloud9/Aquarius/db
-mysql -u root -p -h localhost < station_aquarius_9_mai_final.sql
+mysql -u root -p -h localhost < station_aquarius_4_Juin.sql
 echo "Installing npm packages ..."
 cd /var/lib/cloud9/Aquarius/node-bootstrap
 pwd
