@@ -25,7 +25,7 @@ SET time_zone = "+00:00";
 --
 -- Table structure for table `t_Config`
 --
-
+USE station_aquarius;
 CREATE TABLE IF NOT EXISTS `t_Config` (
   `config_id` int(11) NOT NULL AUTO_INCREMENT,
   `config_key_name` varchar(45) NOT NULL,
