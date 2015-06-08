@@ -327,11 +327,26 @@ function assignConfigurationValues(err, rows, fields){
         }
         else{
             exec(keepLED, function(){});
+            sendAllDataUnsent();
             completeOperations();
         }
 
     });  
 }
+
+/**
+ *
+ *
+ *
+ */
+ function sendAllDataUnsent(){
+    log("Sending all unsent data", 2);
+    aquariusTools.SendAllDataToCloudia(connection, function(err, rows, fields){
+        for (var i = 0; i <= rows.length; i = i + 30) {
+            createJSONfromDatabase(0, rows.slice(i, i + 29), 0);
+        };        
+    });
+ }
 
 /**
  * @brief Callback for configuration setting
@@ -666,7 +681,8 @@ function createJSONfromDatabase(err, rows, fields) {
         else
         {
             log("Could not create connection", 2);
-            completeOperations();
+            if(CONFIG_Operation_Mode)
+                completeOperations();
         }
     }
 }
@@ -712,7 +728,8 @@ function countDataSent(){
     log("Data sent count == " + DataSent_Count, 1);
     if(DataSent_Count > 0){
         DataSent_Count = 0;
-        completeOperations();
+        if(CONFIG_Operation_Mode)
+            completeOperations();
     }
 }
 
