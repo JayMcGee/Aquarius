@@ -88,7 +88,7 @@ function sendConfig(KeyName,Value){
 $("#saveButton" ).click(function() {
     
      var localDate = picker.getLocalDate()
-     alert(localDate)
+     //alert(localDate)
      
      for ( var i = 0; i < dbRows.length; i++)
 	    {

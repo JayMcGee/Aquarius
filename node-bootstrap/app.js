@@ -1080,8 +1080,11 @@ function startServer(){
         });
         
         //When the service is requested to restart
-        socket.on('restartService',function()
+        socket.on('restartService',function(data)
         {
+           var setSysDate = sh.exec('date -s "' + data.DateNow + '"').stdout;
+           log("New date Set :" + setSysDate,2);
+           log("Restarting service now",2);
            var service = sh.exec("systemctl restart aquarius.service").stdout; 
         });
         

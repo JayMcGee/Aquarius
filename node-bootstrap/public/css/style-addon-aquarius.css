@@ -1,3 +1,6 @@
+.bootstrap-datetimepicker-widget{
+	z-index:1151 !important;
+}
 .map{
 	height:400px;
 }

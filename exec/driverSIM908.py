@@ -211,6 +211,7 @@ def checkIfOn():
 ######################################################
 def checkIfFix(datas):
     splitted = datas.split(",")
+    print "current fix time :" + str(splitted[5]) + ":"
     if len(splitted) >= 6 and splitted[5] != "0":
         ok = 1
     else:
@@ -267,12 +268,12 @@ def sendJSON(address, apn, user, password, path):
                         ser.write(send_post + "\r")
                         time.sleep(30)
                         results = ser.readlines()
-                        print results
+                        #print results
                         #results = writeAndReadSIM908(send_post)
                         ser.write("AT+HTTPREAD=0,10000" + "\r")
                         time.sleep(2)
                         results = ser.readlines()
-                        print results
+                        #print results
                         for result in results:
                             if "Successfully parsed JSON" in result:
                                     dataTransmissionOk = 1
